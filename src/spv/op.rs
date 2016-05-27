@@ -761,7 +761,7 @@ pub struct OpLoopMerge(pub OpId, pub OpId, pub LoopControl);
 pub struct OpSelectionMerge(pub OpId, pub SelectionControl);
 
 #[derive(Debug, PartialEq)]
-pub struct OpLabel(pub OpId);
+pub struct OpLabel(pub ResultId);
 
 #[derive(Debug, PartialEq)]
 pub struct OpBranch(pub OpId);

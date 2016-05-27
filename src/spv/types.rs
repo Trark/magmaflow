@@ -472,7 +472,7 @@ pub struct MemoryAccess {
     non_temporal: bool,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Default, PartialEq)]
 pub struct FunctionControl {
     pub inline: bool,
     pub dont_inline: bool,
