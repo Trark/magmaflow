@@ -10,12 +10,12 @@ pub use self::op::*;
 pub struct RawModule {
     pub generator: Generator,
     pub bound: Word,
-    pub instructions: Vec<Op>,
+    pub instructions: Vec<Core>,
 }
 
-/// Enumeration of all instructions (incomplete)
+/// Enumeration of all core nstructions (incomplete)
 #[derive(Debug, PartialEq)]
-pub enum Op {
+pub enum Core {
     OpNop(OpNop),
     OpSource(OpSource),
     OpName(OpName),
