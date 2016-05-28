@@ -46,10 +46,21 @@ impl Display for Core {
             Core::OpTypeInt(ref op) => Display::fmt(op, f),
             Core::OpTypeFloat(ref op) => Display::fmt(op, f),
             Core::OpTypeVector(ref op) => Display::fmt(op, f),
+            Core::OpTypeMatrix(ref op) => Display::fmt(op, f),
+            Core::OpTypeImage(ref op) => Display::fmt(op, f),
+            Core::OpTypeSampler(ref op) => Display::fmt(op, f),
+            Core::OpTypeSampledImage(ref op) => Display::fmt(op, f),
+            Core::OpTypeArray(ref op) => Display::fmt(op, f),
             Core::OpTypeRuntimeArray(ref op) => Display::fmt(op, f),
             Core::OpTypeStruct(ref op) => Display::fmt(op, f),
+            Core::OpTypeOpaque(ref op) => Display::fmt(op, f),
             Core::OpTypePointer(ref op) => Display::fmt(op, f),
             Core::OpTypeFunction(ref op) => Display::fmt(op, f),
+            Core::OpTypeEvent(ref op) => Display::fmt(op, f),
+            Core::OpTypeDeviceEvent(ref op) => Display::fmt(op, f),
+            Core::OpTypeQueue(ref op) => Display::fmt(op, f),
+            Core::OpTypePipe(ref op) => Display::fmt(op, f),
+            Core::OpTypeForwardPointer(ref op) => Display::fmt(op, f),
             Core::OpConstant(ref op) => Display::fmt(op, f),
             Core::OpConstantComposite(ref op) => Display::fmt(op, f),
             Core::OpFunction(ref op) => Display::fmt(op, f),
@@ -449,23 +460,171 @@ impl Display for OpTypeVector {
     }
 }
 
-impl Display for StorageClass {
+
+
+impl Display for OpTypeMatrix {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeMatrix{}{}",
+               Result(&self.result_id),
+               Arg(&self.column_type),
+               Arg(&self.column_count))
+    }
+}
+
+impl Display for Dim {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         let name = match *self {
-            StorageClass::UniformConstant => "UniformConstant",
-            StorageClass::Input => "Input",
-            StorageClass::Uniform => "Uniform",
-            StorageClass::Output => "Output",
-            StorageClass::Workgroup => "Workgroup",
-            StorageClass::CrossWorkgroup => "CrossWorkgroup",
-            StorageClass::Private => "Private",
-            StorageClass::Function => "Function",
-            StorageClass::Generic => "Generic",
-            StorageClass::PushConstant => "PushConstant",
-            StorageClass::AtomicCounter => "AtomicCounter",
-            StorageClass::Image => "Image",
+            Dim::Tex1D => "1D",
+            Dim::Tex2D => "2D",
+            Dim::Tex3D => "3D",
+            Dim::Cube => "Cube",
+            Dim::Rect => "Rect",
+            Dim::Buffer => "Buffer",
+            Dim::SubpassData => "SubpassData",
         };
         write!(f, "{}", name)
+    }
+}
+
+impl Display for DepthStatus {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            DepthStatus::NotDepth => 0,
+            DepthStatus::Depth => 1,
+            DepthStatus::NoIndication => 2,
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl Display for Arrayed {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            Arrayed::False => 0,
+            Arrayed::True => 1,
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl Display for MS {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            MS::Single => 0,
+            MS::Multi => 1,
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl Display for SampledStatus {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            SampledStatus::RuntimeChoice => 0,
+            SampledStatus::WithSampler => 1,
+            SampledStatus::WithoutSampler => 2,
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl Display for ImageFormat {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            ImageFormat::Unknown => "Unknown",
+            ImageFormat::Rgba32f => "Rgba32f",
+            ImageFormat::Rgba16f => "Rgba16f",
+            ImageFormat::R32f => "R32f",
+            ImageFormat::Rgba8 => "Rgba8",
+            ImageFormat::Rgba8Snorm => "Rgba8Snorm",
+            ImageFormat::Rg32f => "Rg32f",
+            ImageFormat::Rg16f => "Rg16f",
+            ImageFormat::R11fG11fB10f => "R11fG11fB10f",
+            ImageFormat::R16f => "R16f",
+            ImageFormat::Rgba16 => "Rgba16",
+            ImageFormat::Rgb10A2 => "Rgb10A2",
+            ImageFormat::Rg16 => "Rg16",
+            ImageFormat::Rg8 => "Rg8",
+            ImageFormat::R16 => "R16",
+            ImageFormat::R8 => "R8",
+            ImageFormat::Rgba16Snorm => "Rgba16Snorm",
+            ImageFormat::Rg16Snorm => "Rg16Snorm",
+            ImageFormat::Rg8Snorm => "Rg8Snorm",
+            ImageFormat::R16Snorm => "R16Snorm",
+            ImageFormat::R8Snorm => "R8Snorm",
+            ImageFormat::Rgba32i => "Rgba32i",
+            ImageFormat::Rgba16i => "Rgba16i",
+            ImageFormat::Rgba8i => "Rgba8i",
+            ImageFormat::R32i => "R32i",
+            ImageFormat::Rg32i => "Rg32i",
+            ImageFormat::Rg16i => "Rg16i",
+            ImageFormat::Rg8i => "Rg8i",
+            ImageFormat::R16i => "R16i",
+            ImageFormat::R8i => "R8i",
+            ImageFormat::Rgba32ui => "Rgba32ui",
+            ImageFormat::Rgba16ui => "Rgba16ui",
+            ImageFormat::Rgba8ui => "Rgba8ui",
+            ImageFormat::Rgb10a2ui => "Rgb10a2ui",
+            ImageFormat::Rg32ui => "Rg32ui",
+            ImageFormat::Rg16ui => "Rg16ui",
+            ImageFormat::Rg8ui => "Rg8ui",
+            ImageFormat::R16ui => "R16ui",
+            ImageFormat::R8ui => "R8ui",
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl Display for AccessQualifier {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            AccessQualifier::ReadOnly => "ReadOnly",
+            AccessQualifier::WriteOnly => "WriteOnly",
+            AccessQualifier::ReadWrite => "ReadWrite",
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl Display for OpTypeImage {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeImage{}{}{}{}{}{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.sampled_type),
+               Arg(&self.dim),
+               Arg(&self.depth),
+               Arg(&self.arrayed),
+               Arg(&self.ms),
+               Arg(&self.sampled),
+               Arg(&self.format),
+               ArgOpt(&self.access_qualifier))
+    }
+}
+
+impl Display for OpTypeSampler {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeSampler", Result(&self.result_id))
+    }
+}
+
+impl Display for OpTypeSampledImage {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeSampledImage{}",
+               Result(&self.result_id),
+               Arg(&self.image_type))
+    }
+}
+
+impl Display for OpTypeArray {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeArray{}{}",
+               Result(&self.result_id),
+               Arg(&self.element_type),
+               Arg(&self.length))
     }
 }
 
@@ -487,6 +646,35 @@ impl Display for OpTypeStruct {
     }
 }
 
+impl Display for OpTypeOpaque {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeOpaque{}",
+               Result(&self.result_id),
+               ArgString(&self.name))
+    }
+}
+
+impl Display for StorageClass {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            StorageClass::UniformConstant => "UniformConstant",
+            StorageClass::Input => "Input",
+            StorageClass::Uniform => "Uniform",
+            StorageClass::Output => "Output",
+            StorageClass::Workgroup => "Workgroup",
+            StorageClass::CrossWorkgroup => "CrossWorkgroup",
+            StorageClass::Private => "Private",
+            StorageClass::Function => "Function",
+            StorageClass::Generic => "Generic",
+            StorageClass::PushConstant => "PushConstant",
+            StorageClass::AtomicCounter => "AtomicCounter",
+            StorageClass::Image => "Image",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 impl Display for OpTypePointer {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
@@ -504,6 +692,45 @@ impl Display for OpTypeFunction {
                Result(&self.result_id),
                Arg(&self.return_type),
                ArgList(&self.parameter_types))
+    }
+}
+
+impl Display for OpTypeEvent {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeEvent", Result(&self.result_id))
+    }
+}
+
+impl Display for OpTypeDeviceEvent {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeDeviceEvent", Result(&self.result_id))
+    }
+}
+
+impl Display for OpTypeReserveId {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeReserveId", Result(&self.result_id))
+    }
+}
+
+impl Display for OpTypeQueue {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeQueue", Result(&self.result_id))
+    }
+}
+
+impl Display for OpTypePipe {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypePipe", Result(&self.result_id))
+    }
+}
+
+impl Display for OpTypeForwardPointer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeForwardPointer{}",
+               Arg(&self.pointer_type),
+               Arg(&self.storage_class))
     }
 }
 

@@ -163,7 +163,7 @@ pub struct OpTypeVector {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeMatrix {
-    pub result_type: ResultId,
+    pub result_id: ResultId,
     pub column_type: OpId,
     pub column_count: u32,
 }
