@@ -5,9 +5,12 @@ pub use self::types::*;
 mod op;
 pub use self::op::*;
 
+mod dis;
+
 /// Raw list of SpirV instructions
 #[derive(Debug, PartialEq)]
 pub struct RawModule {
+    pub version: Version,
     pub generator: Generator,
     pub bound: Word,
     pub instructions: Vec<Core>,

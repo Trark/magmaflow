@@ -53,7 +53,7 @@ pub struct OpGroupMemberDecorate(pub OpId, pub Vec<(OpId, MemberIndex)>);
 pub struct OpExtension(pub LitString);
 
 #[derive(Debug, PartialEq)]
-pub struct OpExtInstImport(pub OpId, pub LitString);
+pub struct OpExtInstImport(pub ResultId, pub LitString);
 
 #[derive(Debug, PartialEq)]
 pub struct OpExtInst(pub OpId, pub ResultId, pub OpId);
@@ -77,16 +77,16 @@ pub struct OpTypeVoid(pub ResultId);
 pub struct OpTypeBool(pub ResultId);
 
 #[derive(Debug, PartialEq)]
-pub struct OpTypeInt(pub ResultId, pub LitNumber, pub LitNumber);
+pub struct OpTypeInt(pub ResultId, pub u32, pub u32);
 
 #[derive(Debug, PartialEq)]
-pub struct OpTypeFloat(pub ResultId, pub LitNumber);
+pub struct OpTypeFloat(pub ResultId, pub u32);
 
 #[derive(Debug, PartialEq)]
-pub struct OpTypeVector(pub ResultId, pub OpId, pub LitNumber);
+pub struct OpTypeVector(pub ResultId, pub OpId, pub u32);
 
 #[derive(Debug, PartialEq)]
-pub struct OpTypeMatrix(pub ResultId, pub OpId, pub LitNumber);
+pub struct OpTypeMatrix(pub ResultId, pub OpId, pub u32);
 
 #[derive(Debug, PartialEq)]
 pub struct OpTypeImage(pub ResultId,

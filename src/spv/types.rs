@@ -19,6 +19,9 @@ pub enum Literal {
 }
 
 #[derive(Debug, PartialEq)]
+pub struct Version(pub u8, pub u8);
+
+#[derive(Debug, PartialEq)]
 pub struct Generator {
     pub tool: Tool,
     pub version: u16,
@@ -90,13 +93,13 @@ pub struct Column(pub u32);
 #[derive(Debug, PartialEq)]
 pub enum Decoration {
     RelaxedPrecision,
-    SpecId(LitNumber),
+    SpecId(u32),
     Block,
     BufferBlock,
     RowMajor,
     ColMajor,
-    ArrayStride(LitNumber),
-    MatrixStride(LitNumber),
+    ArrayStride(u32),
+    MatrixStride(u32),
     GlslShared,
     GlslPacked,
     CPacked,
@@ -116,22 +119,22 @@ pub enum Decoration {
     NonReadable,
     Uniform,
     SaturatedConversion,
-    Stream(LitNumber),
-    Location(LitNumber),
-    Component(LitNumber),
-    Index(LitNumber),
-    Binding(LitNumber),
-    DescriptorSet(LitNumber),
-    Offset(LitNumber),
-    XfbBuffer(LitNumber),
-    XfbStride(LitNumber),
+    Stream(u32),
+    Location(u32),
+    Component(u32),
+    Index(u32),
+    Binding(u32),
+    DescriptorSet(u32),
+    Offset(u32),
+    XfbBuffer(u32),
+    XfbStride(u32),
     FuncParamAttr(FunctionParameterAttribute),
     FpRoundingMode(FpRoundingMode),
     FpFastMathMode(FpFastMathMode),
     LinkageAttributes(LitString, LinkageType),
     NoContraction,
-    InputAttachmentIndex(LitNumber),
-    Alignment(LitNumber),
+    InputAttachmentIndex(u32),
+    Alignment(u32),
 }
 
 #[derive(Debug, PartialEq)]
@@ -209,7 +212,7 @@ pub enum ExecutionModel {
 
 #[derive(Debug, PartialEq)]
 pub enum ExecutionMode {
-    Invocations(LitNumber),
+    Invocations(u32),
     SpacingEqual,
     SpacingFractionalEven,
     SpacingFractionalOdd,
@@ -225,8 +228,8 @@ pub enum ExecutionMode {
     DepthGreater,
     DepthLess,
     DepthUnchanged,
-    LocalSize(LitNumber, LitNumber, LitNumber),
-    LocalSizeHint(LitNumber, LitNumber, LitNumber),
+    LocalSize(u32, u32, u32),
+    LocalSizeHint(u32, u32, u32),
     InputPoints,
     InputLines,
     InputLinesAdjacency,
@@ -234,7 +237,7 @@ pub enum ExecutionMode {
     InputTrianglesAdjacency,
     Quads,
     Isolines,
-    OutputVerticies(LitNumber),
+    OutputVerticies(u32),
     OutputPoints,
     OutputLineStrip,
     OutputTriangleStrip,

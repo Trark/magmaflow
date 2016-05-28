@@ -7,7 +7,8 @@ pub enum ReadError {
     UnexpectedEndOfStream,
     UnexpectedStreamAlignment,
     BadMagic,
-    UnknownVersion(Word),
+    UnknownVersionBytes(u8, u8, u8, u8),
+    UnknownVersion(Version),
     UnknownReservedHeaderWord4,
     UnknownOp(u16, u16),
     WrongWordCountForOp,
@@ -45,11 +46,19 @@ pub fn read_module<'a>(data: &'a [u8]) -> ReadResult<RawModule> {
         _ => return Err(ReadError::BadMagic),
     }
 
-    let version = try!(stream.read_word());
+    let ver_word = try!(stream.read_word());
+    let ver_high = (ver_word >> 24) as u8;
+    let ver_major = ((ver_word >> 16) & 0xF) as u8;
+    let ver_minor = ((ver_word >> 8) & 0xF) as u8;
+    let ver_low = (ver_word & 0xF) as u8;
+    let version = match (ver_high, ver_major, ver_minor, ver_low) {
+        (0, 1, 0, 0) => Version(ver_major, ver_minor),
+        (v3, v2, v1, v0) => return Err(ReadError::UnknownVersionBytes(v3, v2, v1, v0)),
+    };
     match version {
-        0x10000 => {}
+        Version(1, 0) => {}
         v => return Err(ReadError::UnknownVersion(v)),
-    }
+    };
 
     let generator_word = try!(stream.read_word());
     let generator_id = (generator_word >> 16) as u16;
@@ -89,6 +98,7 @@ pub fn read_module<'a>(data: &'a [u8]) -> ReadResult<RawModule> {
     }
 
     Ok(RawModule {
+        version: version,
         generator: generator,
         bound: bound,
         instructions: instructions,
@@ -230,11 +240,6 @@ fn read_op_id_list(stream: &mut InstructionMemory) -> ReadResult<Vec<OpId>> {
     Ok(ids)
 }
 
-fn read_lit_number_word(stream: &mut InstructionMemory) -> ReadResult<LitNumber> {
-    let word = try!(stream.read_next());
-    Ok(vec![word])
-}
-
 fn read_lit_number_u32(stream: &mut InstructionMemory) -> ReadResult<u32> {
     let word = try!(stream.read_next());
     Ok(word)
@@ -302,7 +307,7 @@ fn read_op_ext_inst_import(stream: &mut InstructionMemory) -> ReadResult<Core> {
     if stream.get_word_count() < 3 {
         return Err(ReadError::WrongWordCountForOp);
     }
-    let result_id = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
     let name = try!(read_string_literal(stream));
     Ok(Core::OpExtInstImport(OpExtInstImport(result_id, name)))
 }
@@ -370,7 +375,7 @@ fn read_op_execution_mode(stream: &mut InstructionMemory) -> ReadResult<Core> {
     let execution_mode_id = try!(stream.read_next());
     let mode = match execution_mode_id {
         0 => {
-            let num = try!(read_lit_number_word(stream));
+            let num = try!(read_lit_number_u32(stream));
             ExecutionMode::Invocations(num)
         }
         1 => ExecutionMode::SpacingEqual,
@@ -389,15 +394,15 @@ fn read_op_execution_mode(stream: &mut InstructionMemory) -> ReadResult<Core> {
         15 => ExecutionMode::DepthLess,
         16 => ExecutionMode::DepthUnchanged,
         17 => {
-            let x = try!(read_lit_number_word(stream));
-            let y = try!(read_lit_number_word(stream));
-            let z = try!(read_lit_number_word(stream));
+            let x = try!(read_lit_number_u32(stream));
+            let y = try!(read_lit_number_u32(stream));
+            let z = try!(read_lit_number_u32(stream));
             ExecutionMode::LocalSize(x, y, z)
         }
         18 => {
-            let x = try!(read_lit_number_word(stream));
-            let y = try!(read_lit_number_word(stream));
-            let z = try!(read_lit_number_word(stream));
+            let x = try!(read_lit_number_u32(stream));
+            let y = try!(read_lit_number_u32(stream));
+            let z = try!(read_lit_number_u32(stream));
             ExecutionMode::LocalSizeHint(x, y, z)
         }
         19 => ExecutionMode::InputPoints,
@@ -408,7 +413,7 @@ fn read_op_execution_mode(stream: &mut InstructionMemory) -> ReadResult<Core> {
         24 => ExecutionMode::Quads,
         25 => ExecutionMode::Isolines,
         26 => {
-            let num = try!(read_lit_number_word(stream));
+            let num = try!(read_lit_number_u32(stream));
             ExecutionMode::OutputVerticies(num)
         }
         27 => ExecutionMode::OutputPoints,
@@ -512,8 +517,8 @@ fn read_op_type_int(stream: &mut InstructionMemory) -> ReadResult<Core> {
         return Err(ReadError::WrongWordCountForOp);
     }
     let result_id = try!(read_result_id(stream));
-    let width = try!(read_lit_number_word(stream));
-    let signedness = try!(read_lit_number_word(stream));
+    let width = try!(read_lit_number_u32(stream));
+    let signedness = try!(read_lit_number_u32(stream));
     Ok(Core::OpTypeInt(OpTypeInt(result_id, width, signedness)))
 }
 
@@ -522,7 +527,7 @@ fn read_op_type_float(stream: &mut InstructionMemory) -> ReadResult<Core> {
         return Err(ReadError::WrongWordCountForOp);
     }
     let result_id = try!(read_result_id(stream));
-    let width = try!(read_lit_number_word(stream));
+    let width = try!(read_lit_number_u32(stream));
     Ok(Core::OpTypeFloat(OpTypeFloat(result_id, width)))
 }
 
@@ -532,7 +537,7 @@ fn read_op_type_vector(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }
     let result_id = try!(read_result_id(stream));
     let component_type = try!(read_op_id(stream));
-    let count = try!(read_lit_number_word(stream));
+    let count = try!(read_lit_number_u32(stream));
     Ok(Core::OpTypeVector(OpTypeVector(result_id, component_type, count)))
 }
 
@@ -711,13 +716,13 @@ fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
     let decorate_id = try!(stream.read_next());
     let decorate = match decorate_id {
         0 => Decoration::RelaxedPrecision,
-        1 => Decoration::SpecId(try!(read_lit_number_word(stream))),
+        1 => Decoration::SpecId(try!(read_lit_number_u32(stream))),
         2 => Decoration::Block,
         3 => Decoration::BufferBlock,
         4 => Decoration::RowMajor,
         5 => Decoration::ColMajor,
-        6 => Decoration::ArrayStride(try!(read_lit_number_word(stream))),
-        7 => Decoration::MatrixStride(try!(read_lit_number_word(stream))),
+        6 => Decoration::ArrayStride(try!(read_lit_number_u32(stream))),
+        7 => Decoration::MatrixStride(try!(read_lit_number_u32(stream))),
         8 => Decoration::GlslShared,
         9 => Decoration::GlslPacked,
         10 => Decoration::CPacked,
@@ -737,15 +742,15 @@ fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
         25 => Decoration::NonReadable,
         26 => Decoration::Uniform,
         28 => Decoration::SaturatedConversion,
-        29 => Decoration::Stream(try!(read_lit_number_word(stream))),
-        30 => Decoration::Location(try!(read_lit_number_word(stream))),
-        31 => Decoration::Component(try!(read_lit_number_word(stream))),
-        32 => Decoration::Index(try!(read_lit_number_word(stream))),
-        33 => Decoration::Binding(try!(read_lit_number_word(stream))),
-        34 => Decoration::DescriptorSet(try!(read_lit_number_word(stream))),
-        35 => Decoration::Offset(try!(read_lit_number_word(stream))),
-        36 => Decoration::XfbBuffer(try!(read_lit_number_word(stream))),
-        37 => Decoration::XfbStride(try!(read_lit_number_word(stream))),
+        29 => Decoration::Stream(try!(read_lit_number_u32(stream))),
+        30 => Decoration::Location(try!(read_lit_number_u32(stream))),
+        31 => Decoration::Component(try!(read_lit_number_u32(stream))),
+        32 => Decoration::Index(try!(read_lit_number_u32(stream))),
+        33 => Decoration::Binding(try!(read_lit_number_u32(stream))),
+        34 => Decoration::DescriptorSet(try!(read_lit_number_u32(stream))),
+        35 => Decoration::Offset(try!(read_lit_number_u32(stream))),
+        36 => Decoration::XfbBuffer(try!(read_lit_number_u32(stream))),
+        37 => Decoration::XfbStride(try!(read_lit_number_u32(stream))),
         38 => Decoration::FuncParamAttr(try!(read_func_param_attr(stream))),
         39 => Decoration::FpRoundingMode(try!(read_fp_rounding_mode(stream))),
         40 => Decoration::FpFastMathMode(try!(read_fp_fast_math_mode(stream))),
@@ -755,8 +760,8 @@ fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
             Decoration::LinkageAttributes(name, linkage_type)
         }
         42 => Decoration::NoContraction,
-        43 => Decoration::InputAttachmentIndex(try!(read_lit_number_word(stream))),
-        44 => Decoration::Alignment(try!(read_lit_number_word(stream))),
+        43 => Decoration::InputAttachmentIndex(try!(read_lit_number_u32(stream))),
+        44 => Decoration::Alignment(try!(read_lit_number_u32(stream))),
         id => return Err(ReadError::UnknownDecoration(id)),
     };
     Ok(Core::OpDecorate(OpDecorate(id, decorate)))
