@@ -339,7 +339,13 @@ pub struct OpVariable {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpImageTexelPointer(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId);
+pub struct OpImageTexelPointer {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub image: OpId,
+    pub coordinate: OpId,
+    pub sample: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpLoad {
@@ -357,10 +363,19 @@ pub struct OpStore {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpCopyMemory(pub OpId, pub OpId, pub Option<MemoryAccess>);
+pub struct OpCopyMemory {
+    pub target: OpId,
+    pub source: OpId,
+    pub memory_access: Option<MemoryAccess>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpCopyMemorySized(pub OpId, pub OpId, pub OpId, pub Option<MemoryAccess>);
+pub struct OpCopyMemorySized {
+    pub target: OpId,
+    pub source: OpId,
+    pub size: OpId,
+    pub memory_access: Option<MemoryAccess>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpAccessChain {
@@ -371,19 +386,45 @@ pub struct OpAccessChain {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpInBoundsAccessChain(pub OpId, pub ResultId, pub OpId, pub Vec<OpId>);
+pub struct OpInBoundsAccessChain {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub base: OpId,
+    pub indexes: Vec<OpId>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpPtrAccessChain(pub OpId, pub ResultId, pub OpId, pub OpId, pub Vec<OpId>);
+pub struct OpPtrAccessChain {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub base: OpId,
+    pub element: OpId,
+    pub indexes: Vec<OpId>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpArrayLength(pub OpId, pub ResultId, pub OpId, pub MemberIndex);
+pub struct OpArrayLength {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub structure: OpId,
+    pub array_member: MemberIndex,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpGenericPtrMemSemantics(pub OpId, pub ResultId, pub OpId);
+pub struct OpGenericPtrMemSemantics {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub pointer: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpInBoundsPtrAccessChain(pub OpId, pub ResultId, pub OpId, pub OpId, pub Vec<OpId>);
+pub struct OpInBoundsPtrAccessChain {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub base: OpId,
+    pub element: OpId,
+    pub indexes: Vec<OpId>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFunction {
@@ -403,10 +444,20 @@ pub struct OpFunctionParameter {
 pub struct OpFunctionEnd;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFunctionCall(pub OpId, pub ResultId, pub OpId, pub Vec<OpId>);
+pub struct OpFunctionCall {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub function: OpId,
+    pub arguments: Vec<OpId>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSampledImage(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSampledImage {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub image: OpId,
+    pub sampler: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpImageSampledImplicitLod(pub OpId,
@@ -604,13 +655,25 @@ pub struct OpImageSparseTexelsResident(pub OpId, pub ResultId, pub OpId);
 pub struct OpImageSparseRead(pub OpId, pub ResultId, pub OpId, pub OpId, pub Option<ImageOperands>);
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpConvertFToU(pub OpId, pub ResultId, pub OpId);
+pub struct OpConvertFToU {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub float_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpConvertFToS(pub OpId, pub ResultId, pub OpId);
+pub struct OpConvertFToS {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub float_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpConvertSToF(pub OpId, pub ResultId, pub OpId);
+pub struct OpConvertSToF {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub signed_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConvertUToF {
@@ -620,82 +683,199 @@ pub struct OpConvertUToF {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpUConvert(pub OpId, pub ResultId, pub OpId);
+pub struct OpUConvert {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub unsigned_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSConvert(pub OpId, pub ResultId, pub OpId);
+pub struct OpSConvert {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub signed_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFConvert(pub OpId, pub ResultId, pub OpId);
+pub struct OpFConvert {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub float_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpQuantizeToF16(pub OpId, pub ResultId, pub OpId);
+pub struct OpQuantizeToF16 {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpConvertPtrToU(pub OpId, pub ResultId, pub OpId);
+pub struct OpConvertPtrToU {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub pointer: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSatConvertSToU(pub OpId, pub ResultId, pub OpId);
+pub struct OpSatConvertSToU {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub signed_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSatConvertUToS(pub OpId, pub ResultId, pub OpId);
+pub struct OpSatConvertUToS {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub unsigned_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpConvertUToPtr(pub OpId, pub ResultId, pub OpId);
+pub struct OpConvertUToPtr {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub integer_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpPtrCastToGeneric(pub OpId, pub ResultId, pub OpId);
+pub struct OpPtrCastToGeneric {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub pointer: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpGenericCastToPtr(pub OpId, pub ResultId, pub OpId);
+pub struct OpGenericCastToPtr {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub pointer: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpGenericCastToPtrExplicit(pub OpId, pub ResultId, pub OpId, pub StorageClass);
+pub struct OpGenericCastToPtrExplicit {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub pointer: OpId,
+    pub storage_class: StorageClass,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpBitcast(pub OpId, pub ResultId, pub OpId);
+pub struct OpBitcast {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpVectorExtractDynamic(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpVectorExtractDynamic {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub vector: OpId,
+    pub index: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpVectorInsertDynamic(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId);
+pub struct OpVectorInsertDynamic {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub vector: OpId,
+    pub component: OpId,
+    pub index: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpVectorShuffle(pub OpId, pub ResultId, pub OpId, pub OpId, pub Vec<MemberIndex>);
+pub struct OpVectorShuffle {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+    pub components: Vec<MemberIndex>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpCompositeConstruct(pub OpId, pub ResultId, pub OpId, pub Vec<OpId>);
+pub struct OpCompositeConstruct {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub constituents: Vec<MemberIndex>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpCompositeExtract(pub OpId, pub ResultId, pub OpId, pub Vec<MemberIndex>);
+pub struct OpCompositeExtract {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub composite: OpId,
+    pub indexes: Vec<MemberIndex>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpCompositeInsert(pub OpId, pub ResultId, pub OpId, pub OpId, pub Vec<MemberIndex>);
+pub struct OpCompositeInsert {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub object: OpId,
+    pub composite: OpId,
+    pub indexes: Vec<MemberIndex>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpCopyObject(pub OpId, pub ResultId, pub OpId);
+pub struct OpCopyObject {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpTranspose(pub OpId, pub ResultId, pub OpId);
+pub struct OpTranspose {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub matrix: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSNegate(pub OpId, pub ResultId, pub OpId);
+pub struct OpSNegate {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFNegate(pub OpId, pub ResultId, pub OpId);
+pub struct OpFNegate {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpIAdd(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpIAdd {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFAdd(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFAdd {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpISub(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpISub {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFSub(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFSub {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpIMul {
@@ -706,85 +886,219 @@ pub struct OpIMul {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFMul(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFMul {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpUDiv(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpUDiv {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSDiv(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSDiv {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFDiv(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFDiv {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpUMod(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpUMod {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSRem(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSRem {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSMod(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSMod {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFRem(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFRem {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFMod(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFMod {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpVectorTimesScalar(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpVectorTimesScalar {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub vector: OpId,
+    pub scalar: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpMatrixTimesScalar(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpMatrixTimesScalar {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub matrix: OpId,
+    pub scalar: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpVectorTimesMatrix(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpVectorTimesMatrix {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub vector: OpId,
+    pub matrix: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpMatrixTimesVector(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpMatrixTimesVector {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub matrix: OpId,
+    pub vector: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpMatrixTimesMatrix(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpMatrixTimesMatrix {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub left_matrix: OpId,
+    pub right_matrix: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpOuterProduct(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpOuterProduct {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub vector1: OpId,
+    pub vector2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpDot(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpDot {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub vector1: OpId,
+    pub vector2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpIAddCarry(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpIAddCarry {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpISubBorrow(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpISubBorrow {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpUMulExtended(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpUMulExtended {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSMulExtended(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSMulExtended {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpShiftRightLogical(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpShiftRightLogical {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub base: OpId,
+    pub shift: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpShiftRightArithmetic(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpShiftRightArithmetic {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub base: OpId,
+    pub shift: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpShiftLeftLogical(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpShiftLeftLogical {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub base: OpId,
+    pub shift: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpBitwiseOr(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpBitwiseOr {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpBitwiseXor(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpBitwiseXor {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpBitwiseAnd(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpBitwiseAnd {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpNot(pub OpId, pub ResultId, pub OpId);
+pub struct OpNot {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBitFieldInsert(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId, pub OpId);
