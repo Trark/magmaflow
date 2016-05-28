@@ -85,6 +85,9 @@ pub enum SourceLanguage {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+pub struct SourceVersion(pub u32);
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct Line(pub u32);
 
 #[derive(Clone, Debug, PartialEq)]
@@ -306,6 +309,12 @@ pub enum Capability {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+pub enum Signedness {
+    UnsignedOrNone,
+    Signed,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum StorageClass {
     UniformConstant,
     Input,
@@ -449,6 +458,12 @@ pub enum SamplerAddressingMode {
     Clamp,
     Repeat,
     RepeatMirrored,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum SamplerParam {
+    NonNormalized,
+    Normalized,
 }
 
 #[derive(Clone, Debug, PartialEq)]

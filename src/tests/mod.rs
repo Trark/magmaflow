@@ -8,27 +8,77 @@ const NOOP_DIS: &'static str = include_str!("noop.dis");
 #[test]
 fn load_noop() {
     let result = reader::read_module(NOOP_SPV);
-    let glsl450 = OpExtInstImport(ResultId(1), "GLSL.std.450".into());
-    let mem_model = OpMemoryModel(AddressingMode::Logical, MemoryModel::Glsl450);
-    let entry_point = OpEntryPoint(ExecutionModel::GlCompute, OpId(4), "main".into(), vec![]);
+    let glsl450 = OpExtInstImport {
+        result_id: ResultId(1),
+        name: "GLSL.std.450".into(),
+    };
+    let mem_model = OpMemoryModel {
+        addressing_mode: AddressingMode::Logical,
+        memory_model: MemoryModel::Glsl450,
+    };
+    let entry_point = OpEntryPoint {
+        execution_model: ExecutionModel::GlCompute,
+        entry_point: OpId(4),
+        name: "main".into(),
+        interface: vec![],
+    };
     let local_size = ExecutionMode::LocalSize(32, 32, 32);
-    let source = OpSource(SourceLanguage::Glsl, SourceVersion(430), None, None);
-    let workgroup = OpDecorate(OpId(9), Decoration::BuiltIn(BuiltIn::WorkgroupSize));
-    let ty_void = Core::OpTypeVoid(OpTypeVoid(ResultId(2)));
-    let ty_main = Core::OpTypeFunction(OpTypeFunction(ResultId(3), OpId(2), vec![]));
-    let ty_int = Core::OpTypeInt(OpTypeInt(ResultId(6), 32, 0));
-    let ty_vec = Core::OpTypeVector(OpTypeVector(ResultId(7), OpId(6), 3));
-    let int_32 = Core::OpConstant(OpConstant(OpId(6), ResultId(8), vec![32]));
+    let source = OpSource {
+        language: SourceLanguage::Glsl,
+        version: SourceVersion(430),
+        file: None,
+        source: None,
+    };
+    let workgroup = OpDecorate {
+        target: OpId(9),
+        decoration: Decoration::BuiltIn(BuiltIn::WorkgroupSize),
+    };
+    let ty_void = Core::OpTypeVoid(OpTypeVoid { result_id: ResultId(2) });
+    let ty_main = Core::OpTypeFunction(OpTypeFunction {
+        result_id: ResultId(3),
+        return_type: OpId(2),
+        parameter_types: vec![],
+    });
+    let ty_int = Core::OpTypeInt(OpTypeInt {
+        result_id: ResultId(6),
+        width: 32,
+        signedness: Signedness::UnsignedOrNone,
+    });
+    let ty_vec = Core::OpTypeVector(OpTypeVector {
+        result_id: ResultId(7),
+        component_type: OpId(6),
+        component_count: 3,
+    });
+    let int_32 = Core::OpConstant(OpConstant {
+        result_type: OpId(6),
+        result_id: ResultId(8),
+        value: vec![32],
+    });
     let int_32_x3 = vec![OpId(8), OpId(8), OpId(8)];
-    let int_32x3 = Core::OpConstantComposite(OpConstantComposite(OpId(7), ResultId(9), int_32_x3));
-    let main = OpFunction(OpId(2), ResultId(4), FunctionControl::default(), OpId(3));
-    let instructions = vec![Core::OpCapability(OpCapability(Capability::Shader)),
+    let int_32x3 = Core::OpConstantComposite(OpConstantComposite {
+        result_type: OpId(7),
+        result_id: ResultId(9),
+        constituents: int_32_x3,
+    });
+    let main = OpFunction {
+        result_type: OpId(2),
+        result_id: ResultId(4),
+        function_control: FunctionControl::default(),
+        function_type: OpId(3),
+    };
+    let instructions = vec![Core::OpCapability(OpCapability { capability: Capability::Shader }),
                             Core::OpExtInstImport(glsl450),
                             Core::OpMemoryModel(mem_model),
                             Core::OpEntryPoint(entry_point),
-                            Core::OpExecutionMode(OpExecutionMode(OpId(4), local_size)),
+                            Core::OpExecutionMode(OpExecutionMode {
+                                entry_point: OpId(4),
+                                mode: local_size,
+                            }),
                             Core::OpSource(source),
-                            Core::OpName(OpName(OpId(4), "main".to_string())),
+                            Core::OpName(OpName {
+                                target: OpId(4),
+                                name: "main".to_string(),
+                            }),
                             Core::OpDecorate(workgroup),
                             ty_void,
                             ty_main,
@@ -37,7 +87,7 @@ fn load_noop() {
                             int_32,
                             int_32x3,
                             Core::OpFunction(main),
-                            Core::OpLabel(OpLabel(ResultId(5))),
+                            Core::OpLabel(OpLabel { result_id: ResultId(5) }),
                             Core::OpReturn(OpReturn),
                             Core::OpFunctionEnd(OpFunctionEnd)];
     let expected = RawModule {

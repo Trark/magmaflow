@@ -167,10 +167,10 @@ impl Display for OpSource {
         try!(write!(f,
                     "{}OpSource{}{}{}{}",
                     NoResult,
-                    Arg(&self.0),
-                    Arg(&self.1),
-                    ArgOpt(&self.2),
-                    ArgOpt(&self.3)));
+                    Arg(&self.language),
+                    Arg(&self.version),
+                    ArgOpt(&self.file),
+                    ArgOpt(&self.source)));
         Ok(())
     }
 }
@@ -180,8 +180,8 @@ impl Display for OpName {
         write!(f,
                "{}OpName{}{}",
                NoResult,
-               Arg(&self.0),
-               ArgString(&self.1))
+               Arg(&self.target),
+               ArgString(&self.name))
     }
 }
 
@@ -189,8 +189,8 @@ impl Display for OpExtInstImport {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
                "{}OpExtInstImport{}",
-               Result(&self.0),
-               ArgString(&self.1))
+               Result(&self.result_id),
+               ArgString(&self.name))
     }
 }
 
@@ -221,8 +221,8 @@ impl Display for OpMemoryModel {
         write!(f,
                "{}OpMemoryModel{}{}",
                NoResult,
-               Arg(&self.0),
-               Arg(&self.1))
+               Arg(&self.addressing_mode),
+               Arg(&self.memory_model))
     }
 }
 
@@ -244,11 +244,12 @@ impl Display for ExecutionModel {
 impl Display for OpEntryPoint {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
-               "{}OpEntryPoint{}{}{}",
+               "{}OpEntryPoint{}{}{}{}",
                NoResult,
-               Arg(&self.0),
-               Arg(&self.1),
-               ArgString(&self.2))
+               Arg(&self.execution_model),
+               Arg(&self.entry_point),
+               ArgString(&self.name),
+               ArgList(&self.interface))
     }
 }
 
@@ -300,8 +301,8 @@ impl Display for OpExecutionMode {
         write!(f,
                "{}OpExecutionMode{}{}",
                NoResult,
-               Arg(&self.0),
-               Arg(&self.1))
+               Arg(&self.entry_point),
+               Arg(&self.mode))
     }
 }
 
@@ -371,19 +372,29 @@ impl Display for Capability {
 
 impl Display for OpCapability {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}OpCapability {}", NoResult, self.0)
+        write!(f, "{}OpCapability {}", NoResult, self.capability)
     }
 }
 
 impl Display for OpTypeVoid {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}OpTypeVoid", Result(&self.0))
+        write!(f, "{}OpTypeVoid", Result(&self.result_id))
     }
 }
 
 impl Display for OpTypeBool {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}OpTypeBool", Result(&self.0))
+        write!(f, "{}OpTypeBool", Result(&self.result_id))
+    }
+}
+
+impl Display for Signedness {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            Signedness::UnsignedOrNone => "0",
+            Signedness::Signed => "1",
+        };
+        write!(f, "{}", name)
     }
 }
 
@@ -391,15 +402,18 @@ impl Display for OpTypeInt {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
                "{}OpTypeInt{}{}",
-               Result(&self.0),
-               Arg(&self.1),
-               Arg(&self.2))
+               Result(&self.result_id),
+               Arg(&self.width),
+               Arg(&self.signedness))
     }
 }
 
 impl Display for OpTypeFloat {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}OpTypeFloat{}", Result(&self.0), Arg(&self.1))
+        write!(f,
+               "{}OpTypeFloat{}",
+               Result(&self.result_id),
+               Arg(&self.width))
     }
 }
 
@@ -407,9 +421,9 @@ impl Display for OpTypeVector {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
                "{}OpTypeVector{}{}",
-               Result(&self.0),
-               Arg(&self.1),
-               Arg(&self.2))
+               Result(&self.result_id),
+               Arg(&self.component_type),
+               Arg(&self.component_count))
     }
 }
 
@@ -417,9 +431,9 @@ impl Display for OpTypeFunction {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
                "{}OpTypeFunction{}{}",
-               Result(&self.0),
-               Arg(&self.1),
-               ArgList(&self.2))
+               Result(&self.result_id),
+               Arg(&self.return_type),
+               ArgList(&self.parameter_types))
     }
 }
 
@@ -427,9 +441,9 @@ impl Display for OpConstant {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
                "{}OpConstant{}{}",
-               Result(&self.1),
-               Arg(&self.0),
-               ArgList(&self.2))
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               ArgList(&self.value))
     }
 }
 
@@ -437,9 +451,9 @@ impl Display for OpConstantComposite {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
                "{}OpConstantComposite{}{}",
-               Result(&self.1),
-               Arg(&self.0),
-               ArgList(&self.2))
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               ArgList(&self.constituents))
     }
 }
 
@@ -470,10 +484,10 @@ impl Display for OpFunction {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
                "{}OpFunction{}{}{}",
-               Result(&self.1),
-               Arg(&self.0),
-               Arg(&self.2),
-               Arg(&self.3))
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.function_control),
+               Arg(&self.function_type))
     }
 }
 
@@ -657,19 +671,23 @@ impl Display for Decoration {
 
 impl Display for OpDecorate {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}OpDecorate{}{}", NoResult, Arg(&self.0), Arg(&self.1))
+        write!(f,
+               "{}OpDecorate{}{}",
+               NoResult,
+               Arg(&self.target),
+               Arg(&self.decoration))
     }
 }
 
 impl Display for OpLabel {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}OpLabel", Result(&self.0))
+        write!(f, "{}OpLabel", Result(&self.result_id))
     }
 }
 
 impl Display for OpBranch {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}OpBranch{}", NoResult, Arg(&self.0))
+        write!(f, "{}OpBranch{}", NoResult, Arg(&self.target_label))
     }
 }
 

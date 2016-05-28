@@ -26,6 +26,7 @@ pub enum ReadError {
     UnknownBuiltIn(Word),
     UnknownFpRoundingMode(Word),
     UnknownLinkageType(Word),
+    UnknownSignedness(u32),
     UnknownFunctionParameterAttribute(Word),
 
     ModuleLayoutMemoryModelMissing,
@@ -291,7 +292,12 @@ fn read_op_source(stream: &mut InstructionMemory) -> ReadResult<Core> {
     } else {
         None
     };
-    Ok(Core::OpSource(OpSource(lang, version, file_id, source_name)))
+    Ok(Core::OpSource(OpSource {
+        language: lang,
+        version: version,
+        file: file_id,
+        source: source_name,
+    }))
 }
 
 fn read_op_name(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -300,7 +306,10 @@ fn read_op_name(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }
     let id = try!(read_op_id(stream));
     let name = try!(read_string_literal(stream));
-    Ok(Core::OpName(OpName(id, name)))
+    Ok(Core::OpName(OpName {
+        target: id,
+        name: name,
+    }))
 }
 
 fn read_op_ext_inst_import(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -309,7 +318,10 @@ fn read_op_ext_inst_import(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }
     let result_id = try!(read_result_id(stream));
     let name = try!(read_string_literal(stream));
-    Ok(Core::OpExtInstImport(OpExtInstImport(result_id, name)))
+    Ok(Core::OpExtInstImport(OpExtInstImport {
+        result_id: result_id,
+        name: name,
+    }))
 }
 
 fn read_addressing_mode(stream: &mut InstructionMemory) -> ReadResult<AddressingMode> {
@@ -338,7 +350,10 @@ fn read_op_memory_model(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }
     let am = try!(read_addressing_mode(stream));
     let mm = try!(read_memory_model(stream));
-    Ok(Core::OpMemoryModel(OpMemoryModel(am, mm)))
+    Ok(Core::OpMemoryModel(OpMemoryModel {
+        addressing_mode: am,
+        memory_model: mm,
+    }))
 }
 
 fn read_execution_model(stream: &mut InstructionMemory) -> ReadResult<ExecutionModel> {
@@ -363,7 +378,12 @@ fn read_op_entry_point(stream: &mut InstructionMemory) -> ReadResult<Core> {
     let entry_point = try!(read_op_id(stream));
     let name = try!(read_string_literal(stream));
     let forward_defs = try!(read_op_id_list(stream));
-    let inst = OpEntryPoint(execution_model, entry_point, name, forward_defs);
+    let inst = OpEntryPoint {
+        execution_model: execution_model,
+        entry_point: entry_point,
+        name: name,
+        interface: forward_defs,
+    };
     Ok(Core::OpEntryPoint(inst))
 }
 
@@ -426,7 +446,10 @@ fn read_op_execution_mode(stream: &mut InstructionMemory) -> ReadResult<Core> {
         31 => ExecutionMode::ContractionOff,
         id => return Err(ReadError::UnknownExecutionMode(id)),
     };
-    Ok(Core::OpExecutionMode(OpExecutionMode(entry_point, mode)))
+    Ok(Core::OpExecutionMode(OpExecutionMode {
+        entry_point: entry_point,
+        mode: mode,
+    }))
 }
 
 fn read_op_capability(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -493,7 +516,7 @@ fn read_op_capability(stream: &mut InstructionMemory) -> ReadResult<Core> {
         57 => Capability::MultiViewport,
         id => return Err(ReadError::UnknownCapability(id)),
     };
-    Ok(Core::OpCapability(OpCapability(capability)))
+    Ok(Core::OpCapability(OpCapability { capability: capability }))
 }
 
 fn read_op_type_void(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -501,7 +524,7 @@ fn read_op_type_void(stream: &mut InstructionMemory) -> ReadResult<Core> {
         return Err(ReadError::WrongWordCountForOp);
     }
     let result_id = try!(read_result_id(stream));
-    Ok(Core::OpTypeVoid(OpTypeVoid(result_id)))
+    Ok(Core::OpTypeVoid(OpTypeVoid { result_id: result_id }))
 }
 
 fn read_op_type_bool(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -509,7 +532,7 @@ fn read_op_type_bool(stream: &mut InstructionMemory) -> ReadResult<Core> {
         return Err(ReadError::WrongWordCountForOp);
     }
     let result_id = try!(read_result_id(stream));
-    Ok(Core::OpTypeBool(OpTypeBool(result_id)))
+    Ok(Core::OpTypeBool(OpTypeBool { result_id: result_id }))
 }
 
 fn read_op_type_int(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -518,8 +541,17 @@ fn read_op_type_int(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }
     let result_id = try!(read_result_id(stream));
     let width = try!(read_lit_number_u32(stream));
-    let signedness = try!(read_lit_number_u32(stream));
-    Ok(Core::OpTypeInt(OpTypeInt(result_id, width, signedness)))
+    let signedness_u32 = try!(read_lit_number_u32(stream));
+    let signedness = match signedness_u32 {
+        0 => Signedness::UnsignedOrNone,
+        1 => Signedness::Signed,
+        n => return Err(ReadError::UnknownSignedness(n)),
+    };
+    Ok(Core::OpTypeInt(OpTypeInt {
+        result_id: result_id,
+        width: width,
+        signedness: signedness,
+    }))
 }
 
 fn read_op_type_float(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -528,7 +560,10 @@ fn read_op_type_float(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }
     let result_id = try!(read_result_id(stream));
     let width = try!(read_lit_number_u32(stream));
-    Ok(Core::OpTypeFloat(OpTypeFloat(result_id, width)))
+    Ok(Core::OpTypeFloat(OpTypeFloat {
+        result_id: result_id,
+        width: width,
+    }))
 }
 
 fn read_op_type_vector(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -538,7 +573,11 @@ fn read_op_type_vector(stream: &mut InstructionMemory) -> ReadResult<Core> {
     let result_id = try!(read_result_id(stream));
     let component_type = try!(read_op_id(stream));
     let count = try!(read_lit_number_u32(stream));
-    Ok(Core::OpTypeVector(OpTypeVector(result_id, component_type, count)))
+    Ok(Core::OpTypeVector(OpTypeVector {
+        result_id: result_id,
+        component_type: component_type,
+        component_count: count,
+    }))
 }
 
 fn read_op_type_function(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -552,7 +591,11 @@ fn read_op_type_function(stream: &mut InstructionMemory) -> ReadResult<Core> {
     for _ in 0..rem {
         param_types.push(read_op_id(stream).expect("Reading function type arguments"))
     }
-    Ok(Core::OpTypeFunction(OpTypeFunction(result_id, return_type, param_types)))
+    Ok(Core::OpTypeFunction(OpTypeFunction {
+        result_id: result_id,
+        return_type: return_type,
+        parameter_types: param_types,
+    }))
 }
 
 fn read_op_constant(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -566,8 +609,11 @@ fn read_op_constant(stream: &mut InstructionMemory) -> ReadResult<Core> {
     for _ in 0..rem {
         constant.push(stream.read_next().expect("Reading OpConstant constant"))
     }
-    let inst = OpConstant(result_type_id, result_id, constant);
-    Ok(Core::OpConstant(inst))
+    Ok(Core::OpConstant(OpConstant {
+        result_type: result_type_id,
+        result_id: result_id,
+        value: constant,
+    }))
 }
 
 fn read_op_constant_composite(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -581,8 +627,11 @@ fn read_op_constant_composite(stream: &mut InstructionMemory) -> ReadResult<Core
     for _ in 0..rem {
         constituents.push(read_op_id(stream).expect("Reading OpConstantComposite arguments"))
     }
-    let inst = OpConstantComposite(result_type_id, result_id, constituents);
-    Ok(Core::OpConstantComposite(inst))
+    Ok(Core::OpConstantComposite(OpConstantComposite {
+        result_type: result_type_id,
+        result_id: result_id,
+        constituents: constituents,
+    }))
 }
 
 fn read_function_control(stream: &mut InstructionMemory) -> ReadResult<FunctionControl> {
@@ -603,7 +652,12 @@ fn read_op_function(stream: &mut InstructionMemory) -> ReadResult<Core> {
     let result_id = try!(read_result_id(stream));
     let function_control = try!(read_function_control(stream));
     let function_type = try!(read_op_id(stream));
-    let func = OpFunction(result_type_id, result_id, function_control, function_type);
+    let func = OpFunction {
+        result_type: result_type_id,
+        result_id: result_id,
+        function_control: function_control,
+        function_type: function_type,
+    };
     Ok(Core::OpFunction(func))
 }
 
@@ -764,7 +818,10 @@ fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
         44 => Decoration::Alignment(try!(read_lit_number_u32(stream))),
         id => return Err(ReadError::UnknownDecoration(id)),
     };
-    Ok(Core::OpDecorate(OpDecorate(id, decorate)))
+    Ok(Core::OpDecorate(OpDecorate {
+        target: id,
+        decoration: decorate,
+    }))
 }
 
 fn read_op_label(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -772,15 +829,15 @@ fn read_op_label(stream: &mut InstructionMemory) -> ReadResult<Core> {
         return Err(ReadError::WrongWordCountForOp);
     }
     let result_id = try!(read_result_id(stream));
-    Ok(Core::OpLabel(OpLabel(result_id)))
+    Ok(Core::OpLabel(OpLabel { result_id: result_id }))
 }
 
 fn read_op_branch(stream: &mut InstructionMemory) -> ReadResult<Core> {
     if stream.get_word_count() != 2 {
         return Err(ReadError::WrongWordCountForOp);
     }
-    let label_id = try!(read_result_id(stream));
-    Ok(Core::OpLabel(OpLabel(label_id)))
+    let label_id = try!(read_op_id(stream));
+    Ok(Core::OpBranch(OpBranch { target_label: label_id }))
 }
 
 fn read_op_return(stream: &mut InstructionMemory) -> ReadResult<Core> {
