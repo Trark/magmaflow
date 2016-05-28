@@ -8,7 +8,7 @@ pub use self::op::*;
 mod dis;
 
 /// Raw list of SpirV instructions
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct RawModule {
     pub version: Version,
     pub generator: Generator,
@@ -17,7 +17,7 @@ pub struct RawModule {
 }
 
 /// Enumeration of all core nstructions (incomplete)
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Core {
     OpNop(OpNop),
     OpSource(OpSource),

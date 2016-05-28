@@ -1,10 +1,10 @@
 
 pub type Word = u32;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct OpId(pub Word);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ResultId(pub Word);
 
 pub type WordNumber = Word;
@@ -12,22 +12,22 @@ pub type LitNumber = Vec<u32>;
 pub type LitBytes = Vec<u32>;
 pub type LitString = String;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Literal {
     String(LitString),
     Number(LitNumber),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Version(pub u8, pub u8);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Generator {
     pub tool: Tool,
     pub version: u16,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Tool {
     KhronosReserved,
     LunarG,
@@ -74,7 +74,7 @@ impl Tool {
 
 /// Source language the module was created from
 #[allow(non_camel_case_types)]
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SourceLanguage {
     Unknown,
     Essl,
@@ -84,13 +84,13 @@ pub enum SourceLanguage {
     Other(Word),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Line(pub u32);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Column(pub u32);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Decoration {
     RelaxedPrecision,
     SpecId(u32),
@@ -137,7 +137,7 @@ pub enum Decoration {
     Alignment(u32),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum BuiltIn {
     Position,
     PointSize,
@@ -182,24 +182,24 @@ pub enum BuiltIn {
     InstanceIndex,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MemberIndex(pub u32);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum AddressingMode {
     Logical,
     Physical32,
     Physical64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum MemoryModel {
     Simple,
     Glsl450,
     OpenCL,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ExecutionModel {
     Vertex,
     TesselationControl,
@@ -210,7 +210,7 @@ pub enum ExecutionModel {
     Kernel,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ExecutionMode {
     Invocations(u32),
     SpacingEqual,
@@ -245,7 +245,7 @@ pub enum ExecutionMode {
     ContractionOff,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Capability {
     Matrix,
     Shader,
@@ -305,7 +305,7 @@ pub enum Capability {
     MultiViewport,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum StorageClass {
     UniformConstant,
     Input,
@@ -320,7 +320,7 @@ pub enum StorageClass {
     AtomicCounter,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct FpFastMathMode {
     pub not_nan: bool,
     pub not_inf: bool,
@@ -329,7 +329,7 @@ pub struct FpFastMathMode {
     pub fast: bool,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FpRoundingMode {
     Rte,
     Rtz,
@@ -337,13 +337,13 @@ pub enum FpRoundingMode {
     Rtn,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum LinkageType {
     Export,
     Import,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum FunctionParameterAttribute {
     Zext,
     Sext,
@@ -355,7 +355,7 @@ pub enum FunctionParameterAttribute {
     NoReadWrite,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Dim {
     Tex1D,
     Tex2D,
@@ -366,33 +366,33 @@ pub enum Dim {
     SubpassData,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum DepthStatus {
     NotDepth,
     Depth,
     NoIndication,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Arrayed {
     False,
     True,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum MS {
     Single,
     Multi,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SampledStatus {
     RuntimeChoice,
     WithSampler,
     WithoutSampler,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ImageFormat {
     Unknown,
     Rgba32f,
@@ -435,14 +435,14 @@ pub enum ImageFormat {
     R8ui,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum AccessQualifier {
     ReadOnly,
     WriteOnly,
     ReadWrite,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SamplerAddressingMode {
     None,
     ClampEdge,
@@ -451,13 +451,13 @@ pub enum SamplerAddressingMode {
     RepeatMirrored,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SamplerFilterMode {
     Nearest,
     Linear,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ImageOperands {
     pub bias: Option<OpId>,
     pub lod: Option<OpId>,
@@ -468,14 +468,14 @@ pub struct ImageOperands {
     pub min_lod: Option<OpId>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MemoryAccess {
     volatile: bool,
     aligned: bool,
     non_temporal: bool,
 }
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct FunctionControl {
     pub inline: bool,
     pub dont_inline: bool,
@@ -483,7 +483,7 @@ pub struct FunctionControl {
     pub const_function: bool,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct LoopControl {
     pub unroll: bool,
     pub dont_unroll: bool,
@@ -491,33 +491,33 @@ pub struct LoopControl {
     pub dependency_length: Option<u32>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct SelectionControl {
     flatten: bool,
     dont_flatten: bool,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ScopeId(pub Word);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct MemorySemanticsId(pub Word);
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum GroupOperation {
     Reduce,
     InclusiveScan,
     ExclusiveScan,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum KernelEnqueueFlags {
     NoWait,
     WaitKernel,
     WaitWorkGroup,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct KernelProfilingInfo {
     cmd_exec_time: bool,
 }
