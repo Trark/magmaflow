@@ -16,7 +16,7 @@ pub struct RawModule {
     pub instructions: Vec<Core>,
 }
 
-/// Enumeration of all core nstructions (incomplete)
+/// Enumeration of all core instructions (incomplete)
 #[derive(Clone, Debug, PartialEq)]
 pub enum Core {
     OpNop(OpNop),
