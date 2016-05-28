@@ -27,9 +27,9 @@ pub enum ReadError {
     UnknownFpRoundingMode(Word),
     UnknownLinkageType(Word),
     UnknownSignedness(u32),
+    UnknownStorageClass(u32),
     UnknownFunctionParameterAttribute(Word),
-
-    ModuleLayoutMemoryModelMissing,
+    UnknownMemoryAccess(u32),
 }
 
 pub type ReadResult<T> = Result<T, ReadError>;
@@ -158,6 +158,7 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         0 => Ok(Core::OpNop(OpNop)),
         3 => read_op_source(&mut im),
         5 => read_op_name(&mut im),
+        6 => read_op_member_name(&mut im),
         11 => read_op_ext_inst_import(&mut im),
         14 => read_op_memory_model(&mut im),
         15 => read_op_entry_point(&mut im),
@@ -168,12 +169,22 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         21 => read_op_type_int(&mut im),
         22 => read_op_type_float(&mut im),
         23 => read_op_type_vector(&mut im),
+        29 => read_op_type_runtime_array(&mut im),
+        30 => read_op_type_struct(&mut im),
+        32 => read_op_type_pointer(&mut im),
         33 => read_op_type_function(&mut im),
         43 => read_op_constant(&mut im),
         44 => read_op_constant_composite(&mut im),
         54 => read_op_function(&mut im),
         56 => read_op_function_end(&mut im),
+        59 => read_op_variable(&mut im),
+        61 => read_op_load(&mut im),
+        62 => read_op_store(&mut im),
+        65 => read_op_access_chain(&mut im),
         71 => read_op_decorate(&mut im),
+        72 => read_op_member_decorate(&mut im),
+        112 => read_op_convert_utof(&mut im),
+        132 => read_op_imul(&mut im),
         248 => read_op_label(&mut im),
         249 => read_op_branch(&mut im),
         253 => read_op_return(&mut im),
@@ -308,6 +319,20 @@ fn read_op_name(stream: &mut InstructionMemory) -> ReadResult<Core> {
     let name = try!(read_string_literal(stream));
     Ok(Core::OpName(OpName {
         target: id,
+        name: name,
+    }))
+}
+
+fn read_op_member_name(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let struct_type = try!(read_op_id(stream));
+    let member_index = MemberIndex(try!(read_lit_number_u32(stream)));
+    let name = try!(read_string_literal(stream));
+    Ok(Core::OpMemberName(OpMemberName {
+        struct_type: struct_type,
+        member: member_index,
         name: name,
     }))
 }
@@ -580,6 +605,62 @@ fn read_op_type_vector(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }))
 }
 
+fn read_op_type_runtime_array(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let element_type = try!(read_op_id(stream));
+    Ok(Core::OpTypeRuntimeArray(OpTypeRuntimeArray {
+        result_id: result_id,
+        element_type: element_type,
+    }))
+}
+
+fn read_op_type_struct(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 2 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let member_types = try!(read_op_id_list(stream));
+    Ok(Core::OpTypeStruct(OpTypeStruct {
+        result_id: result_id,
+        member_types: member_types,
+    }))
+}
+
+fn read_storage_class(stream: &mut InstructionMemory) -> ReadResult<StorageClass> {
+    Ok(match try!(stream.read_next()) {
+        0 => StorageClass::UniformConstant,
+        1 => StorageClass::Input,
+        2 => StorageClass::Uniform,
+        3 => StorageClass::Output,
+        4 => StorageClass::Workgroup,
+        5 => StorageClass::CrossWorkgroup,
+        6 => StorageClass::Private,
+        7 => StorageClass::Function,
+        8 => StorageClass::Generic,
+        9 => StorageClass::PushConstant,
+        10 => StorageClass::AtomicCounter,
+        11 => StorageClass::Image,
+        n => return Err(ReadError::UnknownStorageClass(n)),
+    })
+}
+
+fn read_op_type_pointer(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let storage_class = try!(read_storage_class(stream));
+    let pointed_type = try!(read_op_id(stream));
+    Ok(Core::OpTypePointer(OpTypePointer {
+        result_id: result_id,
+        storage_class: storage_class,
+        pointed_type: pointed_type,
+    }))
+}
+
 fn read_op_type_function(stream: &mut InstructionMemory) -> ReadResult<Core> {
     if stream.get_word_count() < 3 {
         return Err(ReadError::WrongWordCountForOp);
@@ -666,6 +747,88 @@ fn read_op_function_end(stream: &mut InstructionMemory) -> ReadResult<Core> {
         return Err(ReadError::WrongWordCountForOp);
     }
     Ok(Core::OpFunctionEnd(OpFunctionEnd))
+}
+
+fn read_op_variable(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 4 && stream.get_word_count() != 5 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let storage_class = try!(read_storage_class(stream));
+    let init = if stream.get_word_count() == 5 {
+        Some(try!(read_op_id(stream)))
+    } else {
+        None
+    };
+    Ok(Core::OpVariable(OpVariable {
+        result_type: result_type,
+        result_id: result_id,
+        storage_class: storage_class,
+        initializer: init,
+    }))
+}
+
+fn read_memory_access_opt(stream: &mut InstructionMemory) -> ReadResult<Option<MemoryAccess>> {
+    Ok(if stream.get_remaining_words() == 0 {
+        None
+    } else {
+        let memory_access_word = try!(stream.read_next());
+        if (memory_access_word & 0xFFF8) != 0 {
+            return Err(ReadError::UnknownMemoryAccess(memory_access_word));
+        }
+        Some(MemoryAccess {
+            volatile: (memory_access_word & 0x1) != 0,
+            aligned: (memory_access_word & 0x2) != 0,
+            non_temporal: (memory_access_word & 0x4) != 0,
+        })
+    })
+}
+
+fn read_op_load(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 4 && stream.get_word_count() != 5 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let pointer = try!(read_op_id(stream));
+    let memory_access = try!(read_memory_access_opt(stream));
+    Ok(Core::OpLoad(OpLoad {
+        result_type: result_type,
+        result_id: result_id,
+        pointer: pointer,
+        memory_access: memory_access,
+    }))
+}
+
+fn read_op_store(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let pointer = try!(read_op_id(stream));
+    let object = try!(read_op_id(stream));
+    let memory_access = try!(read_memory_access_opt(stream));
+    Ok(Core::OpStore(OpStore {
+        pointer: pointer,
+        object: object,
+        memory_access: memory_access,
+    }))
+}
+
+fn read_op_access_chain(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let base = try!(read_op_id(stream));
+    let indexes = try!(read_op_id_list(stream));
+    Ok(Core::OpAccessChain(OpAccessChain {
+        result_type: result_type,
+        result_id: result_id,
+        base: base,
+        indexes: indexes,
+    }))
 }
 
 fn read_builtin(stream: &mut InstructionMemory) -> ReadResult<BuiltIn> {
@@ -762,13 +925,8 @@ fn read_linkage_type(stream: &mut InstructionMemory) -> ReadResult<LinkageType> 
     })
 }
 
-fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let id = try!(read_op_id(stream));
-    let decorate_id = try!(stream.read_next());
-    let decorate = match decorate_id {
+fn read_decoration(stream: &mut InstructionMemory) -> ReadResult<Decoration> {
+    Ok(match try!(stream.read_next()) {
         0 => Decoration::RelaxedPrecision,
         1 => Decoration::SpecId(try!(read_lit_number_u32(stream))),
         2 => Decoration::Block,
@@ -817,10 +975,62 @@ fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
         43 => Decoration::InputAttachmentIndex(try!(read_lit_number_u32(stream))),
         44 => Decoration::Alignment(try!(read_lit_number_u32(stream))),
         id => return Err(ReadError::UnknownDecoration(id)),
-    };
+    })
+}
+
+fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let id = try!(read_op_id(stream));
+    let decorate = try!(read_decoration(stream));
     Ok(Core::OpDecorate(OpDecorate {
         target: id,
         decoration: decorate,
+    }))
+}
+
+fn read_op_member_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let structure_type = try!(read_op_id(stream));
+    let member = MemberIndex(try!(read_lit_number_u32(stream)));
+    let decorate = try!(read_decoration(stream));
+    Ok(Core::OpMemberDecorate(OpMemberDecorate {
+        structure_type: structure_type,
+        member: member,
+        decoration: decorate,
+    }))
+}
+
+fn read_op_convert_utof(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let unsigned_value = try!(read_op_id(stream));
+    Ok(Core::OpConvertUToF(OpConvertUToF {
+        result_type: result_type,
+        result_id: result_id,
+        unsigned_value: unsigned_value,
+    }))
+}
+
+fn read_op_imul(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 5 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let operand1 = try!(read_op_id(stream));
+    let operand2 = try!(read_op_id(stream));
+    Ok(Core::OpIMul(OpIMul {
+        result_type: result_type,
+        result_id: result_id,
+        operand1: operand1,
+        operand2: operand2,
     }))
 }
 

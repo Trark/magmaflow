@@ -35,6 +35,7 @@ impl Display for Core {
             Core::OpNop(ref op) => Display::fmt(op, f),
             Core::OpSource(ref op) => Display::fmt(op, f),
             Core::OpName(ref op) => Display::fmt(op, f),
+            Core::OpMemberName(ref op) => Display::fmt(op, f),
             Core::OpExtInstImport(ref op) => Display::fmt(op, f),
             Core::OpMemoryModel(ref op) => Display::fmt(op, f),
             Core::OpEntryPoint(ref op) => Display::fmt(op, f),
@@ -45,12 +46,22 @@ impl Display for Core {
             Core::OpTypeInt(ref op) => Display::fmt(op, f),
             Core::OpTypeFloat(ref op) => Display::fmt(op, f),
             Core::OpTypeVector(ref op) => Display::fmt(op, f),
+            Core::OpTypeRuntimeArray(ref op) => Display::fmt(op, f),
+            Core::OpTypeStruct(ref op) => Display::fmt(op, f),
+            Core::OpTypePointer(ref op) => Display::fmt(op, f),
             Core::OpTypeFunction(ref op) => Display::fmt(op, f),
             Core::OpConstant(ref op) => Display::fmt(op, f),
             Core::OpConstantComposite(ref op) => Display::fmt(op, f),
             Core::OpFunction(ref op) => Display::fmt(op, f),
             Core::OpFunctionEnd(ref op) => Display::fmt(op, f),
+            Core::OpVariable(ref op) => Display::fmt(op, f),
+            Core::OpLoad(ref op) => Display::fmt(op, f),
+            Core::OpStore(ref op) => Display::fmt(op, f),
+            Core::OpAccessChain(ref op) => Display::fmt(op, f),
             Core::OpDecorate(ref op) => Display::fmt(op, f),
+            Core::OpMemberDecorate(ref op) => Display::fmt(op, f),
+            Core::OpConvertUToF(ref op) => Display::fmt(op, f),
+            Core::OpIMul(ref op) => Display::fmt(op, f),
             Core::OpLabel(ref op) => Display::fmt(op, f),
             Core::OpBranch(ref op) => Display::fmt(op, f),
             Core::OpReturn(ref op) => Display::fmt(op, f),
@@ -181,6 +192,17 @@ impl Display for OpName {
                "{}OpName{}{}",
                NoResult,
                Arg(&self.target),
+               ArgString(&self.name))
+    }
+}
+
+impl Display for OpMemberName {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpMemberName{}{}{}",
+               NoResult,
+               Arg(&self.struct_type),
+               Arg(&self.member.0),
                ArgString(&self.name))
     }
 }
@@ -427,6 +449,54 @@ impl Display for OpTypeVector {
     }
 }
 
+impl Display for StorageClass {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            StorageClass::UniformConstant => "UniformConstant",
+            StorageClass::Input => "Input",
+            StorageClass::Uniform => "Uniform",
+            StorageClass::Output => "Output",
+            StorageClass::Workgroup => "Workgroup",
+            StorageClass::CrossWorkgroup => "CrossWorkgroup",
+            StorageClass::Private => "Private",
+            StorageClass::Function => "Function",
+            StorageClass::Generic => "Generic",
+            StorageClass::PushConstant => "PushConstant",
+            StorageClass::AtomicCounter => "AtomicCounter",
+            StorageClass::Image => "Image",
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl Display for OpTypeRuntimeArray {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeRuntimeArray{}",
+               Result(&self.result_id),
+               Arg(&self.element_type))
+    }
+}
+
+impl Display for OpTypeStruct {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeStruct{}",
+               Result(&self.result_id),
+               ArgList(&self.member_types))
+    }
+}
+
+impl Display for OpTypePointer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypePointer{}{}",
+               Result(&self.result_id),
+               Arg(&self.storage_class),
+               Arg(&self.pointed_type))
+    }
+}
+
 impl Display for OpTypeFunction {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f,
@@ -494,6 +564,70 @@ impl Display for OpFunction {
 impl Display for OpFunctionEnd {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "{}OpFunctionEnd", NoResult)
+    }
+}
+
+impl Display for OpVariable {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpVariable{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.storage_class),
+               ArgOpt(&self.initializer))
+    }
+}
+
+impl Display for MemoryAccess {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.volatile {
+            parts.push("Volatile");
+        }
+        if self.aligned {
+            parts.push("Aligned");
+        }
+        if self.non_temporal {
+            parts.push("Nontemporal");
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
+}
+
+impl Display for OpLoad {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpLoad{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.pointer),
+               ArgOpt(&self.memory_access))
+    }
+}
+
+impl Display for OpStore {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpStore{}{}{}",
+               NoResult,
+               Arg(&self.pointer),
+               Arg(&self.object),
+               ArgOpt(&self.memory_access))
+    }
+}
+
+impl Display for OpAccessChain {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpAccessChain{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.base),
+               ArgList(&self.indexes))
     }
 }
 
@@ -676,6 +810,38 @@ impl Display for OpDecorate {
                NoResult,
                Arg(&self.target),
                Arg(&self.decoration))
+    }
+}
+
+impl Display for OpMemberDecorate {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpMemberDecorate{}{}{}",
+               NoResult,
+               Arg(&self.structure_type),
+               Arg(&self.member.0),
+               Arg(&self.decoration))
+    }
+}
+
+impl Display for OpConvertUToF {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpConvertUToF{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.unsigned_value))
+    }
+}
+
+impl Display for OpIMul {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpIMul{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.operand1),
+               Arg(&self.operand2))
     }
 }
 

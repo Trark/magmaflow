@@ -4,6 +4,8 @@ use reader;
 
 const NOOP_SPV: &'static [u8] = include_bytes!("noop.spv");
 const NOOP_DIS: &'static str = include_str!("noop.dis");
+const WRITE_MULTIPLY_SPV: &'static [u8] = include_bytes!("write_multiply.spv");
+const WRITE_MULTIPLY_DIS: &'static str = include_str!("write_multiply.dis");
 
 #[test]
 fn load_noop() {
@@ -111,4 +113,15 @@ fn dis_noop() {
     }
     assert_eq!(NOOP_DIS, disassembly);
 
+}
+
+#[test]
+fn dis_write_multiply() {
+    let raw_module = reader::read_module(WRITE_MULTIPLY_SPV)
+        .expect("Failed to load write_multiply.spv");
+    let disassembly = format!("{}", raw_module);
+    for (dis, expect) in disassembly.lines().zip(WRITE_MULTIPLY_DIS.lines()) {
+        assert_eq!(dis, expect);
+    }
+    assert_eq!(WRITE_MULTIPLY_DIS, disassembly);
 }

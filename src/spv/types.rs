@@ -320,13 +320,14 @@ pub enum StorageClass {
     Input,
     Uniform,
     Output,
-    WorkgroupLocal,
-    WorkgroupGlobal,
-    PrivateGlobal,
+    Workgroup,
+    CrossWorkgroup,
+    Private,
     Function,
     Generic,
-    Private,
+    PushConstant,
     AtomicCounter,
+    Image,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -483,11 +484,11 @@ pub struct ImageOperands {
     pub min_lod: Option<OpId>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct MemoryAccess {
-    volatile: bool,
-    aligned: bool,
-    non_temporal: bool,
+    pub volatile: bool,
+    pub aligned: bool,
+    pub non_temporal: bool,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]

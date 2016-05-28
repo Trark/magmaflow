@@ -1,0 +1,72 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 1
+; Bound: 40
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %4 "main" %12
+               OpExecutionMode %4 LocalSize 32 32 32
+               OpSource GLSL 430
+               OpName %4 "main"
+               OpName %8 "write_value"
+               OpName %12 "gl_GlobalInvocationID"
+               OpName %23 "MyBuffer"
+               OpMemberName %23 0 "value"
+               OpName %25 ""
+               OpName %37 "Block"
+               OpMemberName %37 0 "value"
+               OpName %39 "test"
+               OpDecorate %12 BuiltIn GlobalInvocationId
+               OpDecorate %22 ArrayStride 4
+               OpMemberDecorate %23 0 Offset 0
+               OpDecorate %23 BufferBlock
+               OpDecorate %25 DescriptorSet 0
+               OpDecorate %25 Binding 2
+               OpDecorate %35 BuiltIn WorkgroupSize
+               OpMemberDecorate %37 0 Offset 0
+               OpDecorate %37 BufferBlock
+               OpDecorate %39 DescriptorSet 0
+          %2 = OpTypeVoid
+          %3 = OpTypeFunction %2
+          %6 = OpTypeFloat 32
+          %7 = OpTypePointer Function %6
+          %9 = OpTypeInt 32 0
+         %10 = OpTypeVector %9 3
+         %11 = OpTypePointer Input %10
+         %12 = OpVariable %11 Input
+         %13 = OpConstant %9 1
+         %14 = OpTypePointer Input %9
+         %17 = OpConstant %9 2
+         %22 = OpTypeRuntimeArray %6
+         %23 = OpTypeStruct %22
+         %24 = OpTypePointer Uniform %23
+         %25 = OpVariable %24 Uniform
+         %26 = OpTypeInt 32 1
+         %27 = OpConstant %26 0
+         %28 = OpConstant %9 0
+         %32 = OpTypePointer Uniform %6
+         %34 = OpConstant %9 32
+         %35 = OpConstantComposite %10 %34 %34 %34
+         %36 = OpTypeVector %6 3
+         %37 = OpTypeStruct %36
+         %38 = OpTypePointer Uniform %37
+         %39 = OpVariable %38 Uniform
+          %4 = OpFunction %2 None %3
+          %5 = OpLabel
+          %8 = OpVariable %7 Function
+         %15 = OpAccessChain %14 %12 %13
+         %16 = OpLoad %9 %15
+         %18 = OpAccessChain %14 %12 %17
+         %19 = OpLoad %9 %18
+         %20 = OpIMul %9 %16 %19
+         %21 = OpConvertUToF %6 %20
+               OpStore %8 %21
+         %29 = OpAccessChain %14 %12 %28
+         %30 = OpLoad %9 %29
+         %31 = OpLoad %6 %8
+         %33 = OpAccessChain %32 %25 %27 %30
+               OpStore %33 %31
+               OpReturn
+               OpFunctionEnd

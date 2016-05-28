@@ -37,7 +37,7 @@ pub struct OpName {
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMemberName {
     pub struct_type: OpId,
-    pub member: u32,
+    pub member: MemberIndex,
     pub name: LitString,
 }
 
@@ -342,10 +342,19 @@ pub struct OpVariable {
 pub struct OpImageTexelPointer(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpLoad(pub OpId, pub ResultId, pub OpId, pub Option<MemoryAccess>);
+pub struct OpLoad {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub pointer: OpId,
+    pub memory_access: Option<MemoryAccess>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpStore(pub OpId, pub OpId, pub Option<MemoryAccess>);
+pub struct OpStore {
+    pub pointer: OpId,
+    pub object: OpId,
+    pub memory_access: Option<MemoryAccess>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpCopyMemory(pub OpId, pub OpId, pub Option<MemoryAccess>);
@@ -354,7 +363,12 @@ pub struct OpCopyMemory(pub OpId, pub OpId, pub Option<MemoryAccess>);
 pub struct OpCopyMemorySized(pub OpId, pub OpId, pub OpId, pub Option<MemoryAccess>);
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpAccessChain(pub OpId, pub ResultId, pub OpId, pub Vec<OpId>);
+pub struct OpAccessChain {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub base: OpId,
+    pub indexes: Vec<OpId>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpInBoundsAccessChain(pub OpId, pub ResultId, pub OpId, pub Vec<OpId>);
@@ -599,7 +613,11 @@ pub struct OpConvertFToS(pub OpId, pub ResultId, pub OpId);
 pub struct OpConvertSToF(pub OpId, pub ResultId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpConvertUToF(pub OpId, pub ResultId, pub OpId);
+pub struct OpConvertUToF {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub unsigned_value: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUConvert(pub OpId, pub ResultId, pub OpId);
@@ -680,7 +698,12 @@ pub struct OpISub(pub OpId, pub ResultId, pub OpId, pub OpId);
 pub struct OpFSub(pub OpId, pub ResultId, pub OpId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpIMul(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpIMul {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFMul(pub OpId, pub ResultId, pub OpId, pub OpId);
