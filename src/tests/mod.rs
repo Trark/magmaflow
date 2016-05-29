@@ -114,7 +114,14 @@ fn dis_noop() {
         assert_eq!(dis, expect);
     }
     assert_eq!(NOOP_DIS, disassembly);
+}
 
+#[test]
+fn validate_noop() {
+    use logic_pass::parse;
+    let raw_module = reader::read_module(NOOP_SPV).expect("Failed to load noop.spv");
+    let module = parse(raw_module);
+    module.unwrap();
 }
 
 #[test]
@@ -126,4 +133,13 @@ fn dis_write_multiply() {
         assert_eq!(dis, expect);
     }
     assert_eq!(WRITE_MULTIPLY_DIS, disassembly);
+}
+
+#[test]
+fn validate_write_multiply() {
+    use logic_pass::parse;
+    let raw_module = reader::read_module(WRITE_MULTIPLY_SPV)
+        .expect("Failed to load write_multiply.spv");
+    let module = parse(raw_module);
+    module.unwrap();
 }

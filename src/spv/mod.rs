@@ -1,6 +1,7 @@
 
 pub mod types;
 pub mod op;
+pub mod logical;
 
 mod dis;
 
