@@ -1,11 +1,11 @@
 
-mod types;
-pub use self::types::*;
-
-mod op;
-pub use self::op::*;
+pub mod types;
+pub mod op;
 
 mod dis;
+
+use spv::op::*;
+use spv::types::*;
 
 /// Raw list of SpirV instructions
 #[derive(Clone, Debug, PartialEq)]

@@ -3,6 +3,8 @@ use std::fmt;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use spv::*;
+use spv::op::*;
+use spv::types::*;
 
 
 impl Display for RawModule {

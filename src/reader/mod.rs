@@ -1,5 +1,7 @@
 
 use spv::*;
+use spv::op::*;
+use spv::types::*;
 use byteorder::{LittleEndian, BigEndian, ByteOrder};
 
 #[derive(Debug, PartialEq)]

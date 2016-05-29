@@ -1,5 +1,7 @@
 
 use spv::*;
+use spv::op::*;
+use spv::types::*;
 use reader;
 
 const NOOP_SPV: &'static [u8] = include_bytes!("noop.spv");
