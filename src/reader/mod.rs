@@ -170,6 +170,7 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         3 => read_op_source(&mut im),
         5 => read_op_name(&mut im),
         6 => read_op_member_name(&mut im),
+        10 => read_op_extension(&mut im),
         11 => read_op_ext_inst_import(&mut im),
         14 => read_op_memory_model(&mut im),
         15 => read_op_entry_point(&mut im),
@@ -193,6 +194,7 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         43 => read_op_constant(&mut im),
         44 => read_op_constant_composite(&mut im),
         54 => read_op_function(&mut im),
+        55 => read_op_function_parameter(&mut im),
         56 => read_op_function_end(&mut im),
         59 => read_op_variable(&mut im),
         61 => read_op_load(&mut im),
@@ -352,6 +354,14 @@ fn read_op_member_name(stream: &mut InstructionMemory) -> ReadResult<Core> {
         member: member_index,
         name: name,
     }))
+}
+
+fn read_op_extension(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 2 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let name = try!(read_string_literal(stream));
+    Ok(Core::OpExtension(OpExtension { name: name }))
 }
 
 fn read_op_ext_inst_import(stream: &mut InstructionMemory) -> ReadResult<Core> {
@@ -951,6 +961,18 @@ fn read_op_function(stream: &mut InstructionMemory) -> ReadResult<Core> {
         function_type: function_type,
     };
     Ok(Core::OpFunction(func))
+}
+
+fn read_op_function_parameter(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    Ok(Core::OpFunctionParameter(OpFunctionParameter {
+        result_type: result_type,
+        result_id: result_id,
+    }))
 }
 
 fn read_op_function_end(stream: &mut InstructionMemory) -> ReadResult<Core> {

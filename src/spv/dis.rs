@@ -38,6 +38,7 @@ impl Display for Core {
             Core::OpSource(ref op) => Display::fmt(op, f),
             Core::OpName(ref op) => Display::fmt(op, f),
             Core::OpMemberName(ref op) => Display::fmt(op, f),
+            Core::OpExtension(ref op) => Display::fmt(op, f),
             Core::OpExtInstImport(ref op) => Display::fmt(op, f),
             Core::OpMemoryModel(ref op) => Display::fmt(op, f),
             Core::OpEntryPoint(ref op) => Display::fmt(op, f),
@@ -66,6 +67,7 @@ impl Display for Core {
             Core::OpConstant(ref op) => Display::fmt(op, f),
             Core::OpConstantComposite(ref op) => Display::fmt(op, f),
             Core::OpFunction(ref op) => Display::fmt(op, f),
+            Core::OpFunctionParameter(ref op) => Display::fmt(op, f),
             Core::OpFunctionEnd(ref op) => Display::fmt(op, f),
             Core::OpVariable(ref op) => Display::fmt(op, f),
             Core::OpLoad(ref op) => Display::fmt(op, f),
@@ -217,6 +219,12 @@ impl Display for OpMemberName {
                Arg(&self.struct_type),
                Arg(&self.member.0),
                ArgString(&self.name))
+    }
+}
+
+impl Display for OpExtension {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpExtension{}", NoResult, ArgString(&self.name))
     }
 }
 
@@ -788,6 +796,15 @@ impl Display for OpFunction {
                Arg(&self.result_type),
                Arg(&self.function_control),
                Arg(&self.function_type))
+    }
+}
+
+impl Display for OpFunctionParameter {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpFunctionParameter{}",
+               Result(&self.result_id),
+               Arg(&self.result_type))
     }
 }
 
