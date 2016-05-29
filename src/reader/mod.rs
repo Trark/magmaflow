@@ -30,6 +30,13 @@ pub enum ReadError {
     UnknownStorageClass(u32),
     UnknownFunctionParameterAttribute(Word),
     UnknownMemoryAccess(u32),
+    UnknownDim(u32),
+    UnknownDepthStatus(u32),
+    UnknownArrayed(u32),
+    UnknownMS(u32),
+    UnknownSampledStatus(u32),
+    UnknownImageFormat(u32),
+    UnknownAccessQualifier(u32),
 }
 
 pub type ReadResult<T> = Result<T, ReadError>;
@@ -169,8 +176,14 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         21 => read_op_type_int(&mut im),
         22 => read_op_type_float(&mut im),
         23 => read_op_type_vector(&mut im),
+        24 => read_op_type_matrix(&mut im),
+        25 => read_op_type_image(&mut im),
+        26 => read_op_type_sampler(&mut im),
+        27 => read_op_type_sampled_image(&mut im),
+        28 => read_op_type_array(&mut im),
         29 => read_op_type_runtime_array(&mut im),
         30 => read_op_type_struct(&mut im),
+        31 => read_op_type_opaque(&mut im),
         32 => read_op_type_pointer(&mut im),
         33 => read_op_type_function(&mut im),
         43 => read_op_constant(&mut im),
@@ -605,6 +618,188 @@ fn read_op_type_vector(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }))
 }
 
+fn read_op_type_matrix(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let column_type = try!(read_op_id(stream));
+    let column_count = try!(read_lit_number_u32(stream));
+    Ok(Core::OpTypeMatrix(OpTypeMatrix {
+        result_id: result_id,
+        column_type: column_type,
+        column_count: column_count,
+    }))
+}
+
+fn read_dim(stream: &mut InstructionMemory) -> ReadResult<Dim> {
+    Ok(match try!(stream.read_next()) {
+        0 => Dim::Tex1D,
+        1 => Dim::Tex2D,
+        2 => Dim::Tex3D,
+        3 => Dim::Cube,
+        4 => Dim::Rect,
+        5 => Dim::Buffer,
+        6 => Dim::SubpassData,
+        n => return Err(ReadError::UnknownDim(n)),
+    })
+}
+
+fn read_depth_status(stream: &mut InstructionMemory) -> ReadResult<DepthStatus> {
+    Ok(match try!(stream.read_next()) {
+        0 => DepthStatus::NotDepth,
+        1 => DepthStatus::Depth,
+        2 => DepthStatus::NoIndication,
+        n => return Err(ReadError::UnknownDepthStatus(n)),
+    })
+}
+
+fn read_arrayed(stream: &mut InstructionMemory) -> ReadResult<Arrayed> {
+    Ok(match try!(stream.read_next()) {
+        0 => Arrayed::False,
+        1 => Arrayed::True,
+        n => return Err(ReadError::UnknownArrayed(n)),
+    })
+}
+
+fn read_ms(stream: &mut InstructionMemory) -> ReadResult<MS> {
+    Ok(match try!(stream.read_next()) {
+        0 => MS::Single,
+        1 => MS::Multi,
+        n => return Err(ReadError::UnknownMS(n)),
+    })
+}
+
+fn read_sampled_status(stream: &mut InstructionMemory) -> ReadResult<SampledStatus> {
+    Ok(match try!(stream.read_next()) {
+        0 => SampledStatus::RuntimeChoice,
+        1 => SampledStatus::WithSampler,
+        2 => SampledStatus::WithoutSampler,
+        n => return Err(ReadError::UnknownSampledStatus(n)),
+    })
+}
+
+fn read_image_format(stream: &mut InstructionMemory) -> ReadResult<ImageFormat> {
+    Ok(match try!(stream.read_next()) {
+        0 => ImageFormat::Unknown,
+        1 => ImageFormat::Rgba32f,
+        2 => ImageFormat::Rgba16f,
+        3 => ImageFormat::R32f,
+        4 => ImageFormat::Rgba8,
+        5 => ImageFormat::Rgba8Snorm,
+        6 => ImageFormat::Rg32f,
+        7 => ImageFormat::Rg16f,
+        8 => ImageFormat::R11fG11fB10f,
+        9 => ImageFormat::R16f,
+        10 => ImageFormat::Rgba16,
+        11 => ImageFormat::Rgb10A2,
+        12 => ImageFormat::Rg16,
+        13 => ImageFormat::Rg8,
+        14 => ImageFormat::R16,
+        15 => ImageFormat::R8,
+        16 => ImageFormat::Rgba16Snorm,
+        17 => ImageFormat::Rg16Snorm,
+        18 => ImageFormat::Rg8Snorm,
+        19 => ImageFormat::R16Snorm,
+        20 => ImageFormat::R8Snorm,
+        21 => ImageFormat::Rgba32i,
+        22 => ImageFormat::Rgba16i,
+        23 => ImageFormat::Rgba8i,
+        24 => ImageFormat::R32i,
+        25 => ImageFormat::Rg32i,
+        26 => ImageFormat::Rg16i,
+        27 => ImageFormat::Rg8i,
+        28 => ImageFormat::R16i,
+        29 => ImageFormat::R8i,
+        30 => ImageFormat::Rgba32ui,
+        31 => ImageFormat::Rgba16ui,
+        32 => ImageFormat::Rgba8ui,
+        33 => ImageFormat::R32ui,
+        34 => ImageFormat::Rgb10a2ui,
+        35 => ImageFormat::Rg32ui,
+        36 => ImageFormat::Rg16ui,
+        37 => ImageFormat::Rg8ui,
+        38 => ImageFormat::R16ui,
+        39 => ImageFormat::R8ui,
+        n => return Err(ReadError::UnknownImageFormat(n)),
+    })
+}
+
+fn read_access_qualifier(stream: &mut InstructionMemory) -> ReadResult<AccessQualifier> {
+    Ok(match try!(stream.read_next()) {
+        0 => AccessQualifier::ReadOnly,
+        1 => AccessQualifier::WriteOnly,
+        2 => AccessQualifier::ReadWrite,
+        n => return Err(ReadError::UnknownAccessQualifier(n)),
+    })
+}
+
+fn read_op_type_image(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 9 && stream.get_word_count() != 10 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let sampled_type = try!(read_op_id(stream));
+    let dim = try!(read_dim(stream));
+    let depth = try!(read_depth_status(stream));
+    let arrayed = try!(read_arrayed(stream));
+    let ms = try!(read_ms(stream));
+    let sampled = try!(read_sampled_status(stream));
+    let image_format = try!(read_image_format(stream));
+    let access_qualifier = if stream.get_remaining_words() > 0 {
+        Some(try!(read_access_qualifier(stream)))
+    } else {
+        None
+    };
+    Ok(Core::OpTypeImage(OpTypeImage {
+        result_id: result_id,
+        sampled_type: sampled_type,
+        dim: dim,
+        depth: depth,
+        arrayed: arrayed,
+        ms: ms,
+        sampled: sampled,
+        format: image_format,
+        access_qualifier: access_qualifier,
+    }))
+}
+
+fn read_op_type_sampler(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 2 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    Ok(Core::OpTypeSampler(OpTypeSampler { result_id: result_id }))
+}
+
+fn read_op_type_sampled_image(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let image_type = try!(read_op_id(stream));
+    Ok(Core::OpTypeSampledImage(OpTypeSampledImage {
+        result_id: result_id,
+        image_type: image_type,
+    }))
+}
+
+fn read_op_type_array(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let element_type = try!(read_op_id(stream));
+    let length = try!(read_op_id(stream));
+    Ok(Core::OpTypeArray(OpTypeArray {
+        result_id: result_id,
+        element_type: element_type,
+        length: length,
+    }))
+}
+
+
+
 fn read_op_type_runtime_array(stream: &mut InstructionMemory) -> ReadResult<Core> {
     if stream.get_word_count() != 3 {
         return Err(ReadError::WrongWordCountForOp);
@@ -626,6 +821,18 @@ fn read_op_type_struct(stream: &mut InstructionMemory) -> ReadResult<Core> {
     Ok(Core::OpTypeStruct(OpTypeStruct {
         result_id: result_id,
         member_types: member_types,
+    }))
+}
+
+fn read_op_type_opaque(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_id = try!(read_result_id(stream));
+    let name = try!(read_string_literal(stream));
+    Ok(Core::OpTypeOpaque(OpTypeOpaque {
+        result_id: result_id,
+        name: name,
     }))
 }
 

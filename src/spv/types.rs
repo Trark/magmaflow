@@ -437,6 +437,7 @@ pub enum ImageFormat {
     Rgba32ui,
     Rgba16ui,
     Rgba8ui,
+    R32ui,
     Rgb10a2ui,
     Rg32ui,
     Rg16ui,

@@ -565,6 +565,7 @@ impl Display for ImageFormat {
             ImageFormat::Rgba32ui => "Rgba32ui",
             ImageFormat::Rgba16ui => "Rgba16ui",
             ImageFormat::Rgba8ui => "Rgba8ui",
+            ImageFormat::R32ui => "R32ui",
             ImageFormat::Rgb10a2ui => "Rgb10a2ui",
             ImageFormat::Rg32ui => "Rg32ui",
             ImageFormat::Rg16ui => "Rg16ui",
