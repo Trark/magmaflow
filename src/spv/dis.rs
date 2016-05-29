@@ -229,12 +229,12 @@ impl Display for OpExtInstImport {
     }
 }
 
-impl Display for AddressingMode {
+impl Display for AddressingModel {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         let name = match *self {
-            AddressingMode::Logical => "Logical",
-            AddressingMode::Physical32 => "Physical32",
-            AddressingMode::Physical64 => "Physical64",
+            AddressingModel::Logical => "Logical",
+            AddressingModel::Physical32 => "Physical32",
+            AddressingModel::Physical64 => "Physical64",
         };
         write!(f, "{}", name)
     }
@@ -256,7 +256,7 @@ impl Display for OpMemoryModel {
         write!(f,
                "{}OpMemoryModel{}{}",
                NoResult,
-               Arg(&self.addressing_mode),
+               Arg(&self.addressing_model),
                Arg(&self.memory_model))
     }
 }

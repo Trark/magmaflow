@@ -11,7 +11,7 @@ pub enum ReadError {
     BadMagic,
     UnknownVersionBytes(u8, u8, u8, u8),
     UnknownVersion(Version),
-    UnknownReservedHeaderWord4,
+    UnknownReservedHeaderu324,
     UnknownOp(u16, u16),
     WrongWordCountForOp,
     InvalidString,
@@ -19,18 +19,18 @@ pub enum ReadError {
     UnexpectedEndOfInstruction,
     InstructionHadExcessData,
 
-    UnknownAddressingMode(Word),
-    UnknownMemoryModel(Word),
-    UnknownExecutionModel(Word),
-    UnknownExecutionMode(Word),
-    UnknownCapability(Word),
-    UnknownDecoration(Word),
-    UnknownBuiltIn(Word),
-    UnknownFpRoundingMode(Word),
-    UnknownLinkageType(Word),
+    UnknownAddressingModel(u32),
+    UnknownMemoryModel(u32),
+    UnknownExecutionModel(u32),
+    UnknownExecutionMode(u32),
+    UnknownCapability(u32),
+    UnknownDecoration(u32),
+    UnknownBuiltIn(u32),
+    UnknownFpRoundingMode(u32),
+    UnknownLinkageType(u32),
     UnknownSignedness(u32),
     UnknownStorageClass(u32),
-    UnknownFunctionParameterAttribute(Word),
+    UnknownFunctionParameterAttribute(u32),
     UnknownMemoryAccess(u32),
     UnknownDim(u32),
     UnknownDepthStatus(u32),
@@ -43,8 +43,10 @@ pub enum ReadError {
 
 pub type ReadResult<T> = Result<T, ReadError>;
 
-const SPIRV_MAGIC_NUMBER: Word = 0x07230203;
-const SPIRV_MAGIC_NUMBER_OTHER_ENDIAN: Word = 0x03022307;
+/// Magic number for a SPIR-V module
+const SPIRV_MAGIC_NUMBER: u32 = 0x07230203;
+/// Magic number for a SPIR-V module if the endianness is flipped
+const SPIRV_MAGIC_NUMBER_OTHER_ENDIAN: u32 = 0x03022307;
 
 pub fn read_module<'a>(data: &'a [u8]) -> ReadResult<RawModule> {
     let mut stream = Stream::new(data);
@@ -98,7 +100,7 @@ pub fn read_module<'a>(data: &'a [u8]) -> ReadResult<RawModule> {
     let zero = try!(stream.read_word());
     match zero {
         0 => {}
-        _ => return Err(ReadError::UnknownReservedHeaderWord4),
+        _ => return Err(ReadError::UnknownReservedHeaderu324),
     }
 
     let mut instructions = Vec::new();
@@ -128,7 +130,7 @@ impl<'a> Stream<'a> {
         }
     }
 
-    fn read_word(&mut self) -> ReadResult<Word> {
+    fn read_word(&mut self) -> ReadResult<u32> {
         if self.source.len() >= 4 {
             let result = if self.is_le {
                 LittleEndian::read_u32(self.source)
@@ -210,19 +212,19 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
 }
 
 struct InstructionMemory<'a> {
-    block: &'a [Word],
+    block: &'a [u32],
     position: usize,
 }
 
 impl<'a> InstructionMemory<'a> {
-    fn new(memory: &'a [Word]) -> InstructionMemory<'a> {
+    fn new(memory: &'a [u32]) -> InstructionMemory<'a> {
         InstructionMemory {
             block: memory,
             position: 1, // First word is code / length
         }
     }
 
-    fn read_next(&mut self) -> ReadResult<Word> {
+    fn read_next(&mut self) -> ReadResult<u32> {
         if self.position < self.block.len() {
             let word = self.block[self.position];
             self.position = self.position + 1;
@@ -364,13 +366,13 @@ fn read_op_ext_inst_import(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }))
 }
 
-fn read_addressing_mode(stream: &mut InstructionMemory) -> ReadResult<AddressingMode> {
+fn read_addressing_model(stream: &mut InstructionMemory) -> ReadResult<AddressingModel> {
     let am = try!(stream.read_next());
     Ok(match am {
-        0 => AddressingMode::Logical,
-        1 => AddressingMode::Physical32,
-        2 => AddressingMode::Physical64,
-        id => return Err(ReadError::UnknownAddressingMode(id)),
+        0 => AddressingModel::Logical,
+        1 => AddressingModel::Physical32,
+        2 => AddressingModel::Physical64,
+        id => return Err(ReadError::UnknownAddressingModel(id)),
     })
 }
 
@@ -388,10 +390,10 @@ fn read_op_memory_model(stream: &mut InstructionMemory) -> ReadResult<Core> {
     if stream.get_word_count() != 3 {
         return Err(ReadError::WrongWordCountForOp);
     }
-    let am = try!(read_addressing_mode(stream));
+    let am = try!(read_addressing_model(stream));
     let mm = try!(read_memory_model(stream));
     Ok(Core::OpMemoryModel(OpMemoryModel {
-        addressing_mode: am,
+        addressing_model: am,
         memory_model: mm,
     }))
 }

@@ -1,32 +1,31 @@
+//! Core types used with SPIR-V instructions
 
-pub type Word = u32;
-
+/// A SPIR-V `<id>`
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpId(pub Word);
+pub struct OpId(pub u32);
 
+/// A SPIR-V `Result <id>`
 #[derive(Clone, Debug, PartialEq)]
-pub struct ResultId(pub Word);
+pub struct ResultId(pub u32);
 
-pub type WordNumber = Word;
-pub type LitNumber = Vec<u32>;
+/// Set of words used to represent a literal constant
 pub type LitBytes = Vec<u32>;
+
+/// A String literal
 pub type LitString = String;
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum Literal {
-    String(LitString),
-    Number(LitNumber),
-}
-
+/// Version for a module
 #[derive(Clone, Debug, PartialEq)]
 pub struct Version(pub u8, pub u8);
 
+/// Struct to hold type and version for the generator of a module
 #[derive(Clone, Debug, PartialEq)]
 pub struct Generator {
     pub tool: Tool,
     pub version: u16,
 }
 
+/// The tool used to generate a module
 #[derive(Clone, Debug, PartialEq)]
 pub enum Tool {
     KhronosReserved,
@@ -81,18 +80,22 @@ pub enum SourceLanguage {
     Glsl,
     OpenCL_C,
     OpenCL_Cpp,
-    Other(Word),
+    Other(u32),
 }
 
+/// Version of the source language
 #[derive(Clone, Debug, PartialEq)]
 pub struct SourceVersion(pub u32);
 
+/// Line number used with OpLine instruction
 #[derive(Clone, Debug, PartialEq)]
 pub struct Line(pub u32);
 
+/// Column number used with OpLine instruction
 #[derive(Clone, Debug, PartialEq)]
 pub struct Column(pub u32);
 
+/// Type of decoration to annotate an instruction with
 #[derive(Clone, Debug, PartialEq)]
 pub enum Decoration {
     RelaxedPrecision,
@@ -140,6 +143,7 @@ pub enum Decoration {
     Alignment(u32),
 }
 
+/// Marks a special built in variable or member
 #[derive(Clone, Debug, PartialEq)]
 pub enum BuiltIn {
     Position,
@@ -185,16 +189,19 @@ pub enum BuiltIn {
     InstanceIndex,
 }
 
+/// Offset of a member in a type
 #[derive(Clone, Debug, PartialEq)]
 pub struct MemberIndex(pub u32);
 
+/// The addressing model used by the module
 #[derive(Clone, Debug, PartialEq)]
-pub enum AddressingMode {
+pub enum AddressingModel {
     Logical,
     Physical32,
     Physical64,
 }
 
+/// The memory model required by the module
 #[derive(Clone, Debug, PartialEq)]
 pub enum MemoryModel {
     Simple,
@@ -202,6 +209,7 @@ pub enum MemoryModel {
     OpenCL,
 }
 
+/// The execution model for an entry point into the module
 #[derive(Clone, Debug, PartialEq)]
 pub enum ExecutionModel {
     Vertex,
@@ -248,6 +256,9 @@ pub enum ExecutionMode {
     ContractionOff,
 }
 
+/// Capability that a module may require
+///
+/// Many instructions and variants depend on a certain capability
 #[derive(Clone, Debug, PartialEq)]
 pub enum Capability {
     Matrix,
@@ -365,6 +376,7 @@ pub enum FunctionParameterAttribute {
     NoReadWrite,
 }
 
+/// The dimension for an image type
 #[derive(Clone, Debug, PartialEq)]
 pub enum Dim {
     Tex1D,
@@ -376,6 +388,7 @@ pub enum Dim {
     SubpassData,
 }
 
+/// Indicates if it is known if an image is a depth image
 #[derive(Clone, Debug, PartialEq)]
 pub enum DepthStatus {
     NotDepth,
@@ -383,18 +396,21 @@ pub enum DepthStatus {
     NoIndication,
 }
 
+/// Indicates if an image is an array or not
 #[derive(Clone, Debug, PartialEq)]
 pub enum Arrayed {
     False,
     True,
 }
 
+/// The multisample state of an image
 #[derive(Clone, Debug, PartialEq)]
 pub enum MS {
     Single,
     Multi,
 }
 
+/// Indicates how an image is used with samplers
 #[derive(Clone, Debug, PartialEq)]
 pub enum SampledStatus {
     RuntimeChoice,
@@ -402,6 +418,7 @@ pub enum SampledStatus {
     WithoutSampler,
 }
 
+/// The format for an image type
 #[derive(Clone, Debug, PartialEq)]
 pub enum ImageFormat {
     Unknown,
@@ -514,11 +531,13 @@ pub struct SelectionControl {
     dont_flatten: bool,
 }
 
+/// An `<id>` that refers to a scope
 #[derive(Clone, Debug, PartialEq)]
-pub struct ScopeId(pub Word);
+pub struct ScopeId(pub u32);
 
+/// An `<id>` that refers to memory semantics
 #[derive(Clone, Debug, PartialEq)]
-pub struct MemorySemanticsId(pub Word);
+pub struct MemorySemanticsId(pub u32);
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GroupOperation {

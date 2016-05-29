@@ -17,7 +17,7 @@ fn load_noop() {
         name: "GLSL.std.450".into(),
     };
     let mem_model = OpMemoryModel {
-        addressing_mode: AddressingMode::Logical,
+        addressing_model: AddressingModel::Logical,
         memory_model: MemoryModel::Glsl450,
     };
     let entry_point = OpEntryPoint {

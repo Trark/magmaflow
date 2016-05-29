@@ -8,11 +8,17 @@ use spv::op::*;
 use spv::types::*;
 
 /// Raw list of SpirV instructions
+///
+/// Instructions do not nessessarily pass validation rules.
 #[derive(Clone, Debug, PartialEq)]
 pub struct RawModule {
+    /// Version number of the module
     pub version: Version,
+    /// Tool and tool version used to generate the SPIR-V module
     pub generator: Generator,
-    pub bound: Word,
+    /// Bound on the highest id in the module (0 < id < bound)
+    pub bound: u32,
+    /// List of all instructions.
     pub instructions: Vec<Core>,
 }
 

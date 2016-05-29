@@ -1,3 +1,4 @@
+//! Instructions present in the core SPIR-V spec
 
 use super::types::*;
 
@@ -108,7 +109,7 @@ pub struct OpExtInst {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMemoryModel {
-    pub addressing_mode: AddressingMode,
+    pub addressing_model: AddressingModel,
     pub memory_model: MemoryModel,
 }
 
