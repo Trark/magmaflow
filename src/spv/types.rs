@@ -521,14 +521,28 @@ pub struct FunctionControl {
 pub struct LoopControl {
     pub unroll: bool,
     pub dont_unroll: bool,
+    /// Added in 1.1
     pub dependency_infinite: bool,
+    /// Added in 1.1
     pub dependency_length: Option<u32>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct SelectionControl {
-    flatten: bool,
-    dont_flatten: bool,
+    pub flatten: bool,
+    pub dont_flatten: bool,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct PhiArg {
+    pub variable: OpId,
+    pub parent: OpId,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct BranchWeights {
+    pub true_weight: u32,
+    pub false_weight: u32,
 }
 
 /// An `<id>` that refers to a scope

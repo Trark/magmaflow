@@ -24,6 +24,7 @@ enum OpByBlock {
     OpFunctionEnd(OpFunctionEnd),
     OpLabel(OpLabel),
     GroupCode(GroupCode),
+    GroupMerge(GroupMerge),
     GroupBranch(GroupBranch),
 }
 
@@ -60,6 +61,12 @@ impl From<GroupConstant> for OpByBlock {
 impl From<GroupCode> for OpByBlock {
     fn from(inst: GroupCode) -> OpByBlock {
         OpByBlock::GroupCode(inst)
+    }
+}
+
+impl From<GroupMerge> for OpByBlock {
+    fn from(inst: GroupMerge) -> OpByBlock {
+        OpByBlock::GroupMerge(inst)
     }
 }
 
@@ -125,8 +132,14 @@ impl From<Core> for OpByBlock {
             OpMemberDecorate(op) => GroupAnnotation::OpMemberDecorate(op).into(),
             OpConvertUToF(op) => GroupCode::OpConvertUToF(op).into(),
             OpIMul(op) => GroupCode::OpIMul(op).into(),
+            OpUMod(op) => GroupCode::OpUMod(op).into(),
+            OpIEqual(op) => GroupCode::OpIEqual(op).into(),
+            OpPhi(op) => GroupCode::OpPhi(op).into(),
+            OpLoopMerge(op) => GroupMerge::OpLoopMerge(op).into(),
+            OpSelectionMerge(op) => GroupMerge::OpSelectionMerge(op).into(),
             OpLabel(op) => OpByBlock::OpLabel(op),
             OpBranch(op) => GroupBranch::OpBranch(op).into(),
+            OpBranchConditional(op) => GroupBranch::OpBranchConditional(op).into(),
             OpReturn(op) => GroupBranch::OpReturn(op).into(),
         }
     }

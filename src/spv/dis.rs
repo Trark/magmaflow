@@ -77,8 +77,14 @@ impl Display for Core {
             Core::OpMemberDecorate(ref op) => Display::fmt(op, f),
             Core::OpConvertUToF(ref op) => Display::fmt(op, f),
             Core::OpIMul(ref op) => Display::fmt(op, f),
+            Core::OpUMod(ref op) => Display::fmt(op, f),
+            Core::OpIEqual(ref op) => Display::fmt(op, f),
+            Core::OpPhi(ref op) => Display::fmt(op, f),
+            Core::OpLoopMerge(ref op) => Display::fmt(op, f),
+            Core::OpSelectionMerge(ref op) => Display::fmt(op, f),
             Core::OpLabel(ref op) => Display::fmt(op, f),
             Core::OpBranch(ref op) => Display::fmt(op, f),
+            Core::OpBranchConditional(ref op) => Display::fmt(op, f),
             Core::OpReturn(ref op) => Display::fmt(op, f),
         }
     }
@@ -1092,9 +1098,126 @@ impl Display for OpIMul {
     }
 }
 
+impl Display for OpUMod {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpUMod{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.operand1),
+               Arg(&self.operand2))
+    }
+}
+
+impl Display for OpIEqual {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpIEqual{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.operand1),
+               Arg(&self.operand2))
+    }
+}
+
+impl Display for PhiArg {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}{}", Arg(&self.variable), Arg(&self.parent))
+    }
+}
+
+impl Display for OpPhi {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpPhi{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               ArgList(&self.variables))
+    }
+}
+
+impl Display for LoopControl {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.unroll {
+            parts.push("Unroll".to_string());
+        }
+        if self.dont_unroll {
+            parts.push("DontUnroll".to_string());
+        }
+        if self.dependency_infinite {
+            parts.push("DependencyInfinite".to_string());
+        }
+        if let Some(len) = self.dependency_length {
+            parts.push(format!("DependencyLength({})", len));
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
+}
+
+impl Display for OpLoopMerge {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpLoopMerge{}{}{}",
+               NoResult,
+               Arg(&self.merge_block),
+               Arg(&self.continue_target),
+               Arg(&self.loop_control))
+    }
+}
+
+impl Display for SelectionControl {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.flatten {
+            parts.push("Flatten");
+        }
+        if self.dont_flatten {
+            parts.push("DontFlatten");
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
+}
+
+impl Display for OpSelectionMerge {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpSelectionMerge{}{}",
+               NoResult,
+               Arg(&self.merge_block),
+               Arg(&self.selection_control))
+    }
+}
+
 impl Display for OpLabel {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "{}OpLabel", Result(&self.result_id))
+    }
+}
+
+impl Display for BranchWeights {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}{}", Arg(&self.true_weight), Arg(&self.false_weight))
+    }
+}
+
+impl Display for OpBranchConditional {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpBranchConditional{}{}{}{}",
+               NoResult,
+               Arg(&self.condition),
+               Arg(&self.true_label),
+               Arg(&self.false_label),
+               ArgOpt(&self.weights))
     }
 }
 

@@ -234,6 +234,14 @@ fn read_branch(insts: OpSlice) -> ValidationResult<(GroupBranch, OpSlice)> {
     }
 }
 
+fn read_merge(insts: OpSlice) -> (Option<GroupMerge>, OpSlice) {
+    if let Some(&OpByBlock::GroupMerge(ref op)) = insts.first() {
+        (Some(op.clone()), insts.advance())
+    } else {
+        (None, insts)
+    }
+}
+
 fn read_basic_block(insts: OpSlice) -> PhaseResult<BasicBlock> {
     if let Some(&OpByBlock::OpLabel(ref op)) = insts.first() {
         let label = op.clone();
@@ -241,6 +249,7 @@ fn read_basic_block(insts: OpSlice) -> PhaseResult<BasicBlock> {
             Ok((code, insts)) => (code, insts),
             Err(err) => return PhaseResult::Err(err),
         };
+        let (merge, insts) = read_merge(insts);
         let (branch, insts) = match read_branch(insts) {
             Ok((branch, insts)) => (branch, insts),
             Err(err) => return PhaseResult::Err(err),
@@ -248,6 +257,7 @@ fn read_basic_block(insts: OpSlice) -> PhaseResult<BasicBlock> {
         let block = BasicBlock {
             label: label,
             code: code,
+            merge: merge,
             branch: branch,
         };
         PhaseResult::Ok(block, insts)

@@ -40,6 +40,8 @@ pub enum ReadError {
     UnknownSampledStatus(u32),
     UnknownImageFormat(u32),
     UnknownAccessQualifier(u32),
+    UnknownLoopControl(u32),
+    UnknownSelectionControl(u32),
 }
 
 pub type ReadResult<T> = Result<T, ReadError>;
@@ -284,7 +286,7 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         134 => return Err(ReadError::UnimplementedOp("OpUDiv")),
         135 => return Err(ReadError::UnimplementedOp("OpSDiv")),
         136 => return Err(ReadError::UnimplementedOp("OpFDiv")),
-        137 => return Err(ReadError::UnimplementedOp("OpUMod")),
+        137 => read_op_umod(&mut im),
         138 => return Err(ReadError::UnimplementedOp("OpSRem")),
         139 => return Err(ReadError::UnimplementedOp("OpSMod")),
         140 => return Err(ReadError::UnimplementedOp("OpFRem")),
@@ -316,7 +318,7 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         167 => return Err(ReadError::UnimplementedOp("OpLogicalAnd")),
         168 => return Err(ReadError::UnimplementedOp("OpLogicalNot")),
         169 => return Err(ReadError::UnimplementedOp("OpSelect")),
-        170 => return Err(ReadError::UnimplementedOp("OpIEqual")),
+        170 => read_op_iequal(&mut im),
         171 => return Err(ReadError::UnimplementedOp("OpINotEqual")),
         172 => return Err(ReadError::UnimplementedOp("OpUGreaterThan")),
         173 => return Err(ReadError::UnimplementedOp("OpSGreaterThan")),
@@ -381,12 +383,12 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         240 => return Err(ReadError::UnimplementedOp("OpAtomicAnd")),
         241 => return Err(ReadError::UnimplementedOp("OpAtomicOr")),
         242 => return Err(ReadError::UnimplementedOp("OpAtomicXor")),
-        245 => return Err(ReadError::UnimplementedOp("OpPhi")),
-        246 => return Err(ReadError::UnimplementedOp("OpLoopMerge")),
-        247 => return Err(ReadError::UnimplementedOp("OpSelectionMerge")),
+        245 => read_op_phi(&mut im),
+        246 => read_op_loop_merge(&mut im),
+        247 => read_op_selection_merge(&mut im),
         248 => read_op_label(&mut im),
         249 => read_op_branch(&mut im),
-        250 => return Err(ReadError::UnimplementedOp("OpBranchConditional")),
+        250 => read_op_branch_conditional(&mut im),
         251 => return Err(ReadError::UnimplementedOp("OpSwitch")),
         252 => return Err(ReadError::UnimplementedOp("OpKill")),
         253 => read_op_return(&mut im),
@@ -1511,6 +1513,120 @@ fn read_op_imul(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }))
 }
 
+fn read_op_umod(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 5 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let operand1 = try!(read_op_id(stream));
+    let operand2 = try!(read_op_id(stream));
+    Ok(Core::OpUMod(OpUMod {
+        result_type: result_type,
+        result_id: result_id,
+        operand1: operand1,
+        operand2: operand2,
+    }))
+}
+
+fn read_op_iequal(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 5 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let operand1 = try!(read_op_id(stream));
+    let operand2 = try!(read_op_id(stream));
+    Ok(Core::OpIEqual(OpIEqual {
+        result_type: result_type,
+        result_id: result_id,
+        operand1: operand1,
+        operand2: operand2,
+    }))
+}
+
+fn read_op_phi(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+
+    let slots2 = stream.get_remaining_words();
+    let slots = slots2 / 2;
+    let mut ids = Vec::with_capacity(slots2);
+    for _ in 0..slots {
+        let var = read_op_id(stream).expect("Phi op var read should never pass end");
+        let parent = read_op_id(stream).expect("Phi op parent read should never pass end");
+        ids.push(PhiArg {
+            variable: var,
+            parent: parent,
+        });
+    }
+
+    Ok(Core::OpPhi(OpPhi {
+        result_type: result_type,
+        result_id: result_id,
+        variables: ids,
+    }))
+}
+
+fn read_loop_control(stream: &mut InstructionMemory) -> ReadResult<LoopControl> {
+    let word = try!(stream.read_next());
+    if word & 0xFFF0 != 0 {
+        return Err(ReadError::UnknownLoopControl(word));
+    }
+    let dependency_length_val = (word & 0x8) != 0;
+    let dependency_length = if dependency_length_val {
+        Some(try!(read_lit_number_u32(stream)))
+    } else {
+        None
+    };
+    Ok(LoopControl {
+        unroll: (word & 0x1) != 0,
+        dont_unroll: (word & 0x2) != 0,
+        dependency_infinite: (word & 0x4) != 0,
+        dependency_length: dependency_length,
+    })
+}
+
+fn read_op_loop_merge(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() < 4 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let merge_block = try!(read_op_id(stream));
+    let continue_target = try!(read_op_id(stream));
+    let loop_control = try!(read_loop_control(stream));
+    Ok(Core::OpLoopMerge(OpLoopMerge {
+        merge_block: merge_block,
+        continue_target: continue_target,
+        loop_control: loop_control,
+    }))
+}
+
+fn read_selection_control(stream: &mut InstructionMemory) -> ReadResult<SelectionControl> {
+    let word = try!(stream.read_next());
+    if word & 0xFFFC != 0 {
+        return Err(ReadError::UnknownSelectionControl(word));
+    }
+    Ok(SelectionControl {
+        flatten: (word & 0x1) != 0,
+        dont_flatten: (word & 0x2) != 0,
+    })
+}
+
+fn read_op_selection_merge(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 3 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let merge_block = try!(read_op_id(stream));
+    let selection_control = try!(read_selection_control(stream));
+    Ok(Core::OpSelectionMerge(OpSelectionMerge {
+        merge_block: merge_block,
+        selection_control: selection_control,
+    }))
+}
+
 fn read_op_label(stream: &mut InstructionMemory) -> ReadResult<Core> {
     if stream.get_word_count() != 2 {
         return Err(ReadError::WrongWordCountForOp);
@@ -1525,6 +1641,31 @@ fn read_op_branch(stream: &mut InstructionMemory) -> ReadResult<Core> {
     }
     let label_id = try!(read_op_id(stream));
     Ok(Core::OpBranch(OpBranch { target_label: label_id }))
+}
+
+fn read_op_branch_conditional(stream: &mut InstructionMemory) -> ReadResult<Core> {
+    if stream.get_word_count() != 4 && stream.get_word_count() != 6 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let condition = try!(read_op_id(stream));
+    let true_label = try!(read_op_id(stream));
+    let false_label = try!(read_op_id(stream));
+    let weights = if stream.get_word_count() == 6 {
+        let w1 = try!(stream.read_next());
+        let w2 = try!(stream.read_next());
+        Some(BranchWeights {
+            true_weight: w1,
+            false_weight: w2,
+        })
+    } else {
+        None
+    };
+    Ok(Core::OpBranchConditional(OpBranchConditional {
+        condition: condition,
+        true_label: true_label,
+        false_label: false_label,
+        weights: weights,
+    }))
 }
 
 fn read_op_return(stream: &mut InstructionMemory) -> ReadResult<Core> {

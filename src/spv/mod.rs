@@ -69,7 +69,13 @@ pub enum Core {
     OpMemberDecorate(OpMemberDecorate),
     OpConvertUToF(OpConvertUToF),
     OpIMul(OpIMul),
+    OpUMod(OpUMod),
+    OpIEqual(OpIEqual),
+    OpPhi(OpPhi),
+    OpLoopMerge(OpLoopMerge),
+    OpSelectionMerge(OpSelectionMerge),
     OpLabel(OpLabel),
     OpBranch(OpBranch),
+    OpBranchConditional(OpBranchConditional),
     OpReturn(OpReturn),
 }

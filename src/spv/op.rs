@@ -1165,70 +1165,180 @@ pub struct OpLogicalNot(pub OpId, pub ResultId, pub OpId);
 pub struct OpSelect(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpIEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpIEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpINotEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpINotEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpUGreaterThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpUGreaterThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSGreaterThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSGreaterThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpUGreaterThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpUGreaterThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSGreaterThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSGreaterThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpULessThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpULessThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSLessThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSLessThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpULessThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpULessThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSLessThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpSLessThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFOrdEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFOrdEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFUnordEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFUnordEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFOrdNotEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFOrdNotEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFUnordNotEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFUnordNotEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFOrdLessThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFOrdLessThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFUnordLessThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFUnordLessThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFOrdGreaterThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFOrdGreaterThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFUnordGreaterThan(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFUnordGreaterThan {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFOrdLessThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFOrdLessThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFUnordLessThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFUnordLessThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFOrdGreaterThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFOrdGreaterThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpFUnordGreaterThanEqual(pub OpId, pub ResultId, pub OpId, pub OpId);
+pub struct OpFUnordGreaterThanEqual {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub operand1: OpId,
+    pub operand2: OpId,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpDPdx(pub OpId, pub ResultId, pub OpId);
@@ -1258,13 +1368,24 @@ pub struct OpDPdyCoarse(pub OpId, pub ResultId, pub OpId);
 pub struct OpFwidthCoarse(pub OpId, pub ResultId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpPhi(pub OpId, pub ResultId, pub Vec<OpId>);
+pub struct OpPhi {
+    pub result_type: OpId,
+    pub result_id: ResultId,
+    pub variables: Vec<PhiArg>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpLoopMerge(pub OpId, pub OpId, pub LoopControl);
+pub struct OpLoopMerge {
+    pub merge_block: OpId,
+    pub continue_target: OpId,
+    pub loop_control: LoopControl,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpSelectionMerge(pub OpId, pub SelectionControl);
+pub struct OpSelectionMerge {
+    pub merge_block: OpId,
+    pub selection_control: SelectionControl,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpLabel {
@@ -1277,7 +1398,12 @@ pub struct OpBranch {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct OpBranchConditional(pub OpId, pub OpId, pub OpId, pub Option<(u32, u32)>);
+pub struct OpBranchConditional {
+    pub condition: OpId,
+    pub true_label: OpId,
+    pub false_label: OpId,
+    pub weights: Option<BranchWeights>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSwitch(pub OpId, pub OpId, pub Vec<(LitBytes, OpId)>);

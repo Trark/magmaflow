@@ -63,11 +63,21 @@ pub enum GroupCode {
     OpAccessChain(OpAccessChain),
     OpConvertUToF(OpConvertUToF),
     OpIMul(OpIMul),
+    OpUMod(OpUMod),
+    OpIEqual(OpIEqual),
+    OpPhi(OpPhi),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum GroupMerge {
+    OpLoopMerge(OpLoopMerge),
+    OpSelectionMerge(OpSelectionMerge),
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GroupBranch {
     OpBranch(OpBranch),
+    OpBranchConditional(OpBranchConditional),
     OpReturn(OpReturn),
 }
 
@@ -81,6 +91,7 @@ pub struct FunctionDeclaration {
 pub struct BasicBlock {
     pub label: OpLabel,
     pub code: Vec<GroupCode>,
+    pub merge: Option<GroupMerge>,
     pub branch: GroupBranch,
 }
 
