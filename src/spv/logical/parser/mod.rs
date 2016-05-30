@@ -1,11 +1,18 @@
 
 mod parser;
-pub use self::parser::{parse, ValidationError};
+pub use self::parser::{validate, ValidationError};
 
-use spv::*;
 use spv::op::*;
 use spv::types::*;
-use spv::logical::*;
+use spv::raw::*;
+use super::GroupDebug;
+use super::GroupAnnotation;
+use super::GroupType;
+use super::GroupConstant;
+use super::GroupGlobal;
+use super::GroupCode;
+use super::GroupMerge;
+use super::GroupBranch;
 
 /// Instructions grouped by where they fit in the logical module layout
 #[derive(Clone, Debug, PartialEq)]
@@ -87,7 +94,7 @@ impl From<OpVariable> for OpByBlock {
 
 impl From<Core> for OpByBlock {
     fn from(inst: Core) -> OpByBlock {
-        use spv::Core::*;
+        use spv::raw::Core::*;
         match inst {
             OpNop(op) => GroupCode::OpNop(op).into(),
             OpSource(op) => GroupDebug::OpSource(op).into(),

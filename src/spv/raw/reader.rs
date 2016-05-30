@@ -1,50 +1,8 @@
 
-use spv::*;
 use spv::op::*;
 use spv::types::*;
+use spv::raw::*;
 use byteorder::{LittleEndian, BigEndian, ByteOrder};
-
-#[derive(Debug, PartialEq)]
-pub enum ReadError {
-    UnexpectedEndOfStream,
-    UnexpectedStreamAlignment,
-    BadMagic,
-    UnknownVersionBytes(u8, u8, u8, u8),
-    UnknownVersion(Version),
-    UnknownReservedHeaderu324,
-    UnknownOp(u16, u16),
-    UnimplementedOp(&'static str),
-    WrongWordCountForOp,
-    InvalidString,
-
-    UnexpectedEndOfInstruction,
-    InstructionHadExcessData,
-
-    UnknownAddressingModel(u32),
-    UnknownMemoryModel(u32),
-    UnknownExecutionModel(u32),
-    UnknownExecutionMode(u32),
-    UnknownCapability(u32),
-    UnknownDecoration(u32),
-    UnknownBuiltIn(u32),
-    UnknownFpRoundingMode(u32),
-    UnknownLinkageType(u32),
-    UnknownSignedness(u32),
-    UnknownStorageClass(u32),
-    UnknownFunctionParameterAttribute(u32),
-    UnknownMemoryAccess(u32),
-    UnknownDim(u32),
-    UnknownDepthStatus(u32),
-    UnknownArrayed(u32),
-    UnknownMS(u32),
-    UnknownSampledStatus(u32),
-    UnknownImageFormat(u32),
-    UnknownAccessQualifier(u32),
-    UnknownLoopControl(u32),
-    UnknownSelectionControl(u32),
-}
-
-pub type ReadResult<T> = Result<T, ReadError>;
 
 /// Magic number for a SPIR-V module
 const SPIRV_MAGIC_NUMBER: u32 = 0x07230203;

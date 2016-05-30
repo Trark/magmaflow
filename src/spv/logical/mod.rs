@@ -1,4 +1,7 @@
 
+mod parser;
+pub use self::parser::{validate, ValidationError};
+
 use super::op::*;
 use super::types::*;
 

@@ -1,8 +1,8 @@
 
-use spv::*;
 use spv::op::*;
 use spv::types::*;
-use reader;
+use spv::raw::*;
+use spv::logical::*;
 
 const NOOP_SPV: &'static [u8] = include_bytes!("noop.spv");
 const NOOP_DIS: &'static str = include_str!("noop.dis");
@@ -11,7 +11,7 @@ const WRITE_MULTIPLY_DIS: &'static str = include_str!("write_multiply.dis");
 
 #[test]
 fn load_noop() {
-    let result = reader::read_module(NOOP_SPV);
+    let result = read_module(NOOP_SPV);
     let glsl450 = OpExtInstImport {
         result_id: ResultId(1),
         name: "GLSL.std.450".into(),
@@ -108,7 +108,7 @@ fn load_noop() {
 
 #[test]
 fn dis_noop() {
-    let raw_module = reader::read_module(NOOP_SPV).expect("Failed to load noop.spv");
+    let raw_module = read_module(NOOP_SPV).expect("Failed to load noop.spv");
     let disassembly = format!("{}", raw_module);
     for (dis, expect) in disassembly.lines().zip(NOOP_DIS.lines()) {
         assert_eq!(dis, expect);
@@ -118,16 +118,14 @@ fn dis_noop() {
 
 #[test]
 fn validate_noop() {
-    use logic_pass::parse;
-    let raw_module = reader::read_module(NOOP_SPV).expect("Failed to load noop.spv");
-    let module = parse(raw_module);
+    let raw_module = read_module(NOOP_SPV).expect("Failed to load noop.spv");
+    let module = validate(raw_module);
     module.unwrap();
 }
 
 #[test]
 fn dis_write_multiply() {
-    let raw_module = reader::read_module(WRITE_MULTIPLY_SPV)
-        .expect("Failed to load write_multiply.spv");
+    let raw_module = read_module(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
     let disassembly = format!("{}", raw_module);
     for (dis, expect) in disassembly.lines().zip(WRITE_MULTIPLY_DIS.lines()) {
         assert_eq!(dis, expect);
@@ -137,9 +135,7 @@ fn dis_write_multiply() {
 
 #[test]
 fn validate_write_multiply() {
-    use logic_pass::parse;
-    let raw_module = reader::read_module(WRITE_MULTIPLY_SPV)
-        .expect("Failed to load write_multiply.spv");
-    let module = parse(raw_module);
+    let raw_module = read_module(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
+    let module = validate(raw_module);
     module.unwrap();
 }

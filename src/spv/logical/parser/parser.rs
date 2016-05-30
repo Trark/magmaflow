@@ -1,7 +1,7 @@
 
-use spv::*;
 use spv::op::*;
 use spv::types::*;
+use spv::raw::*;
 use spv::logical::*;
 use super::OpByBlock;
 
@@ -16,7 +16,7 @@ pub enum ValidationError {
 
 pub type ValidationResult<T> = Result<T, ValidationError>;
 
-pub fn parse(raw: RawModule) -> ValidationResult<LogicalModule> {
+pub fn validate(raw: RawModule) -> ValidationResult<LogicalModule> {
     let group = Into::<OpByBlock>::into;
     let insts_storage = raw.instructions.into_iter().map(group).collect::<Vec<_>>();
     let insts = OpSlice::new(&insts_storage);
