@@ -1,0 +1,87 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 1
+; Bound: 50
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %4 "main" %9
+               OpExecutionMode %4 LocalSize 32 32 32
+               OpSource GLSL 430
+               OpName %4 "main"
+               OpName %9 "gl_GlobalInvocationID"
+               OpName %23 "write_value"
+               OpName %34 "MyBuffer"
+               OpMemberName %34 0 "value"
+               OpName %36 ""
+               OpName %47 "Block"
+               OpMemberName %47 0 "value"
+               OpName %49 "test"
+               OpDecorate %9 BuiltIn GlobalInvocationId
+               OpDecorate %33 ArrayStride 4
+               OpMemberDecorate %34 0 Offset 0
+               OpDecorate %34 BufferBlock
+               OpDecorate %36 DescriptorSet 0
+               OpDecorate %36 Binding 2
+               OpDecorate %45 BuiltIn WorkgroupSize
+               OpMemberDecorate %47 0 Offset 0
+               OpDecorate %47 BufferBlock
+               OpDecorate %49 DescriptorSet 0
+          %2 = OpTypeVoid
+          %3 = OpTypeFunction %2
+          %6 = OpTypeInt 32 0
+          %7 = OpTypeVector %6 3
+          %8 = OpTypePointer Input %7
+          %9 = OpVariable %8 Input
+         %10 = OpConstant %6 1
+         %11 = OpTypePointer Input %6
+         %14 = OpConstant %6 2
+         %16 = OpConstant %6 0
+         %17 = OpTypeBool
+         %21 = OpTypeFloat 32
+         %22 = OpTypePointer Function %21
+         %33 = OpTypeRuntimeArray %21
+         %34 = OpTypeStruct %33
+         %35 = OpTypePointer Uniform %34
+         %36 = OpVariable %35 Uniform
+         %37 = OpTypeInt 32 1
+         %38 = OpConstant %37 0
+         %42 = OpTypePointer Uniform %21
+         %44 = OpConstant %6 32
+         %45 = OpConstantComposite %7 %44 %44 %44
+         %46 = OpTypeVector %21 3
+         %47 = OpTypeStruct %46
+         %48 = OpTypePointer Uniform %47
+         %49 = OpVariable %48 Uniform
+          %4 = OpFunction %2 None %3
+          %5 = OpLabel
+         %23 = OpVariable %22 Function
+         %12 = OpAccessChain %11 %9 %10
+         %13 = OpLoad %6 %12
+         %15 = OpUMod %6 %13 %14
+         %18 = OpIEqual %17 %15 %16
+               OpSelectionMerge %20 None
+               OpBranchConditional %18 %19 %28
+         %19 = OpLabel
+         %24 = OpAccessChain %11 %9 %14
+         %25 = OpLoad %6 %24
+         %26 = OpConvertUToF %21 %25
+         %27 = OpExtInst %21 %1 Sin %26
+               OpStore %23 %27
+               OpBranch %20
+         %28 = OpLabel
+         %29 = OpAccessChain %11 %9 %14
+         %30 = OpLoad %6 %29
+         %31 = OpConvertUToF %21 %30
+         %32 = OpExtInst %21 %1 Cos %31
+               OpStore %23 %32
+               OpBranch %20
+         %20 = OpLabel
+         %39 = OpAccessChain %11 %9 %16
+         %40 = OpLoad %6 %39
+         %41 = OpLoad %21 %23
+         %43 = OpAccessChain %42 %36 %38 %40
+               OpStore %43 %41
+               OpReturn
+               OpFunctionEnd

@@ -40,6 +40,7 @@ impl Display for Core {
             Core::OpMemberName(ref op) => Display::fmt(op, f),
             Core::OpExtension(ref op) => Display::fmt(op, f),
             Core::OpExtInstImport(ref op) => Display::fmt(op, f),
+            Core::OpExtInst(ref op) => Display::fmt(op, f),
             Core::OpMemoryModel(ref op) => Display::fmt(op, f),
             Core::OpEntryPoint(ref op) => Display::fmt(op, f),
             Core::OpExecutionMode(ref op) => Display::fmt(op, f),
@@ -240,6 +241,17 @@ impl Display for OpExtInstImport {
                "{}OpExtInstImport{}",
                Result(&self.result_id),
                ArgString(&self.name))
+    }
+}
+
+impl Display for OpExtInst {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpExtInst{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.set),
+               Arg(&self.instruction))
     }
 }
 

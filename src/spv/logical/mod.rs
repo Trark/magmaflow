@@ -59,6 +59,7 @@ pub enum GroupGlobal {
 #[derive(Clone, Debug, PartialEq)]
 pub enum GroupCode {
     OpNop(OpNop),
+    OpExtInst(OpExtInst),
     /// Variables inside blocks must have a storage class of Function
     OpVariable(OpVariable),
     OpLoad(OpLoad),

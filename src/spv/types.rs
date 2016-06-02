@@ -1,7 +1,7 @@
 //! Core types used with SPIR-V instructions
 
 /// A SPIR-V `<id>`
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct OpId(pub u32);
 
 /// A SPIR-V `Result <id>`

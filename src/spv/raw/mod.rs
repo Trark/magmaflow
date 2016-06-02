@@ -29,6 +29,7 @@ pub enum Core {
     OpMemberName(OpMemberName),
     OpExtension(OpExtension),
     OpExtInstImport(OpExtInstImport),
+    OpExtInst(OpExtInst),
     OpMemoryModel(OpMemoryModel),
     OpEntryPoint(OpEntryPoint),
     OpExecutionMode(OpExecutionMode),
@@ -94,6 +95,10 @@ pub enum ReadError {
     UnexpectedEndOfInstruction,
     InstructionHadExcessData,
 
+    UnknownInstSet(String),
+    UnknownInstSetId(OpId),
+    UnknownExtInstOp(&'static str, u32),
+    DuplicateResultId(ResultId),
     UnknownAddressingModel(u32),
     UnknownMemoryModel(u32),
     UnknownExecutionModel(u32),
@@ -119,3 +124,32 @@ pub enum ReadError {
 }
 
 pub type ReadResult<T> = Result<T, ReadError>;
+
+pub struct MemoryBlock<'a> {
+    data: &'a [u32],
+}
+
+pub type MemoryBlockResult<'a, T> = Result<(MemoryBlock<'a>, T), ReadError>;
+
+impl<'a> MemoryBlock<'a> {
+    fn new(data: &[u32]) -> MemoryBlock {
+        MemoryBlock { data: data }
+    }
+
+    pub fn read_word(self) -> MemoryBlockResult<'a, u32> {
+        if self.data.len() > 0 {
+            Ok((MemoryBlock { data: &self.data[1..] }, self.data[0]))
+        } else {
+            Err(ReadError::UnexpectedEndOfInstruction)
+        }
+    }
+
+    pub fn end(&self) -> bool {
+        self.data.len() == 0
+    }
+
+    pub fn read_op_id(self) -> MemoryBlockResult<'a, OpId> {
+        let (next, word) = try!(self.read_word());
+        Ok((next, OpId(word)))
+    }
+}

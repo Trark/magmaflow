@@ -102,6 +102,7 @@ impl From<Core> for OpByBlock {
             OpMemberName(op) => GroupDebug::OpMemberName(op).into(),
             OpExtension(op) => OpByBlock::OpExtension(op),
             OpExtInstImport(op) => OpByBlock::OpExtInstImport(op),
+            OpExtInst(op) => GroupCode::OpExtInst(op).into(),
             OpMemoryModel(op) => OpByBlock::OpMemoryModel(op),
             OpEntryPoint(op) => OpByBlock::OpEntryPoint(op),
             OpExecutionMode(op) => OpByBlock::OpExecutionMode(op),

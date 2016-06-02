@@ -1,4 +1,7 @@
 
+use std::collections::HashMap;
+use spv::ExtInstSet;
+use spv::ExtInstBox;
 use spv::op::*;
 use spv::types::*;
 use spv::raw::*;
@@ -9,7 +12,9 @@ const SPIRV_MAGIC_NUMBER: u32 = 0x07230203;
 /// Magic number for a SPIR-V module if the endianness is flipped
 const SPIRV_MAGIC_NUMBER_OTHER_ENDIAN: u32 = 0x03022307;
 
-pub fn read_module<'a>(data: &'a [u8]) -> ReadResult<RawModule> {
+pub fn read_module<'a>(data: &'a [u8],
+                       known_inst_sets: Vec<Box<ExtInstSet>>)
+                       -> ReadResult<RawModule> {
     let mut stream = Stream::new(data);
 
     let magic = try!(stream.read_word());
@@ -65,8 +70,9 @@ pub fn read_module<'a>(data: &'a [u8]) -> ReadResult<RawModule> {
     }
 
     let mut instructions = Vec::new();
+    let mut bound_inst_sets = HashMap::new();
     while !stream.is_end() {
-        let instr = try!(read_instruction(&mut stream));
+        let instr = try!(read_instruction(&mut stream, &known_inst_sets, &mut bound_inst_sets));
         instructions.push(instr);
     }
 
@@ -116,7 +122,10 @@ impl<'a> Stream<'a> {
     }
 }
 
-fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
+fn read_instruction(stream: &mut Stream,
+                    known_inst_sets: &[Box<ExtInstSet>],
+                    bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
+                    -> ReadResult<Core> {
     let head = try!(stream.read_word());
     let id = (head & 0xFFFF) as u16;
     let wc = (head >> 16) as u16;
@@ -137,8 +146,8 @@ fn read_instruction(stream: &mut Stream) -> ReadResult<Core> {
         7 => return Err(ReadError::UnimplementedOp("OpString")),
         8 => return Err(ReadError::UnimplementedOp("OpLine")),
         10 => read_op_extension(&mut im),
-        11 => read_op_ext_inst_import(&mut im),
-        12 => return Err(ReadError::UnimplementedOp("OpExtInst")),
+        11 => read_op_ext_inst_import(&mut im, known_inst_sets, bound_inst_sets),
+        12 => read_op_ext_inst(&mut im, bound_inst_sets),
         14 => read_op_memory_model(&mut im),
         15 => read_op_entry_point(&mut im),
         16 => read_op_execution_mode(&mut im),
@@ -456,6 +465,12 @@ impl<'a> InstructionMemory<'a> {
             Ok(())
         }
     }
+
+    fn as_memory_block(&mut self) -> MemoryBlock {
+        let block = MemoryBlock::new(&self.block[self.position..]);
+        self.position = self.block.len();
+        block
+    }
 }
 
 fn read_op_id(stream: &mut InstructionMemory) -> ReadResult<OpId> {
@@ -568,16 +583,56 @@ fn read_op_extension(stream: &mut InstructionMemory) -> ReadResult<Core> {
     Ok(Core::OpExtension(OpExtension { name: name }))
 }
 
-fn read_op_ext_inst_import(stream: &mut InstructionMemory) -> ReadResult<Core> {
+fn read_op_ext_inst_import(stream: &mut InstructionMemory,
+                           known_inst_sets: &[Box<ExtInstSet>],
+                           bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
+                           -> ReadResult<Core> {
     if stream.get_word_count() < 3 {
         return Err(ReadError::WrongWordCountForOp);
     }
     let result_id = try!(read_result_id(stream));
     let name = try!(read_string_literal(stream));
-    Ok(Core::OpExtInstImport(OpExtInstImport {
-        result_id: result_id,
-        name: name,
-    }))
+    for inst_set in known_inst_sets {
+        if inst_set.get_name() == name {
+            match bound_inst_sets.insert(OpId(result_id.0), inst_set.duplicate()) {
+                Some(_) => return Err(ReadError::DuplicateResultId(result_id)),
+                None => {}
+            }
+            return Ok(Core::OpExtInstImport(OpExtInstImport {
+                result_id: result_id,
+                name: name,
+            }));
+        }
+    }
+    Err(ReadError::UnknownInstSet(name))
+}
+
+fn read_op_ext_inst(stream: &mut InstructionMemory,
+                    bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
+                    -> ReadResult<Core> {
+    if stream.get_word_count() < 5 {
+        return Err(ReadError::WrongWordCountForOp);
+    }
+    let result_type = try!(read_op_id(stream));
+    let result_id = try!(read_result_id(stream));
+    let set_id = try!(read_op_id(stream));
+    let inst = try!(read_lit_number_u32(stream));
+    match bound_inst_sets.get(&set_id) {
+        Some(set) => {
+            let block = stream.as_memory_block();
+            let (block, extinst) = try!(set.read_instruction(inst, block));
+            if !block.end() {
+                return Err(ReadError::InstructionHadExcessData);
+            }
+            Ok(Core::OpExtInst(OpExtInst {
+                result_type: result_type,
+                result_id: result_id,
+                set: set_id,
+                instruction: ExtInstBox(extinst),
+            }))
+        }
+        None => Err(ReadError::UnknownInstSetId(set_id)),
+    }
 }
 
 fn read_addressing_model(stream: &mut InstructionMemory) -> ReadResult<AddressingModel> {

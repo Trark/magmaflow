@@ -1,17 +1,26 @@
 
+use spv::*;
 use spv::op::*;
 use spv::types::*;
 use spv::raw::*;
 use spv::logical::*;
+use glsl450;
 
 const NOOP_SPV: &'static [u8] = include_bytes!("noop.spv");
 const NOOP_DIS: &'static str = include_str!("noop.dis");
 const WRITE_MULTIPLY_SPV: &'static [u8] = include_bytes!("write_multiply.spv");
 const WRITE_MULTIPLY_DIS: &'static str = include_str!("write_multiply.dis");
+const COND_TRIG_SPV: &'static [u8] = include_bytes!("cond_trig.spv");
+const COND_TRIG_DIS: &'static str = include_str!("cond_trig.dis");
+
+fn read(module: &'static [u8]) -> ReadResult<RawModule> {
+    let inst_sets: Vec<Box<ExtInstSet>> = vec![Box::new(glsl450::InstSet)];
+    read_module(module, inst_sets)
+}
 
 #[test]
 fn load_noop() {
-    let result = read_module(NOOP_SPV);
+    let result = read(NOOP_SPV);
     let glsl450 = OpExtInstImport {
         result_id: ResultId(1),
         name: "GLSL.std.450".into(),
@@ -108,7 +117,7 @@ fn load_noop() {
 
 #[test]
 fn dis_noop() {
-    let raw_module = read_module(NOOP_SPV).expect("Failed to load noop.spv");
+    let raw_module = read(NOOP_SPV).expect("Failed to load noop.spv");
     let disassembly = format!("{}", raw_module);
     for (dis, expect) in disassembly.lines().zip(NOOP_DIS.lines()) {
         assert_eq!(dis, expect);
@@ -118,14 +127,14 @@ fn dis_noop() {
 
 #[test]
 fn validate_noop() {
-    let raw_module = read_module(NOOP_SPV).expect("Failed to load noop.spv");
+    let raw_module = read(NOOP_SPV).expect("Failed to load noop.spv");
     let module = validate(raw_module);
     module.unwrap();
 }
 
 #[test]
 fn dis_write_multiply() {
-    let raw_module = read_module(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
+    let raw_module = read(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
     let disassembly = format!("{}", raw_module);
     for (dis, expect) in disassembly.lines().zip(WRITE_MULTIPLY_DIS.lines()) {
         assert_eq!(dis, expect);
@@ -135,7 +144,17 @@ fn dis_write_multiply() {
 
 #[test]
 fn validate_write_multiply() {
-    let raw_module = read_module(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
+    let raw_module = read(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
     let module = validate(raw_module);
     module.unwrap();
+}
+
+#[test]
+fn dis_cond_trig() {
+    let raw_module = read(COND_TRIG_SPV).expect("Failed to load cond_trig.spv");
+    let disassembly = format!("{}", raw_module);
+    for (dis, expect) in disassembly.lines().zip(COND_TRIG_DIS.lines()) {
+        assert_eq!(dis, expect);
+    }
+    assert_eq!(COND_TRIG_DIS, disassembly);
 }

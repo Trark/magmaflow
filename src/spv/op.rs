@@ -1,6 +1,7 @@
 //! Instructions present in the core SPIR-V spec
 
 use super::types::*;
+use super::ExtInstBox;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpNop;
@@ -104,7 +105,7 @@ pub struct OpExtInst {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub set: OpId,
-    pub instruction: u32,
+    pub instruction: ExtInstBox,
 }
 
 #[derive(Clone, Debug, PartialEq)]
