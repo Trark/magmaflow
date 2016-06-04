@@ -1,8 +1,18 @@
 //! Core types used with SPIR-V instructions
 
+use std::fmt;
+use std::fmt::{Display, Formatter};
+use super::dis::*;
+
 /// A SPIR-V `<id>`
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct OpId(pub u32);
+
+impl Display for OpId {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        f.pad(&format!("%{}", self.0))
+    }
+}
 
 /// A SPIR-V `Result <id>`
 #[derive(Clone, Debug, PartialEq)]
@@ -83,9 +93,29 @@ pub enum SourceLanguage {
     Other(u32),
 }
 
+impl Display for SourceLanguage {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            SourceLanguage::Unknown => "Unknown",
+            SourceLanguage::Essl => "ESSL",
+            SourceLanguage::Glsl => "GLSL",
+            SourceLanguage::OpenCL_C => "OpenCL_C",
+            SourceLanguage::OpenCL_Cpp => "OpenCL_CPP",
+            SourceLanguage::Other(n) => return write!(f, "Unknown({})", n),
+        };
+        write!(f, "{}", name)
+    }
+}
+
 /// Version of the source language
 #[derive(Clone, Debug, PartialEq)]
 pub struct SourceVersion(pub u32);
+
+impl Display for SourceVersion {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 /// Line number used with OpLine instruction
 #[derive(Clone, Debug, PartialEq)]
@@ -143,6 +173,65 @@ pub enum Decoration {
     Alignment(u32),
 }
 
+impl Display for Decoration {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            Decoration::RelaxedPrecision => "RelaxedPrecision",
+            Decoration::SpecId(ref n) => return write!(f, "SpecId {}", n),
+            Decoration::Block => "Block",
+            Decoration::BufferBlock => "BufferBlock",
+            Decoration::RowMajor => "RowMajor",
+            Decoration::ColMajor => "ColMajor",
+            Decoration::ArrayStride(ref n) => return write!(f, "ArrayStride {}", n),
+            Decoration::MatrixStride(ref n) => return write!(f, "MatrixStride {}", n),
+            Decoration::GlslShared => "GLSLShared",
+            Decoration::GlslPacked => "GLSLPacked",
+            Decoration::CPacked => "CPacked",
+            Decoration::BuiltIn(ref b) => return write!(f, "BuiltIn {}", b),
+            Decoration::NoPerspective => "NoPerspective",
+            Decoration::Flat => "Flat",
+            Decoration::Patch => "Patch",
+            Decoration::Centroid => "Centroid",
+            Decoration::Sample => "Sample",
+            Decoration::Invariant => "Invariant",
+            Decoration::Restrict => "Restrict",
+            Decoration::Aliased => "Aliased",
+            Decoration::Volatile => "Volatile",
+            Decoration::Constant => "Constant",
+            Decoration::Coherent => "Coherent",
+            Decoration::NonWritable => "NonWritable",
+            Decoration::NonReadable => "NonReadable",
+            Decoration::Uniform => "Uniform",
+            Decoration::SaturatedConversion => "SaturatedConversion",
+            Decoration::Stream(ref n) => return write!(f, "Stream {}", n),
+            Decoration::Location(ref n) => return write!(f, "Location {}", n),
+            Decoration::Component(ref n) => return write!(f, "Component {}", n),
+            Decoration::Index(ref n) => return write!(f, "Index {}", n),
+            Decoration::Binding(ref n) => return write!(f, "Binding {}", n),
+            Decoration::DescriptorSet(ref n) => return write!(f, "DescriptorSet {}", n),
+            Decoration::Offset(ref n) => return write!(f, "Offset {}", n),
+            Decoration::XfbBuffer(ref n) => return write!(f, "XfbBuffer {}", n),
+            Decoration::XfbStride(ref n) => return write!(f, "XfbStride {}", n),
+            Decoration::FuncParamAttr(ref foa) => return write!(f, "FuncParamAttr {}", foa),
+            Decoration::FpRoundingMode(ref rounding_mode) => {
+                return write!(f, "FpRoundingMode {}", rounding_mode)
+            }
+            Decoration::FpFastMathMode(ref fast_math_mode) => {
+                return write!(f, "FpFastMathMode {}", fast_math_mode)
+            }
+            Decoration::LinkageAttributes(ref name, ref lt) => {
+                return write!(f, "LinkageAttributes {} {}", name, lt)
+            }
+            Decoration::NoContraction => "NoContraction",
+            Decoration::InputAttachmentIndex(ref n) => {
+                return write!(f, "InputAttachmentIndex {}", n)
+            }
+            Decoration::Alignment(ref n) => return write!(f, "Alignment {}", n),
+        };
+        write!(f, "{}", name)
+    }
+}
+
 /// Marks a special built in variable or member
 #[derive(Clone, Debug, PartialEq)]
 pub enum BuiltIn {
@@ -189,6 +278,55 @@ pub enum BuiltIn {
     InstanceIndex,
 }
 
+impl Display for BuiltIn {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            BuiltIn::Position => "Position",
+            BuiltIn::PointSize => "PointSize",
+            BuiltIn::ClipDistance => "ClipDistance",
+            BuiltIn::CullDistance => "CullDistance",
+            BuiltIn::VertexId => "VertexId",
+            BuiltIn::InstanceId => "InstanceId",
+            BuiltIn::PrimitiveId => "PrimitiveId",
+            BuiltIn::InvocationId => "InvocationId",
+            BuiltIn::Layer => "Layer",
+            BuiltIn::ViewportIndex => "ViewportIndex",
+            BuiltIn::TessLevelOuter => "TessLevelOuter",
+            BuiltIn::TessLevelInner => "TessLevelInner",
+            BuiltIn::TessCoord => "TessCoord",
+            BuiltIn::PatchVerticies => "PatchVerticies",
+            BuiltIn::FragCoord => "FragCoord",
+            BuiltIn::PointCoord => "PointCoord",
+            BuiltIn::FrontFacing => "FrontFacing",
+            BuiltIn::SampleId => "SampleId",
+            BuiltIn::SamplePosition => "SamplePosition",
+            BuiltIn::SampleMask => "SampleMask",
+            BuiltIn::FragDepth => "FragDepth",
+            BuiltIn::HelperInvocation => "HelperInvocation",
+            BuiltIn::NumWorkgroups => "NumWorkgroups",
+            BuiltIn::WorkgroupSize => "WorkgroupSize",
+            BuiltIn::WorkgroupId => "WorkgroupId",
+            BuiltIn::LocalInvocationId => "LocalInvocationId",
+            BuiltIn::GlobalInvocationId => "GlobalInvocationId",
+            BuiltIn::LocalInvocationIndex => "LocalInvocationIndex",
+            BuiltIn::WorkDim => "WorkDim",
+            BuiltIn::GlobalSize => "GlobalSize",
+            BuiltIn::EnqueuedWorkgroupSize => "EnqueuedWorkgroupSize",
+            BuiltIn::GlobalOffset => "GlobalOffset",
+            BuiltIn::GlobalLinearId => "GlobalLinearId",
+            BuiltIn::SubgroupSize => "SubgroupSize",
+            BuiltIn::SubgroupMaxSize => "SubgroupMaxSize",
+            BuiltIn::NumSubgroups => "NumSubgroups",
+            BuiltIn::NumEnqueuedSubgroups => "NumEnqueuedSubgroups",
+            BuiltIn::SubgroupId => "SubgroupId",
+            BuiltIn::SubgroupLocalInvocationId => "SubgroupLocalInvocationId",
+            BuiltIn::VertexIndex => "VertexIndex",
+            BuiltIn::InstanceIndex => "InstanceIndex",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 /// Offset of a member in a type
 #[derive(Clone, Debug, PartialEq)]
 pub struct MemberIndex(pub u32);
@@ -201,12 +339,34 @@ pub enum AddressingModel {
     Physical64,
 }
 
+impl Display for AddressingModel {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            AddressingModel::Logical => "Logical",
+            AddressingModel::Physical32 => "Physical32",
+            AddressingModel::Physical64 => "Physical64",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 /// The memory model required by the module
 #[derive(Clone, Debug, PartialEq)]
 pub enum MemoryModel {
     Simple,
     Glsl450,
     OpenCL,
+}
+
+impl Display for MemoryModel {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            MemoryModel::Simple => "Simple",
+            MemoryModel::Glsl450 => "GLSL450",
+            MemoryModel::OpenCL => "OpenCL",
+        };
+        write!(f, "{}", name)
+    }
 }
 
 /// The execution model for an entry point into the module
@@ -219,6 +379,21 @@ pub enum ExecutionModel {
     Fragment,
     GlCompute,
     Kernel,
+}
+
+impl Display for ExecutionModel {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            ExecutionModel::Vertex => "Vertex",
+            ExecutionModel::TesselationControl => "TesselationControl",
+            ExecutionModel::TesselationEvaluation => "TesselationEvaluation",
+            ExecutionModel::Geometry => "Geometry",
+            ExecutionModel::Fragment => "Fragment",
+            ExecutionModel::GlCompute => "GLCompute",
+            ExecutionModel::Kernel => "Kernel",
+        };
+        write!(f, "{}", name)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -254,6 +429,49 @@ pub enum ExecutionMode {
     OutputTriangleStrip,
     VecTypeHint(OpId),
     ContractionOff,
+}
+
+impl Display for ExecutionMode {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            ExecutionMode::Invocations(ref n) => return write!(f, "Invocations {}", n),
+            ExecutionMode::SpacingEqual => "SpacingEqual",
+            ExecutionMode::SpacingFractionalEven => "SpacingFractionalEven",
+            ExecutionMode::SpacingFractionalOdd => "SpacingFractionalOdd",
+            ExecutionMode::VertexOrderCw => "VertexOrderCw",
+            ExecutionMode::VertexOrderCcw => "VertexOrderCcw",
+            ExecutionMode::PixelCenterInteger => "PixelCenterInteger",
+            ExecutionMode::OriginUpperLeft => "OriginUpperLeft",
+            ExecutionMode::OriginLowerLeft => "OriginLowerLeft",
+            ExecutionMode::EarlyFragmentTests => "EarlyFragmentTests",
+            ExecutionMode::PointMode => "PointMode",
+            ExecutionMode::Xfb => "Xfb",
+            ExecutionMode::DepthReplacing => "DepthReplacing",
+            ExecutionMode::DepthGreater => "DepthGreater",
+            ExecutionMode::DepthLess => "DepthLess",
+            ExecutionMode::DepthUnchanged => "DepthUnchanged",
+            ExecutionMode::LocalSize(ref x, ref y, ref z) => {
+                return write!(f, "LocalSize {} {} {}", x, y, z)
+            }
+            ExecutionMode::LocalSizeHint(ref x, ref y, ref z) => {
+                return write!(f, "LocalSizeHint {} {} {}", x, y, z)
+            }
+            ExecutionMode::InputPoints => "InputPoints",
+            ExecutionMode::InputLines => "InputLines",
+            ExecutionMode::InputLinesAdjacency => "InputLinesAdjacency",
+            ExecutionMode::Triangles => "Triangles",
+            ExecutionMode::InputTrianglesAdjacency => "InputTrianglesAdjacency",
+            ExecutionMode::Quads => "Quads",
+            ExecutionMode::Isolines => "Isolines",
+            ExecutionMode::OutputVerticies(ref n) => return write!(f, "OutputVerticies {}", n),
+            ExecutionMode::OutputPoints => "OutputPoints",
+            ExecutionMode::OutputLineStrip => "OutputLineStrip",
+            ExecutionMode::OutputTriangleStrip => "OutputTriangleStrip",
+            ExecutionMode::VecTypeHint(ref id) => return write!(f, "VecTypeHint {}", id),
+            ExecutionMode::ContractionOff => "ContractionOff",
+        };
+        write!(f, "{}", name)
+    }
 }
 
 /// Capability that a module may require
@@ -319,10 +537,84 @@ pub enum Capability {
     MultiViewport,
 }
 
+impl Display for Capability {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            Capability::Matrix => "Matrix",
+            Capability::Shader => "Shader",
+            Capability::Geometry => "Geometry",
+            Capability::Tessellation => "Tessellation",
+            Capability::Addresses => "Addresses",
+            Capability::Linkage => "Linkage",
+            Capability::Kernel => "Kernel",
+            Capability::Vector16 => "Vector16",
+            Capability::Float16Buffer => "Float16Buffer",
+            Capability::Float16 => "Float16",
+            Capability::Float64 => "Float64",
+            Capability::Int64 => "Int64",
+            Capability::Int64Atomics => "Int64Atomics",
+            Capability::ImageBasic => "ImageBasic",
+            Capability::ImageReadWrite => "ImageReadWrite",
+            Capability::ImageMipmap => "ImageMipmap",
+            Capability::Pipes => "Pipes",
+            Capability::Groups => "Groups",
+            Capability::DeviceEnqueue => "DeviceEnqueue",
+            Capability::LiteralSampler => "LiteralSampler",
+            Capability::AtomicStorage => "AtomicStorage",
+            Capability::Int16 => "Int16",
+            Capability::TessellationPointSize => "TessellationPointSize",
+            Capability::GeometryPointSize => "GeometryPointSize",
+            Capability::ImageGatherExtended => "ImageGatherExtended",
+            Capability::StorageImageMultisample => "StorageImageMultisample",
+            Capability::UniformBufferArrayDynamicIndexing => "UniformBufferArrayDynamicIndexing",
+            Capability::SampledImageArrayDynamicIndexing => "SampledImageArrayDynamicIndexing",
+            Capability::StorageBufferArrayDynamicIndexing => "StorageBufferArrayDynamicIndexing",
+            Capability::StorageImageArrayDynamicIndexing => "StorageImageArrayDynamicIndexing",
+            Capability::ClipDistance => "ClipDistance",
+            Capability::CullDistance => "CullDistance",
+            Capability::ImageCubeArray => "ImageCubeArray",
+            Capability::SampleRateShading => "SampleRateShading",
+            Capability::ImageRect => "ImageRect",
+            Capability::SampledRect => "SampledRect",
+            Capability::GenericPointer => "GenericPointer",
+            Capability::Int8 => "Int8",
+            Capability::InputAttachment => "InputAttachment",
+            Capability::SparseResidency => "SparseResidency",
+            Capability::MinLod => "MinLod",
+            Capability::Sampled1D => "Sampled1D",
+            Capability::Image1D => "Image1D",
+            Capability::SampledCubeArray => "SampledCubeArray",
+            Capability::SampledBuffer => "SampledBuffer",
+            Capability::ImageBuffer => "ImageBuffer",
+            Capability::ImageMSArray => "ImageMSArray",
+            Capability::StorageImageExtendedFormats => "StorageImageExtendedFormats",
+            Capability::ImageQuery => "ImageQuery",
+            Capability::DerivativeControl => "DerivativeControl",
+            Capability::InterpolationFunction => "InterpolationFunction",
+            Capability::TransformFeedback => "TransformFeedback",
+            Capability::GeometryStreams => "GeometryStreams",
+            Capability::StorageImageReadWithoutFormat => "StorageImageReadWithoutFormat",
+            Capability::StorageImageWriteWithoutFormat => "StorageImageWriteWithoutFormat",
+            Capability::MultiViewport => "MultiViewport",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Signedness {
     UnsignedOrNone,
     Signed,
+}
+
+impl Display for Signedness {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            Signedness::UnsignedOrNone => "0",
+            Signedness::Signed => "1",
+        };
+        write!(f, "{}", name)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -341,6 +633,26 @@ pub enum StorageClass {
     Image,
 }
 
+impl Display for StorageClass {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            StorageClass::UniformConstant => "UniformConstant",
+            StorageClass::Input => "Input",
+            StorageClass::Uniform => "Uniform",
+            StorageClass::Output => "Output",
+            StorageClass::Workgroup => "Workgroup",
+            StorageClass::CrossWorkgroup => "CrossWorkgroup",
+            StorageClass::Private => "Private",
+            StorageClass::Function => "Function",
+            StorageClass::Generic => "Generic",
+            StorageClass::PushConstant => "PushConstant",
+            StorageClass::AtomicCounter => "AtomicCounter",
+            StorageClass::Image => "Image",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct FpFastMathMode {
     pub not_nan: bool,
@@ -348,6 +660,32 @@ pub struct FpFastMathMode {
     pub nsz: bool,
     pub allow_recip: bool,
     pub fast: bool,
+}
+
+impl Display for FpFastMathMode {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.not_nan {
+            parts.push("NotNaN");
+        }
+        if self.not_inf {
+            parts.push("NotInf");
+        }
+        if self.nsz {
+            parts.push("NSZ");
+        }
+        if self.allow_recip {
+            parts.push("AllowRecip");
+        }
+        if self.fast {
+            parts.push("Fast");
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -358,10 +696,32 @@ pub enum FpRoundingMode {
     Rtn,
 }
 
+impl Display for FpRoundingMode {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            FpRoundingMode::Rte => "RTE",
+            FpRoundingMode::Rtz => "RTZ",
+            FpRoundingMode::Rtp => "RTP",
+            FpRoundingMode::Rtn => "RTN",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum LinkageType {
     Export,
     Import,
+}
+
+impl Display for LinkageType {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            LinkageType::Export => "Export",
+            LinkageType::Import => "Import",
+        };
+        write!(f, "{}", name)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -376,6 +736,22 @@ pub enum FunctionParameterAttribute {
     NoReadWrite,
 }
 
+impl Display for FunctionParameterAttribute {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            FunctionParameterAttribute::Zext => "Zext",
+            FunctionParameterAttribute::Sext => "Sext",
+            FunctionParameterAttribute::ByVal => "ByVal",
+            FunctionParameterAttribute::Sret => "Sret",
+            FunctionParameterAttribute::NoAlias => "NoAlias",
+            FunctionParameterAttribute::NoCapture => "NoCapture",
+            FunctionParameterAttribute::NoWrite => "NoWrite",
+            FunctionParameterAttribute::NoReadWrite => "NoReadWrite",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 /// The dimension for an image type
 #[derive(Clone, Debug, PartialEq)]
 pub enum Dim {
@@ -388,12 +764,38 @@ pub enum Dim {
     SubpassData,
 }
 
+impl Display for Dim {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            Dim::Tex1D => "1D",
+            Dim::Tex2D => "2D",
+            Dim::Tex3D => "3D",
+            Dim::Cube => "Cube",
+            Dim::Rect => "Rect",
+            Dim::Buffer => "Buffer",
+            Dim::SubpassData => "SubpassData",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 /// Indicates if it is known if an image is a depth image
 #[derive(Clone, Debug, PartialEq)]
 pub enum DepthStatus {
     NotDepth,
     Depth,
     NoIndication,
+}
+
+impl Display for DepthStatus {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            DepthStatus::NotDepth => 0,
+            DepthStatus::Depth => 1,
+            DepthStatus::NoIndication => 2,
+        };
+        write!(f, "{}", name)
+    }
 }
 
 /// Indicates if an image is an array or not
@@ -403,11 +805,31 @@ pub enum Arrayed {
     True,
 }
 
+impl Display for Arrayed {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            Arrayed::False => 0,
+            Arrayed::True => 1,
+        };
+        write!(f, "{}", name)
+    }
+}
+
 /// The multisample state of an image
 #[derive(Clone, Debug, PartialEq)]
 pub enum MS {
     Single,
     Multi,
+}
+
+impl Display for MS {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            MS::Single => 0,
+            MS::Multi => 1,
+        };
+        write!(f, "{}", name)
+    }
 }
 
 /// Indicates how an image is used with samplers
@@ -416,6 +838,17 @@ pub enum SampledStatus {
     RuntimeChoice,
     WithSampler,
     WithoutSampler,
+}
+
+impl Display for SampledStatus {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            SampledStatus::RuntimeChoice => 0,
+            SampledStatus::WithSampler => 1,
+            SampledStatus::WithoutSampler => 2,
+        };
+        write!(f, "{}", name)
+    }
 }
 
 /// The format for an image type
@@ -463,11 +896,70 @@ pub enum ImageFormat {
     R8ui,
 }
 
+impl Display for ImageFormat {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            ImageFormat::Unknown => "Unknown",
+            ImageFormat::Rgba32f => "Rgba32f",
+            ImageFormat::Rgba16f => "Rgba16f",
+            ImageFormat::R32f => "R32f",
+            ImageFormat::Rgba8 => "Rgba8",
+            ImageFormat::Rgba8Snorm => "Rgba8Snorm",
+            ImageFormat::Rg32f => "Rg32f",
+            ImageFormat::Rg16f => "Rg16f",
+            ImageFormat::R11fG11fB10f => "R11fG11fB10f",
+            ImageFormat::R16f => "R16f",
+            ImageFormat::Rgba16 => "Rgba16",
+            ImageFormat::Rgb10A2 => "Rgb10A2",
+            ImageFormat::Rg16 => "Rg16",
+            ImageFormat::Rg8 => "Rg8",
+            ImageFormat::R16 => "R16",
+            ImageFormat::R8 => "R8",
+            ImageFormat::Rgba16Snorm => "Rgba16Snorm",
+            ImageFormat::Rg16Snorm => "Rg16Snorm",
+            ImageFormat::Rg8Snorm => "Rg8Snorm",
+            ImageFormat::R16Snorm => "R16Snorm",
+            ImageFormat::R8Snorm => "R8Snorm",
+            ImageFormat::Rgba32i => "Rgba32i",
+            ImageFormat::Rgba16i => "Rgba16i",
+            ImageFormat::Rgba8i => "Rgba8i",
+            ImageFormat::R32i => "R32i",
+            ImageFormat::Rg32i => "Rg32i",
+            ImageFormat::Rg16i => "Rg16i",
+            ImageFormat::Rg8i => "Rg8i",
+            ImageFormat::R16i => "R16i",
+            ImageFormat::R8i => "R8i",
+            ImageFormat::Rgba32ui => "Rgba32ui",
+            ImageFormat::Rgba16ui => "Rgba16ui",
+            ImageFormat::Rgba8ui => "Rgba8ui",
+            ImageFormat::R32ui => "R32ui",
+            ImageFormat::Rgb10a2ui => "Rgb10a2ui",
+            ImageFormat::Rg32ui => "Rg32ui",
+            ImageFormat::Rg16ui => "Rg16ui",
+            ImageFormat::Rg8ui => "Rg8ui",
+            ImageFormat::R16ui => "R16ui",
+            ImageFormat::R8ui => "R8ui",
+        };
+        write!(f, "{}", name)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum AccessQualifier {
     ReadOnly,
     WriteOnly,
     ReadWrite,
+}
+
+impl Display for AccessQualifier {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            AccessQualifier::ReadOnly => "ReadOnly",
+            AccessQualifier::WriteOnly => "WriteOnly",
+            AccessQualifier::ReadWrite => "ReadWrite",
+        };
+        write!(f, "{}", name)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -509,12 +1001,55 @@ pub struct MemoryAccess {
     pub non_temporal: bool,
 }
 
+impl Display for MemoryAccess {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.volatile {
+            parts.push("Volatile");
+        }
+        if self.aligned {
+            parts.push("Aligned");
+        }
+        if self.non_temporal {
+            parts.push("Nontemporal");
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct FunctionControl {
     pub inline: bool,
     pub dont_inline: bool,
     pub pure_function: bool,
     pub const_function: bool,
+}
+
+impl Display for FunctionControl {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.inline {
+            parts.push("Inline");
+        }
+        if self.dont_inline {
+            parts.push("DontInline");
+        }
+        if self.pure_function {
+            parts.push("Pure");
+        }
+        if self.const_function {
+            parts.push("Const");
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -527,10 +1062,50 @@ pub struct LoopControl {
     pub dependency_length: Option<u32>,
 }
 
+impl Display for LoopControl {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.unroll {
+            parts.push("Unroll".to_string());
+        }
+        if self.dont_unroll {
+            parts.push("DontUnroll".to_string());
+        }
+        if self.dependency_infinite {
+            parts.push("DependencyInfinite".to_string());
+        }
+        if let Some(len) = self.dependency_length {
+            parts.push(format!("DependencyLength({})", len));
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct SelectionControl {
     pub flatten: bool,
     pub dont_flatten: bool,
+}
+
+impl Display for SelectionControl {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let mut parts = Vec::new();
+        if self.flatten {
+            parts.push("Flatten");
+        }
+        if self.dont_flatten {
+            parts.push("DontFlatten");
+        }
+        if parts.len() == 0 {
+            write!(f, "None")
+        } else {
+            write!(f, "{}", parts.join(" | "))
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -539,10 +1114,22 @@ pub struct PhiArg {
     pub parent: OpId,
 }
 
+impl Display for PhiArg {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}{}", Arg(&self.variable), Arg(&self.parent))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct BranchWeights {
     pub true_weight: u32,
     pub false_weight: u32,
+}
+
+impl Display for BranchWeights {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}{}", Arg(&self.true_weight), Arg(&self.false_weight))
+    }
 }
 
 /// An `<id>` that refers to a scope

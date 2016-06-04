@@ -1,10 +1,19 @@
 //! Instructions present in the core SPIR-V spec
 
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use super::types::*;
 use super::ExtInstBox;
+use super::dis::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpNop;
+
+impl Display for OpNop {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpNop", NoResult)
+    }
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUndef {
@@ -25,6 +34,19 @@ pub struct OpSource {
     pub source: Option<LitString>,
 }
 
+impl Display for OpSource {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        try!(write!(f,
+                    "{}OpSource{}{}{}{}",
+                    NoResult,
+                    Arg(&self.language),
+                    Arg(&self.version),
+                    ArgOpt(&self.file),
+                    ArgOpt(&self.source)));
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSourceExtension {
     pub extension: LitString,
@@ -36,11 +58,32 @@ pub struct OpName {
     pub name: LitString,
 }
 
+impl Display for OpName {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpName{}{}",
+               NoResult,
+               Arg(&self.target),
+               ArgString(&self.name))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMemberName {
     pub struct_type: OpId,
     pub member: MemberIndex,
     pub name: LitString,
+}
+
+impl Display for OpMemberName {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpMemberName{}{}{}",
+               NoResult,
+               Arg(&self.struct_type),
+               Arg(&self.member.0),
+               ArgString(&self.name))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -65,11 +108,32 @@ pub struct OpDecorate {
     pub decoration: Decoration,
 }
 
+impl Display for OpDecorate {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpDecorate{}{}",
+               NoResult,
+               Arg(&self.target),
+               Arg(&self.decoration))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMemberDecorate {
     pub structure_type: OpId,
     pub member: MemberIndex,
     pub decoration: Decoration,
+}
+
+impl Display for OpMemberDecorate {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpMemberDecorate{}{}{}",
+               NoResult,
+               Arg(&self.structure_type),
+               Arg(&self.member.0),
+               Arg(&self.decoration))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -94,10 +158,25 @@ pub struct OpExtension {
     pub name: LitString,
 }
 
+impl Display for OpExtension {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpExtension{}", NoResult, ArgString(&self.name))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpExtInstImport {
     pub result_id: ResultId,
     pub name: LitString,
+}
+
+impl Display for OpExtInstImport {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpExtInstImport{}",
+               Result(&self.result_id),
+               ArgString(&self.name))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -108,10 +187,31 @@ pub struct OpExtInst {
     pub instruction: ExtInstBox,
 }
 
+impl Display for OpExtInst {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpExtInst{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.set),
+               Arg(&self.instruction))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMemoryModel {
     pub addressing_model: AddressingModel,
     pub memory_model: MemoryModel,
+}
+
+impl Display for OpMemoryModel {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpMemoryModel{}{}",
+               NoResult,
+               Arg(&self.addressing_model),
+               Arg(&self.memory_model))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -122,10 +222,32 @@ pub struct OpEntryPoint {
     pub interface: Vec<OpId>,
 }
 
+impl Display for OpEntryPoint {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpEntryPoint{}{}{}{}",
+               NoResult,
+               Arg(&self.execution_model),
+               Arg(&self.entry_point),
+               ArgString(&self.name),
+               ArgList(&self.interface))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpExecutionMode {
     pub entry_point: OpId,
     pub mode: ExecutionMode,
+}
+
+impl Display for OpExecutionMode {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpExecutionMode{}{}",
+               NoResult,
+               Arg(&self.entry_point),
+               Arg(&self.mode))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -133,14 +255,32 @@ pub struct OpCapability {
     pub capability: Capability,
 }
 
+impl Display for OpCapability {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpCapability {}", NoResult, self.capability)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeVoid {
     pub result_id: ResultId,
 }
 
+impl Display for OpTypeVoid {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeVoid", Result(&self.result_id))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeBool {
     pub result_id: ResultId,
+}
+
+impl Display for OpTypeBool {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeBool", Result(&self.result_id))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -150,10 +290,29 @@ pub struct OpTypeInt {
     pub signedness: Signedness,
 }
 
+impl Display for OpTypeInt {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeInt{}{}",
+               Result(&self.result_id),
+               Arg(&self.width),
+               Arg(&self.signedness))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeFloat {
     pub result_id: ResultId,
     pub width: u32,
+}
+
+impl Display for OpTypeFloat {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeFloat{}",
+               Result(&self.result_id),
+               Arg(&self.width))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -163,11 +322,31 @@ pub struct OpTypeVector {
     pub component_count: u32,
 }
 
+impl Display for OpTypeVector {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeVector{}{}",
+               Result(&self.result_id),
+               Arg(&self.component_type),
+               Arg(&self.component_count))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeMatrix {
     pub result_id: ResultId,
     pub column_type: OpId,
     pub column_count: u32,
+}
+
+impl Display for OpTypeMatrix {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeMatrix{}{}",
+               Result(&self.result_id),
+               Arg(&self.column_type),
+               Arg(&self.column_count))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -183,15 +362,46 @@ pub struct OpTypeImage {
     pub access_qualifier: Option<AccessQualifier>,
 }
 
+impl Display for OpTypeImage {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeImage{}{}{}{}{}{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.sampled_type),
+               Arg(&self.dim),
+               Arg(&self.depth),
+               Arg(&self.arrayed),
+               Arg(&self.ms),
+               Arg(&self.sampled),
+               Arg(&self.format),
+               ArgOpt(&self.access_qualifier))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeSampler {
     pub result_id: ResultId,
+}
+
+impl Display for OpTypeSampler {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeSampler", Result(&self.result_id))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeSampledImage {
     pub result_id: ResultId,
     pub image_type: OpId,
+}
+
+impl Display for OpTypeSampledImage {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeSampledImage{}",
+               Result(&self.result_id),
+               Arg(&self.image_type))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -201,10 +411,29 @@ pub struct OpTypeArray {
     pub length: OpId,
 }
 
+impl Display for OpTypeArray {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeArray{}{}",
+               Result(&self.result_id),
+               Arg(&self.element_type),
+               Arg(&self.length))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeRuntimeArray {
     pub result_id: ResultId,
     pub element_type: OpId,
+}
+
+impl Display for OpTypeRuntimeArray {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeRuntimeArray{}",
+               Result(&self.result_id),
+               Arg(&self.element_type))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -213,10 +442,28 @@ pub struct OpTypeStruct {
     pub member_types: Vec<OpId>,
 }
 
+impl Display for OpTypeStruct {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeStruct{}",
+               Result(&self.result_id),
+               ArgList(&self.member_types))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeOpaque {
     pub result_id: ResultId,
     pub name: LitString,
+}
+
+impl Display for OpTypeOpaque {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeOpaque{}",
+               Result(&self.result_id),
+               ArgString(&self.name))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -226,6 +473,16 @@ pub struct OpTypePointer {
     pub pointed_type: OpId,
 }
 
+impl Display for OpTypePointer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypePointer{}{}",
+               Result(&self.result_id),
+               Arg(&self.storage_class),
+               Arg(&self.pointed_type))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeFunction {
     pub result_id: ResultId,
@@ -233,9 +490,25 @@ pub struct OpTypeFunction {
     pub parameter_types: Vec<OpId>,
 }
 
+impl Display for OpTypeFunction {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeFunction{}{}",
+               Result(&self.result_id),
+               Arg(&self.return_type),
+               ArgList(&self.parameter_types))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeEvent {
     pub result_id: ResultId,
+}
+
+impl Display for OpTypeEvent {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeEvent", Result(&self.result_id))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -243,14 +516,32 @@ pub struct OpTypeDeviceEvent {
     pub result_id: ResultId,
 }
 
+impl Display for OpTypeDeviceEvent {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeDeviceEvent", Result(&self.result_id))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeReserveId {
     pub result_id: ResultId,
 }
 
+impl Display for OpTypeReserveId {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeReserveId", Result(&self.result_id))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeQueue {
     pub result_id: ResultId,
+}
+
+impl Display for OpTypeQueue {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypeQueue", Result(&self.result_id))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -259,10 +550,25 @@ pub struct OpTypePipe {
     pub access_qualifier: AccessQualifier,
 }
 
+impl Display for OpTypePipe {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpTypePipe", Result(&self.result_id))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeForwardPointer {
     pub pointer_type: OpId,
     pub storage_class: StorageClass,
+}
+
+impl Display for OpTypeForwardPointer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpTypeForwardPointer{}",
+               Arg(&self.pointer_type),
+               Arg(&self.storage_class))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -284,11 +590,31 @@ pub struct OpConstant {
     pub value: LitBytes,
 }
 
+impl Display for OpConstant {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpConstant{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               ArgList(&self.value))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConstantComposite {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub constituents: Vec<OpId>,
+}
+
+impl Display for OpConstantComposite {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpConstantComposite{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               ArgList(&self.constituents))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -340,6 +666,17 @@ pub struct OpVariable {
     pub initializer: Option<OpId>,
 }
 
+impl Display for OpVariable {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpVariable{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.storage_class),
+               ArgOpt(&self.initializer))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpImageTexelPointer {
     pub result_type: OpId,
@@ -357,11 +694,33 @@ pub struct OpLoad {
     pub memory_access: Option<MemoryAccess>,
 }
 
+impl Display for OpLoad {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpLoad{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.pointer),
+               ArgOpt(&self.memory_access))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpStore {
     pub pointer: OpId,
     pub object: OpId,
     pub memory_access: Option<MemoryAccess>,
+}
+
+impl Display for OpStore {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpStore{}{}{}",
+               NoResult,
+               Arg(&self.pointer),
+               Arg(&self.object),
+               ArgOpt(&self.memory_access))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -385,6 +744,17 @@ pub struct OpAccessChain {
     pub result_id: ResultId,
     pub base: OpId,
     pub indexes: Vec<OpId>,
+}
+
+impl Display for OpAccessChain {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpAccessChain{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.base),
+               ArgList(&self.indexes))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -436,14 +806,40 @@ pub struct OpFunction {
     pub function_type: OpId,
 }
 
+impl Display for OpFunction {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpFunction{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.function_control),
+               Arg(&self.function_type))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFunctionParameter {
     pub result_type: OpId,
     pub result_id: ResultId,
 }
 
+impl Display for OpFunctionParameter {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpFunctionParameter{}",
+               Result(&self.result_id),
+               Arg(&self.result_type))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFunctionEnd;
+
+impl Display for OpFunctionEnd {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpFunctionEnd", NoResult)
+    }
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFunctionCall {
@@ -684,6 +1080,16 @@ pub struct OpConvertUToF {
     pub unsigned_value: OpId,
 }
 
+impl Display for OpConvertUToF {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpConvertUToF{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.unsigned_value))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUConvert {
     pub result_type: OpId,
@@ -887,6 +1293,17 @@ pub struct OpIMul {
     pub operand2: OpId,
 }
 
+impl Display for OpIMul {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpIMul{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.operand1),
+               Arg(&self.operand2))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFMul {
     pub result_type: OpId,
@@ -925,6 +1342,17 @@ pub struct OpUMod {
     pub result_id: ResultId,
     pub operand1: OpId,
     pub operand2: OpId,
+}
+
+impl Display for OpUMod {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpUMod{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.operand1),
+               Arg(&self.operand2))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1173,6 +1601,17 @@ pub struct OpIEqual {
     pub operand2: OpId,
 }
 
+impl Display for OpIEqual {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpIEqual{}{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               Arg(&self.operand1),
+               Arg(&self.operand2))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpINotEqual {
     pub result_type: OpId,
@@ -1375,11 +1814,32 @@ pub struct OpPhi {
     pub variables: Vec<PhiArg>,
 }
 
+impl Display for OpPhi {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpPhi{}{}",
+               Result(&self.result_id),
+               Arg(&self.result_type),
+               ArgList(&self.variables))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpLoopMerge {
     pub merge_block: OpId,
     pub continue_target: OpId,
     pub loop_control: LoopControl,
+}
+
+impl Display for OpLoopMerge {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpLoopMerge{}{}{}",
+               NoResult,
+               Arg(&self.merge_block),
+               Arg(&self.continue_target),
+               Arg(&self.loop_control))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1388,14 +1848,36 @@ pub struct OpSelectionMerge {
     pub selection_control: SelectionControl,
 }
 
+impl Display for OpSelectionMerge {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpSelectionMerge{}{}",
+               NoResult,
+               Arg(&self.merge_block),
+               Arg(&self.selection_control))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpLabel {
     pub result_id: ResultId,
 }
 
+impl Display for OpLabel {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpLabel", Result(&self.result_id))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBranch {
     pub target_label: OpId,
+}
+
+impl Display for OpBranch {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpBranch{}", NoResult, Arg(&self.target_label))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1406,6 +1888,18 @@ pub struct OpBranchConditional {
     pub weights: Option<BranchWeights>,
 }
 
+impl Display for OpBranchConditional {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f,
+               "{}OpBranchConditional{}{}{}{}",
+               NoResult,
+               Arg(&self.condition),
+               Arg(&self.true_label),
+               Arg(&self.false_label),
+               ArgOpt(&self.weights))
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSwitch(pub OpId, pub OpId, pub Vec<(LitBytes, OpId)>);
 
@@ -1414,6 +1908,12 @@ pub struct OpKill;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpReturn;
+
+impl Display for OpReturn {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}OpReturn", NoResult)
+    }
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpReturnValue(pub OpId);

@@ -1,4 +1,6 @@
 
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use spv::op::*;
 use spv::types::*;
 
@@ -18,6 +20,30 @@ pub struct RawModule {
     pub bound: u32,
     /// List of all instructions.
     pub instructions: Vec<Core>,
+}
+
+impl Display for RawModule {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        try!(write!(f, "; SPIR-V\n"));
+        try!(write!(f, "; Version: {}.{}\n", self.version.0, self.version.1));
+        let generator_vendor = self.generator.tool.get_vendor();
+        let generator_tool = self.generator.tool.get_tool();
+        let gen_name = match (generator_vendor, generator_tool) {
+            (Some(vendor), Some(tool)) => format!("{} {}", vendor, tool),
+            (Some(vendor), None) => format!("{}", vendor),
+            (None, Some(tool)) => format!("{}", tool),
+            (None, None) => "Unknown".into(),
+        };
+        try!(write!(f, "; Generator: {}; {}\n", gen_name, self.generator.version));
+        try!(write!(f, "; Bound: {}\n", self.bound));
+        // Trivially 0 as we only support loading a RawModule with 0 in slot
+        // reserved for schema
+        try!(write!(f, "; Schema: 0\n"));
+        for inst in &self.instructions {
+            try!(write!(f, "{}\n", inst));
+        }
+        Ok(())
+    }
 }
 
 /// Enumeration of all core instructions (incomplete)
@@ -78,6 +104,65 @@ pub enum Core {
     OpReturn(OpReturn),
 }
 
+impl Display for Core {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match *self {
+            Core::OpNop(ref op) => Display::fmt(op, f),
+            Core::OpSource(ref op) => Display::fmt(op, f),
+            Core::OpName(ref op) => Display::fmt(op, f),
+            Core::OpMemberName(ref op) => Display::fmt(op, f),
+            Core::OpExtension(ref op) => Display::fmt(op, f),
+            Core::OpExtInstImport(ref op) => Display::fmt(op, f),
+            Core::OpExtInst(ref op) => Display::fmt(op, f),
+            Core::OpMemoryModel(ref op) => Display::fmt(op, f),
+            Core::OpEntryPoint(ref op) => Display::fmt(op, f),
+            Core::OpExecutionMode(ref op) => Display::fmt(op, f),
+            Core::OpCapability(ref op) => Display::fmt(op, f),
+            Core::OpTypeVoid(ref op) => Display::fmt(op, f),
+            Core::OpTypeBool(ref op) => Display::fmt(op, f),
+            Core::OpTypeInt(ref op) => Display::fmt(op, f),
+            Core::OpTypeFloat(ref op) => Display::fmt(op, f),
+            Core::OpTypeVector(ref op) => Display::fmt(op, f),
+            Core::OpTypeMatrix(ref op) => Display::fmt(op, f),
+            Core::OpTypeImage(ref op) => Display::fmt(op, f),
+            Core::OpTypeSampler(ref op) => Display::fmt(op, f),
+            Core::OpTypeSampledImage(ref op) => Display::fmt(op, f),
+            Core::OpTypeArray(ref op) => Display::fmt(op, f),
+            Core::OpTypeRuntimeArray(ref op) => Display::fmt(op, f),
+            Core::OpTypeStruct(ref op) => Display::fmt(op, f),
+            Core::OpTypeOpaque(ref op) => Display::fmt(op, f),
+            Core::OpTypePointer(ref op) => Display::fmt(op, f),
+            Core::OpTypeFunction(ref op) => Display::fmt(op, f),
+            Core::OpTypeEvent(ref op) => Display::fmt(op, f),
+            Core::OpTypeDeviceEvent(ref op) => Display::fmt(op, f),
+            Core::OpTypeQueue(ref op) => Display::fmt(op, f),
+            Core::OpTypePipe(ref op) => Display::fmt(op, f),
+            Core::OpTypeForwardPointer(ref op) => Display::fmt(op, f),
+            Core::OpConstant(ref op) => Display::fmt(op, f),
+            Core::OpConstantComposite(ref op) => Display::fmt(op, f),
+            Core::OpFunction(ref op) => Display::fmt(op, f),
+            Core::OpFunctionParameter(ref op) => Display::fmt(op, f),
+            Core::OpFunctionEnd(ref op) => Display::fmt(op, f),
+            Core::OpVariable(ref op) => Display::fmt(op, f),
+            Core::OpLoad(ref op) => Display::fmt(op, f),
+            Core::OpStore(ref op) => Display::fmt(op, f),
+            Core::OpAccessChain(ref op) => Display::fmt(op, f),
+            Core::OpDecorate(ref op) => Display::fmt(op, f),
+            Core::OpMemberDecorate(ref op) => Display::fmt(op, f),
+            Core::OpConvertUToF(ref op) => Display::fmt(op, f),
+            Core::OpIMul(ref op) => Display::fmt(op, f),
+            Core::OpUMod(ref op) => Display::fmt(op, f),
+            Core::OpIEqual(ref op) => Display::fmt(op, f),
+            Core::OpPhi(ref op) => Display::fmt(op, f),
+            Core::OpLoopMerge(ref op) => Display::fmt(op, f),
+            Core::OpSelectionMerge(ref op) => Display::fmt(op, f),
+            Core::OpLabel(ref op) => Display::fmt(op, f),
+            Core::OpBranch(ref op) => Display::fmt(op, f),
+            Core::OpBranchConditional(ref op) => Display::fmt(op, f),
+            Core::OpReturn(ref op) => Display::fmt(op, f),
+        }
+    }
+}
 
 #[derive(Debug, PartialEq)]
 pub enum ReadError {
