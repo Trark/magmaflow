@@ -66,7 +66,7 @@ pub fn read_module<'a>(data: &'a [u8],
     let zero = try!(stream.read_word());
     match zero {
         0 => {}
-        _ => return Err(ReadError::UnknownReservedHeaderu324),
+        _ => return Err(ReadError::UnknownReservedSchema),
     }
 
     let mut instructions = Vec::new();

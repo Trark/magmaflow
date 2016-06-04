@@ -1,4 +1,5 @@
 
+use std::error::Error;
 use std::fmt;
 use std::fmt::{Display, Formatter};
 use spv::op::*;
@@ -171,7 +172,7 @@ pub enum ReadError {
     BadMagic,
     UnknownVersionBytes(u8, u8, u8, u8),
     UnknownVersion(Version),
-    UnknownReservedHeaderu324,
+    UnknownReservedSchema,
     UnknownOp(u16, u16),
     UnimplementedOp(&'static str),
     WrongWordCountForOp,
@@ -206,6 +207,58 @@ pub enum ReadError {
     UnknownAccessQualifier(u32),
     UnknownLoopControl(u32),
     UnknownSelectionControl(u32),
+}
+
+impl Display for ReadError {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
+}
+
+impl Error for ReadError {
+    fn description(&self) -> &str {
+        use self::ReadError::*;
+        match *self {
+            UnexpectedEndOfStream => "unexpected end of stream",
+            UnexpectedStreamAlignment => "stream is not word aligned",
+            BadMagic => "invalid magic number",
+            UnknownVersionBytes(_, _, _, _) => "unknown version bytes",
+            UnknownVersion(_) => "unknown version",
+            UnknownReservedSchema => "unknown reserved schema field",
+            UnknownOp(_, _) => "unknown op",
+            UnimplementedOp(_) => "unimplemented op",
+            WrongWordCountForOp => "op has invalid word count",
+            InvalidString => "invalid string literal",
+            UnexpectedEndOfInstruction => "instruction didn't have enough data",
+            InstructionHadExcessData => "instruction didn't require all data",
+            UnknownInstSet(_) => "unknown instruction set",
+            UnknownInstSetId(_) => "extended instruction referenced unknown instruction set",
+            UnknownExtInstOp(_, _) => "unknown op in extended instruction set",
+            DuplicateResultId(_) => "duplicate result id",
+            UnknownAddressingModel(_) => "unknown addressing model",
+            UnknownMemoryModel(_) => "unknown memory model",
+            UnknownExecutionModel(_) => "unknown execution model",
+            UnknownExecutionMode(_) => "unknown execution mode",
+            UnknownCapability(_) => "unknown capability",
+            UnknownDecoration(_) => "unknown decoration",
+            UnknownBuiltIn(_) => "unknown built in",
+            UnknownFpRoundingMode(_) => "unknown fp rounding mode",
+            UnknownLinkageType(_) => "unknown linkage type",
+            UnknownSignedness(_) => "unknown signedness",
+            UnknownStorageClass(_) => "unknown storage class",
+            UnknownFunctionParameterAttribute(_) => "unknown function parameter attribute",
+            UnknownMemoryAccess(_) => "unknown memory access",
+            UnknownDim(_) => "unknown image dimension",
+            UnknownDepthStatus(_) => "unknown image depth hint",
+            UnknownArrayed(_) => "unknown image arrayed status",
+            UnknownMS(_) => "unknown multisampled status",
+            UnknownSampledStatus(_) => "unknown sampled hint",
+            UnknownImageFormat(_) => "unknown image format",
+            UnknownAccessQualifier(_) => "unknown access qualifier",
+            UnknownLoopControl(_) => "unknown loop control",
+            UnknownSelectionControl(_) => "unknown selection control",
+        }
+    }
 }
 
 pub type ReadResult<T> = Result<T, ReadError>;
