@@ -158,3 +158,10 @@ fn dis_cond_trig() {
     }
     assert_eq!(COND_TRIG_DIS, disassembly);
 }
+
+#[test]
+fn validate_cond_trig() {
+    let raw_module = read(COND_TRIG_SPV).expect("Failed to load cond_trig.spv");
+    let module = validate(raw_module);
+    module.unwrap();
+}
