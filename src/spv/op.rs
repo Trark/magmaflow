@@ -17,10 +17,14 @@ pub struct OpUndef {
     pub result_id: ResultId,
 }
 
+def_op_display!(OpUndef; result_id = result_type);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSourceContinued {
     pub continued_source: LitString,
 }
+
+def_op_display!(OpSourceContinued; continued_source);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSource {
@@ -36,6 +40,8 @@ def_op_display!(OpSource; language | version | file | source);
 pub struct OpSourceExtension {
     pub extension: LitString,
 }
+
+def_op_display!(OpSourceExtension; extension);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpName {
@@ -56,9 +62,11 @@ def_op_display!(OpMemberName; struct_type | member | name);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpString {
-    pub result_id: OpId,
+    pub result_id: ResultId,
     pub string: LitString,
 }
+
+def_op_display!(OpString; result_id = string);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpLine {
@@ -67,8 +75,12 @@ pub struct OpLine {
     pub column: Column,
 }
 
+def_op_display!(OpLine; file | line | column);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpNoLine;
+
+def_op_display!(OpNoLine;);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpDecorate {
@@ -92,11 +104,15 @@ pub struct OpDecorationGroup {
     pub result_id: ResultId,
 }
 
+def_op_display!(OpDecorationGroup; result_id =);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpGroupDecorate {
     pub decoration_group: OpId,
     pub targets: Vec<OpId>,
 }
+
+def_op_display!(OpGroupDecorate; decoration_group | targets);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpGroupMemberDecorate {
@@ -351,11 +367,15 @@ pub struct OpConstantTrue {
     pub result_id: ResultId,
 }
 
+def_op_display!(OpConstantTrue; result_id = result_type);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConstantFalse {
     pub result_type: OpId,
     pub result_id: ResultId,
 }
+
+def_op_display!(OpConstantFalse; result_id = result_type);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConstant {
@@ -384,11 +404,15 @@ pub struct OpConstantSampler {
     pub filter_mode: SamplerFilterMode,
 }
 
+def_op_display!(OpConstantSampler; result_id = result_type | addressing_mode | param | filter_mode);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConstantNull {
     pub result_type: OpId,
     pub result_id: ResultId,
 }
+
+def_op_display!(OpConstantNull; result_id = result_type);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSpecConstantTrue {
@@ -396,11 +420,15 @@ pub struct OpSpecConstantTrue {
     pub result_id: ResultId,
 }
 
+def_op_display!(OpSpecConstantTrue; result_id = result_type);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSpecConstantFalse {
     pub result_type: OpId,
     pub result_id: ResultId,
 }
+
+def_op_display!(OpSpecConstantFalse; result_id = result_type);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSpecConstant {
@@ -409,12 +437,16 @@ pub struct OpSpecConstant {
     pub value: LitBytes,
 }
 
+def_op_display!(OpSpecConstant; result_id = result_type | value);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSpecConstantComposite {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub constituents: Vec<OpId>,
 }
+
+def_op_display!(OpSpecConstantComposite; result_id = result_type | constituents);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVariable {
@@ -434,6 +466,8 @@ pub struct OpImageTexelPointer {
     pub coordinate: OpId,
     pub sample: OpId,
 }
+
+def_op_display!(OpImageTexelPointer; result_id = result_type | image | coordinate | sample);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpLoad {
@@ -461,6 +495,8 @@ pub struct OpCopyMemory {
     pub memory_access: Option<MemoryAccess>,
 }
 
+def_op_display!(OpCopyMemory; target | source | memory_access);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpCopyMemorySized {
     pub target: OpId,
@@ -468,6 +504,8 @@ pub struct OpCopyMemorySized {
     pub size: OpId,
     pub memory_access: Option<MemoryAccess>,
 }
+
+def_op_display!(OpCopyMemorySized; target | source | size | memory_access);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpAccessChain {
@@ -487,6 +525,8 @@ pub struct OpInBoundsAccessChain {
     pub indexes: Vec<OpId>,
 }
 
+def_op_display!(OpInBoundsAccessChain; result_id = result_type | base | indexes);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpPtrAccessChain {
     pub result_type: OpId,
@@ -496,6 +536,8 @@ pub struct OpPtrAccessChain {
     pub indexes: Vec<OpId>,
 }
 
+def_op_display!(OpPtrAccessChain; result_id = result_type | base | element | indexes);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpArrayLength {
     pub result_type: OpId,
@@ -504,12 +546,16 @@ pub struct OpArrayLength {
     pub array_member: MemberIndex,
 }
 
+def_op_display!(OpArrayLength; result_id = result_type | structure | array_member);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpGenericPtrMemSemantics {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub pointer: OpId,
 }
+
+def_op_display!(OpGenericPtrMemSemantics; result_id = result_type | pointer);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpInBoundsPtrAccessChain {
@@ -519,6 +565,8 @@ pub struct OpInBoundsPtrAccessChain {
     pub element: OpId,
     pub indexes: Vec<OpId>,
 }
+
+def_op_display!(OpInBoundsPtrAccessChain; result_id = result_type | base | element | indexes);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFunction {
@@ -551,6 +599,8 @@ pub struct OpFunctionCall {
     pub arguments: Vec<OpId>,
 }
 
+def_op_display!(OpFunctionCall; result_id = result_type | function | arguments);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSampledImage {
     pub result_type: OpId,
@@ -558,6 +608,8 @@ pub struct OpSampledImage {
     pub image: OpId,
     pub sampler: OpId,
 }
+
+def_op_display!(OpSampledImage; result_id = result_type | image | sampler);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpImageSampledImplicitLod(pub OpId,
@@ -761,6 +813,8 @@ pub struct OpConvertFToU {
     pub float_value: OpId,
 }
 
+def_op_display!(OpConvertFToU; result_id = result_type | float_value);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConvertFToS {
     pub result_type: OpId,
@@ -768,12 +822,16 @@ pub struct OpConvertFToS {
     pub float_value: OpId,
 }
 
+def_op_display!(OpConvertFToS; result_id = result_type | float_value);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConvertSToF {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub signed_value: OpId,
 }
+
+def_op_display!(OpConvertSToF; result_id = result_type | signed_value);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConvertUToF {
@@ -791,12 +849,16 @@ pub struct OpUConvert {
     pub unsigned_value: OpId,
 }
 
+def_op_display!(OpUConvert; result_id = result_type | unsigned_value);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSConvert {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub signed_value: OpId,
 }
+
+def_op_display!(OpSConvert; result_id = result_type | signed_value);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFConvert {
@@ -805,12 +867,16 @@ pub struct OpFConvert {
     pub float_value: OpId,
 }
 
+def_op_display!(OpFConvert; result_id = result_type | float_value);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpQuantizeToF16 {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub value: OpId,
 }
+
+def_op_display!(OpQuantizeToF16; result_id = result_type | value);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConvertPtrToU {
@@ -819,12 +885,16 @@ pub struct OpConvertPtrToU {
     pub pointer: OpId,
 }
 
+def_op_display!(OpConvertPtrToU; result_id = result_type | pointer);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSatConvertSToU {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub signed_value: OpId,
 }
+
+def_op_display!(OpSatConvertSToU; result_id = result_type | signed_value);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSatConvertUToS {
@@ -833,12 +903,16 @@ pub struct OpSatConvertUToS {
     pub unsigned_value: OpId,
 }
 
+def_op_display!(OpSatConvertUToS; result_id = result_type | unsigned_value);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConvertUToPtr {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub integer_value: OpId,
 }
+
+def_op_display!(OpConvertUToPtr; result_id = result_type | integer_value);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpPtrCastToGeneric {
@@ -847,12 +921,16 @@ pub struct OpPtrCastToGeneric {
     pub pointer: OpId,
 }
 
+def_op_display!(OpPtrCastToGeneric; result_id = result_type | pointer);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpGenericCastToPtr {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub pointer: OpId,
 }
+
+def_op_display!(OpGenericCastToPtr; result_id = result_type | pointer);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpGenericCastToPtrExplicit {
@@ -862,12 +940,16 @@ pub struct OpGenericCastToPtrExplicit {
     pub storage_class: StorageClass,
 }
 
+def_op_display!(OpGenericCastToPtrExplicit; result_id = result_type | pointer | storage_class);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBitcast {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub operand: OpId,
 }
+
+def_op_display_s1!(OpBitcast);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVectorExtractDynamic {
@@ -876,6 +958,8 @@ pub struct OpVectorExtractDynamic {
     pub vector: OpId,
     pub index: OpId,
 }
+
+def_op_display!(OpVectorExtractDynamic; result_id = result_type | vector | index);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVectorInsertDynamic {
@@ -886,6 +970,8 @@ pub struct OpVectorInsertDynamic {
     pub index: OpId,
 }
 
+def_op_display!(OpVectorInsertDynamic; result_id = result_type | vector | component | index);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVectorShuffle {
     pub result_type: OpId,
@@ -895,12 +981,16 @@ pub struct OpVectorShuffle {
     pub components: Vec<MemberIndex>,
 }
 
+def_op_display!(OpVectorShuffle; result_id = result_type | operand1 | operand2 | components);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpCompositeConstruct {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub constituents: Vec<MemberIndex>,
 }
+
+def_op_display!(OpCompositeConstruct; result_id = result_type | constituents);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpCompositeExtract {
@@ -909,6 +999,8 @@ pub struct OpCompositeExtract {
     pub composite: OpId,
     pub indexes: Vec<MemberIndex>,
 }
+
+def_op_display!(OpCompositeExtract; result_id = result_type | composite | indexes);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpCompositeInsert {
@@ -919,12 +1011,16 @@ pub struct OpCompositeInsert {
     pub indexes: Vec<MemberIndex>,
 }
 
+def_op_display!(OpCompositeInsert; result_id = result_type | object | composite | indexes);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpCopyObject {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub operand: OpId,
 }
+
+def_op_display_s1!(OpCopyObject);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTranspose {
@@ -933,6 +1029,8 @@ pub struct OpTranspose {
     pub matrix: OpId,
 }
 
+def_op_display!(OpTranspose; result_id = result_type | matrix);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSNegate {
     pub result_type: OpId,
@@ -940,12 +1038,16 @@ pub struct OpSNegate {
     pub operand: OpId,
 }
 
+def_op_display_s1!(OpSNegate);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFNegate {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub operand: OpId,
 }
+
+def_op_display_s1!(OpFNegate);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpIAdd {
@@ -955,6 +1057,8 @@ pub struct OpIAdd {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpIAdd);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFAdd {
     pub result_type: OpId,
@@ -962,6 +1066,8 @@ pub struct OpFAdd {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFAdd);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpISub {
@@ -971,6 +1077,8 @@ pub struct OpISub {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpISub);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFSub {
     pub result_type: OpId,
@@ -978,6 +1086,8 @@ pub struct OpFSub {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFSub);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpIMul {
@@ -997,6 +1107,8 @@ pub struct OpFMul {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFMul);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUDiv {
     pub result_type: OpId,
@@ -1004,6 +1116,8 @@ pub struct OpUDiv {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpUDiv);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSDiv {
@@ -1013,6 +1127,8 @@ pub struct OpSDiv {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpSDiv);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFDiv {
     pub result_type: OpId,
@@ -1020,6 +1136,8 @@ pub struct OpFDiv {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFDiv);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUMod {
@@ -1039,6 +1157,8 @@ pub struct OpSRem {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpSRem);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSMod {
     pub result_type: OpId,
@@ -1046,6 +1166,8 @@ pub struct OpSMod {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpSMod);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFRem {
@@ -1055,6 +1177,8 @@ pub struct OpFRem {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFRem);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFMod {
     pub result_type: OpId,
@@ -1062,6 +1186,8 @@ pub struct OpFMod {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFMod);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVectorTimesScalar {
@@ -1071,6 +1197,8 @@ pub struct OpVectorTimesScalar {
     pub scalar: OpId,
 }
 
+def_op_display!(OpVectorTimesScalar; result_id = result_type | vector | scalar);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMatrixTimesScalar {
     pub result_type: OpId,
@@ -1078,6 +1206,8 @@ pub struct OpMatrixTimesScalar {
     pub matrix: OpId,
     pub scalar: OpId,
 }
+
+def_op_display!(OpMatrixTimesScalar; result_id = result_type | matrix | scalar);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVectorTimesMatrix {
@@ -1087,6 +1217,8 @@ pub struct OpVectorTimesMatrix {
     pub matrix: OpId,
 }
 
+def_op_display!(OpVectorTimesMatrix; result_id = result_type | vector | matrix);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMatrixTimesVector {
     pub result_type: OpId,
@@ -1094,6 +1226,8 @@ pub struct OpMatrixTimesVector {
     pub matrix: OpId,
     pub vector: OpId,
 }
+
+def_op_display!(OpMatrixTimesVector; result_id = result_type | matrix | vector);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMatrixTimesMatrix {
@@ -1103,6 +1237,8 @@ pub struct OpMatrixTimesMatrix {
     pub right_matrix: OpId,
 }
 
+def_op_display!(OpMatrixTimesMatrix; result_id = result_type | left_matrix | right_matrix);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpOuterProduct {
     pub result_type: OpId,
@@ -1110,6 +1246,8 @@ pub struct OpOuterProduct {
     pub vector1: OpId,
     pub vector2: OpId,
 }
+
+def_op_display!(OpOuterProduct; result_id = result_type | vector1 | vector2);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpDot {
@@ -1119,6 +1257,8 @@ pub struct OpDot {
     pub vector2: OpId,
 }
 
+def_op_display!(OpDot; result_id = result_type | vector1 | vector2);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpIAddCarry {
     pub result_type: OpId,
@@ -1126,6 +1266,8 @@ pub struct OpIAddCarry {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpIAddCarry);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpISubBorrow {
@@ -1135,6 +1277,8 @@ pub struct OpISubBorrow {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpISubBorrow);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUMulExtended {
     pub result_type: OpId,
@@ -1142,6 +1286,8 @@ pub struct OpUMulExtended {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpUMulExtended);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSMulExtended {
@@ -1151,6 +1297,8 @@ pub struct OpSMulExtended {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpSMulExtended);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpShiftRightLogical {
     pub result_type: OpId,
@@ -1158,6 +1306,8 @@ pub struct OpShiftRightLogical {
     pub base: OpId,
     pub shift: OpId,
 }
+
+def_op_display!(OpShiftRightLogical; result_id = result_type | base | shift);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpShiftRightArithmetic {
@@ -1167,6 +1317,8 @@ pub struct OpShiftRightArithmetic {
     pub shift: OpId,
 }
 
+def_op_display!(OpShiftRightArithmetic; result_id = result_type | base | shift);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpShiftLeftLogical {
     pub result_type: OpId,
@@ -1174,6 +1326,8 @@ pub struct OpShiftLeftLogical {
     pub base: OpId,
     pub shift: OpId,
 }
+
+def_op_display!(OpShiftLeftLogical; result_id = result_type | base | shift);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBitwiseOr {
@@ -1183,6 +1337,8 @@ pub struct OpBitwiseOr {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpBitwiseOr);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBitwiseXor {
     pub result_type: OpId,
@@ -1190,6 +1346,8 @@ pub struct OpBitwiseXor {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpBitwiseXor);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBitwiseAnd {
@@ -1199,12 +1357,16 @@ pub struct OpBitwiseAnd {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpBitwiseAnd);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpNot {
     pub result_type: OpId,
     pub result_id: ResultId,
     pub operand: OpId,
 }
+
+def_op_display_s1!(OpNot);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBitFieldInsert(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId, pub OpId);
@@ -1287,6 +1449,8 @@ pub struct OpINotEqual {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpINotEqual);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUGreaterThan {
     pub result_type: OpId,
@@ -1294,6 +1458,8 @@ pub struct OpUGreaterThan {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpUGreaterThan);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSGreaterThan {
@@ -1303,6 +1469,8 @@ pub struct OpSGreaterThan {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpSGreaterThan);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpUGreaterThanEqual {
     pub result_type: OpId,
@@ -1310,6 +1478,8 @@ pub struct OpUGreaterThanEqual {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpUGreaterThanEqual);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSGreaterThanEqual {
@@ -1319,6 +1489,8 @@ pub struct OpSGreaterThanEqual {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpSGreaterThanEqual);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpULessThan {
     pub result_type: OpId,
@@ -1326,6 +1498,8 @@ pub struct OpULessThan {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpULessThan);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSLessThan {
@@ -1335,6 +1509,8 @@ pub struct OpSLessThan {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpSLessThan);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpULessThanEqual {
     pub result_type: OpId,
@@ -1342,6 +1518,8 @@ pub struct OpULessThanEqual {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpULessThanEqual);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSLessThanEqual {
@@ -1351,6 +1529,8 @@ pub struct OpSLessThanEqual {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpSLessThanEqual);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFOrdEqual {
     pub result_type: OpId,
@@ -1358,6 +1538,8 @@ pub struct OpFOrdEqual {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFOrdEqual);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFUnordEqual {
@@ -1367,6 +1549,8 @@ pub struct OpFUnordEqual {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFUnordEqual);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFOrdNotEqual {
     pub result_type: OpId,
@@ -1374,6 +1558,8 @@ pub struct OpFOrdNotEqual {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFOrdNotEqual);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFUnordNotEqual {
@@ -1383,6 +1569,8 @@ pub struct OpFUnordNotEqual {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFUnordNotEqual);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFOrdLessThan {
     pub result_type: OpId,
@@ -1390,6 +1578,8 @@ pub struct OpFOrdLessThan {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFOrdLessThan);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFUnordLessThan {
@@ -1399,6 +1589,8 @@ pub struct OpFUnordLessThan {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFUnordLessThan);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFOrdGreaterThan {
     pub result_type: OpId,
@@ -1406,6 +1598,8 @@ pub struct OpFOrdGreaterThan {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFOrdGreaterThan);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFUnordGreaterThan {
@@ -1415,6 +1609,8 @@ pub struct OpFUnordGreaterThan {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFUnordGreaterThan);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFOrdLessThanEqual {
     pub result_type: OpId,
@@ -1422,6 +1618,8 @@ pub struct OpFOrdLessThanEqual {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFOrdLessThanEqual);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFUnordLessThanEqual {
@@ -1431,6 +1629,8 @@ pub struct OpFUnordLessThanEqual {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFUnordLessThanEqual);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFOrdGreaterThanEqual {
     pub result_type: OpId,
@@ -1439,6 +1639,8 @@ pub struct OpFOrdGreaterThanEqual {
     pub operand2: OpId,
 }
 
+def_op_display_s2!(OpFOrdGreaterThanEqual);
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFUnordGreaterThanEqual {
     pub result_type: OpId,
@@ -1446,6 +1648,8 @@ pub struct OpFUnordGreaterThanEqual {
     pub operand1: OpId,
     pub operand2: OpId,
 }
+
+def_op_display_s2!(OpFUnordGreaterThanEqual);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpDPdx(pub OpId, pub ResultId, pub OpId);

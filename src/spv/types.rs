@@ -127,9 +127,25 @@ impl DisplayArgType for SourceVersion {}
 #[derive(Clone, Debug, PartialEq)]
 pub struct Line(pub u32);
 
+impl Display for Line {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl DisplayArgType for Line {}
+
 /// Column number used with OpLine instruction
 #[derive(Clone, Debug, PartialEq)]
 pub struct Column(pub u32);
+
+impl Display for Column {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl DisplayArgType for Column {}
 
 /// Type of decoration to annotate an instruction with
 #[derive(Clone, Debug, PartialEq)]
@@ -1019,11 +1035,26 @@ impl DisplayArgType for AccessQualifier {}
 #[derive(Clone, Debug, PartialEq)]
 pub enum SamplerAddressingMode {
     None,
-    ClampEdge,
+    ClampToEdge,
     Clamp,
     Repeat,
     RepeatMirrored,
 }
+
+impl Display for SamplerAddressingMode {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            SamplerAddressingMode::None => "None",
+            SamplerAddressingMode::ClampToEdge => "ClampToEdge",
+            SamplerAddressingMode::Clamp => "Clamp",
+            SamplerAddressingMode::Repeat => "Repeat",
+            SamplerAddressingMode::RepeatMirrored => "RepeatMirrored",
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl DisplayArgType for SamplerAddressingMode {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum SamplerParam {
@@ -1031,11 +1062,35 @@ pub enum SamplerParam {
     Normalized,
 }
 
+impl Display for SamplerParam {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            SamplerParam::NonNormalized => 0,
+            SamplerParam::Normalized => 1,
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl DisplayArgType for SamplerParam {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum SamplerFilterMode {
     Nearest,
     Linear,
 }
+
+impl Display for SamplerFilterMode {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let name = match *self {
+            SamplerFilterMode::Nearest => "Nearest",
+            SamplerFilterMode::Linear => "Linear",
+        };
+        write!(f, "{}", name)
+    }
+}
+
+impl DisplayArgType for SamplerFilterMode {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ImageOperands {
