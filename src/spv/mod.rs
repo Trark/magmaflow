@@ -1,10 +1,11 @@
 
+#[macro_use]
+mod dis;
+
 pub mod types;
 pub mod op;
 pub mod raw;
 pub mod logical;
-
-mod dis;
 
 use std::any::Any;
 use std::fmt;
@@ -70,6 +71,8 @@ impl Display for ExtInstBox {
         Display::fmt(self.as_ref(), f)
     }
 }
+
+impl dis::DisplayArgType for ExtInstBox {}
 
 /// Represents an object that controls an extended instruction set
 pub trait ExtInstSet {

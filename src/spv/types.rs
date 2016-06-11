@@ -14,6 +14,8 @@ impl Display for OpId {
     }
 }
 
+impl DisplayArgType for OpId {}
+
 /// A SPIR-V `Result <id>`
 #[derive(Clone, Debug, PartialEq)]
 pub struct ResultId(pub u32);
@@ -107,6 +109,8 @@ impl Display for SourceLanguage {
     }
 }
 
+impl DisplayArgType for SourceLanguage {}
+
 /// Version of the source language
 #[derive(Clone, Debug, PartialEq)]
 pub struct SourceVersion(pub u32);
@@ -116,6 +120,8 @@ impl Display for SourceVersion {
         write!(f, "{}", self.0)
     }
 }
+
+impl DisplayArgType for SourceVersion {}
 
 /// Line number used with OpLine instruction
 #[derive(Clone, Debug, PartialEq)]
@@ -232,6 +238,8 @@ impl Display for Decoration {
     }
 }
 
+impl DisplayArgType for Decoration {}
+
 /// Marks a special built in variable or member
 #[derive(Clone, Debug, PartialEq)]
 pub enum BuiltIn {
@@ -327,9 +335,19 @@ impl Display for BuiltIn {
     }
 }
 
+impl DisplayArgType for BuiltIn {}
+
 /// Offset of a member in a type
 #[derive(Clone, Debug, PartialEq)]
 pub struct MemberIndex(pub u32);
+
+impl Display for MemberIndex {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl DisplayArgType for MemberIndex {}
 
 /// The addressing model used by the module
 #[derive(Clone, Debug, PartialEq)]
@@ -350,6 +368,8 @@ impl Display for AddressingModel {
     }
 }
 
+impl DisplayArgType for AddressingModel {}
+
 /// The memory model required by the module
 #[derive(Clone, Debug, PartialEq)]
 pub enum MemoryModel {
@@ -368,6 +388,8 @@ impl Display for MemoryModel {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for MemoryModel {}
 
 /// The execution model for an entry point into the module
 #[derive(Clone, Debug, PartialEq)]
@@ -395,6 +417,8 @@ impl Display for ExecutionModel {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for ExecutionModel {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ExecutionMode {
@@ -473,6 +497,8 @@ impl Display for ExecutionMode {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for ExecutionMode {}
 
 /// Capability that a module may require
 ///
@@ -601,6 +627,8 @@ impl Display for Capability {
     }
 }
 
+impl DisplayArgType for Capability {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Signedness {
     UnsignedOrNone,
@@ -616,6 +644,8 @@ impl Display for Signedness {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for Signedness {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum StorageClass {
@@ -653,6 +683,8 @@ impl Display for StorageClass {
     }
 }
 
+impl DisplayArgType for StorageClass {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct FpFastMathMode {
     pub not_nan: bool,
@@ -688,6 +720,8 @@ impl Display for FpFastMathMode {
     }
 }
 
+impl DisplayArgType for FpFastMathMode {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum FpRoundingMode {
     Rte,
@@ -708,6 +742,8 @@ impl Display for FpRoundingMode {
     }
 }
 
+impl DisplayArgType for FpRoundingMode {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum LinkageType {
     Export,
@@ -723,6 +759,8 @@ impl Display for LinkageType {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for LinkageType {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum FunctionParameterAttribute {
@@ -752,6 +790,8 @@ impl Display for FunctionParameterAttribute {
     }
 }
 
+impl DisplayArgType for FunctionParameterAttribute {}
+
 /// The dimension for an image type
 #[derive(Clone, Debug, PartialEq)]
 pub enum Dim {
@@ -779,6 +819,8 @@ impl Display for Dim {
     }
 }
 
+impl DisplayArgType for Dim {}
+
 /// Indicates if it is known if an image is a depth image
 #[derive(Clone, Debug, PartialEq)]
 pub enum DepthStatus {
@@ -798,6 +840,8 @@ impl Display for DepthStatus {
     }
 }
 
+impl DisplayArgType for DepthStatus {}
+
 /// Indicates if an image is an array or not
 #[derive(Clone, Debug, PartialEq)]
 pub enum Arrayed {
@@ -815,6 +859,8 @@ impl Display for Arrayed {
     }
 }
 
+impl DisplayArgType for Arrayed {}
+
 /// The multisample state of an image
 #[derive(Clone, Debug, PartialEq)]
 pub enum MS {
@@ -831,6 +877,8 @@ impl Display for MS {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for MS {}
 
 /// Indicates how an image is used with samplers
 #[derive(Clone, Debug, PartialEq)]
@@ -850,6 +898,8 @@ impl Display for SampledStatus {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for SampledStatus {}
 
 /// The format for an image type
 #[derive(Clone, Debug, PartialEq)]
@@ -944,6 +994,8 @@ impl Display for ImageFormat {
     }
 }
 
+impl DisplayArgType for ImageFormat {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum AccessQualifier {
     ReadOnly,
@@ -961,6 +1013,8 @@ impl Display for AccessQualifier {
         write!(f, "{}", name)
     }
 }
+
+impl DisplayArgType for AccessQualifier {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum SamplerAddressingMode {
@@ -1021,6 +1075,8 @@ impl Display for MemoryAccess {
     }
 }
 
+impl DisplayArgType for MemoryAccess {}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct FunctionControl {
     pub inline: bool,
@@ -1051,6 +1107,8 @@ impl Display for FunctionControl {
         }
     }
 }
+
+impl DisplayArgType for FunctionControl {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct LoopControl {
@@ -1085,6 +1143,8 @@ impl Display for LoopControl {
     }
 }
 
+impl DisplayArgType for LoopControl {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct SelectionControl {
     pub flatten: bool,
@@ -1108,6 +1168,8 @@ impl Display for SelectionControl {
     }
 }
 
+impl DisplayArgType for SelectionControl {}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct PhiArg {
     pub variable: OpId,
@@ -1116,9 +1178,11 @@ pub struct PhiArg {
 
 impl Display for PhiArg {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}{}", Arg(&self.variable), Arg(&self.parent))
+        write!(f, "{} {}", self.variable, self.parent)
     }
 }
+
+impl DisplayArgType for PhiArg {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct BranchWeights {
@@ -1128,9 +1192,11 @@ pub struct BranchWeights {
 
 impl Display for BranchWeights {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}{}", Arg(&self.true_weight), Arg(&self.false_weight))
+        write!(f, "{} {}", self.true_weight, self.false_weight)
     }
 }
+
+impl DisplayArgType for BranchWeights {}
 
 /// An `<id>` that refers to a scope
 #[derive(Clone, Debug, PartialEq)]
