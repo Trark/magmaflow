@@ -139,38 +139,38 @@ fn read_instruction(stream: &mut Stream,
         0 => Ok(Core::OpNop(OpNop)),
         1 => return Err(ReadError::UnimplementedOp("OpUndef")),
         2 => return Err(ReadError::UnimplementedOp("OpSourceContinued")),
-        3 => read_op_source(&mut im),
+        3 => OpSource::inst_read(&mut im),
         4 => return Err(ReadError::UnimplementedOp("OpSourceExtension")),
-        5 => read_op_name(&mut im),
-        6 => read_op_member_name(&mut im),
+        5 => OpName::inst_read(&mut im),
+        6 => OpMemberName::inst_read(&mut im),
         7 => return Err(ReadError::UnimplementedOp("OpString")),
         8 => return Err(ReadError::UnimplementedOp("OpLine")),
-        10 => read_op_extension(&mut im),
+        10 => OpExtension::inst_read(&mut im),
         11 => read_op_ext_inst_import(&mut im, known_inst_sets, bound_inst_sets),
         12 => read_op_ext_inst(&mut im, bound_inst_sets),
-        14 => read_op_memory_model(&mut im),
-        15 => read_op_entry_point(&mut im),
-        16 => read_op_execution_mode(&mut im),
-        17 => read_op_capability(&mut im),
-        19 => read_op_type_void(&mut im),
-        20 => read_op_type_bool(&mut im),
-        21 => read_op_type_int(&mut im),
-        22 => read_op_type_float(&mut im),
-        23 => read_op_type_vector(&mut im),
-        24 => read_op_type_matrix(&mut im),
-        25 => read_op_type_image(&mut im),
-        26 => read_op_type_sampler(&mut im),
-        27 => read_op_type_sampled_image(&mut im),
-        28 => read_op_type_array(&mut im),
-        29 => read_op_type_runtime_array(&mut im),
-        30 => read_op_type_struct(&mut im),
-        31 => read_op_type_opaque(&mut im),
-        32 => read_op_type_pointer(&mut im),
-        33 => read_op_type_function(&mut im),
+        14 => OpMemoryModel::inst_read(&mut im),
+        15 => OpEntryPoint::inst_read(&mut im),
+        16 => OpExecutionMode::inst_read(&mut im),
+        17 => OpCapability::inst_read(&mut im),
+        19 => OpTypeVoid::inst_read(&mut im),
+        20 => OpTypeBool::inst_read(&mut im),
+        21 => OpTypeInt::inst_read(&mut im),
+        22 => OpTypeFloat::inst_read(&mut im),
+        23 => OpTypeVector::inst_read(&mut im),
+        24 => OpTypeMatrix::inst_read(&mut im),
+        25 => OpTypeImage::inst_read(&mut im),
+        26 => OpTypeSampler::inst_read(&mut im),
+        27 => OpTypeSampledImage::inst_read(&mut im),
+        28 => OpTypeArray::inst_read(&mut im),
+        29 => OpTypeRuntimeArray::inst_read(&mut im),
+        30 => OpTypeStruct::inst_read(&mut im),
+        31 => OpTypeOpaque::inst_read(&mut im),
+        32 => OpTypePointer::inst_read(&mut im),
+        33 => OpTypeFunction::inst_read(&mut im),
         41 => return Err(ReadError::UnimplementedOp("OpConstantTrue")),
         42 => return Err(ReadError::UnimplementedOp("OpConstantFalse")),
-        43 => read_op_constant(&mut im),
-        44 => read_op_constant_composite(&mut im),
+        43 => OpConstant::inst_read(&mut im),
+        44 => OpConstantComposite::inst_read(&mut im),
         45 => return Err(ReadError::UnimplementedOp("OpConstantSampler")),
         46 => return Err(ReadError::UnimplementedOp("OpConstantNull")),
         48 => return Err(ReadError::UnimplementedOp("OpSpecConstantTrue")),
@@ -178,24 +178,24 @@ fn read_instruction(stream: &mut Stream,
         50 => return Err(ReadError::UnimplementedOp("OpSpecConstant")),
         51 => return Err(ReadError::UnimplementedOp("OpSpecConstantComposite")),
         52 => return Err(ReadError::UnimplementedOp("OpSpecConstantOp")),
-        54 => read_op_function(&mut im),
-        55 => read_op_function_parameter(&mut im),
-        56 => read_op_function_end(&mut im),
+        54 => OpFunction::inst_read(&mut im),
+        55 => OpFunctionParameter::inst_read(&mut im),
+        56 => OpFunctionEnd::inst_read(&mut im),
         57 => return Err(ReadError::UnimplementedOp("OpFunctionCall")),
-        59 => read_op_variable(&mut im),
+        59 => OpVariable::inst_read(&mut im),
         60 => return Err(ReadError::UnimplementedOp("OpImageTexelPointer")),
-        61 => read_op_load(&mut im),
-        62 => read_op_store(&mut im),
+        61 => OpLoad::inst_read(&mut im),
+        62 => OpStore::inst_read(&mut im),
         63 => return Err(ReadError::UnimplementedOp("OpCopyMemory")),
         64 => return Err(ReadError::UnimplementedOp("OpCopyMemorySized")),
-        65 => read_op_access_chain(&mut im),
+        65 => OpAccessChain::inst_read(&mut im),
         66 => return Err(ReadError::UnimplementedOp("OpInBoundsAccessChain")),
         67 => return Err(ReadError::UnimplementedOp("OpPtrAccessChain")),
         68 => return Err(ReadError::UnimplementedOp("OpArrayLength")),
         69 => return Err(ReadError::UnimplementedOp("OpGenericPtrMemSemantics")),
         70 => return Err(ReadError::UnimplementedOp("OpInBoundsPtrAccessChain")),
-        71 => read_op_decorate(&mut im),
-        72 => read_op_member_decorate(&mut im),
+        71 => OpDecorate::inst_read(&mut im),
+        72 => OpMemberDecorate::inst_read(&mut im),
         77 => return Err(ReadError::UnimplementedOp("OpVectorExtractDynamic")),
         78 => return Err(ReadError::UnimplementedOp("OpVectorInsertDynamic")),
         79 => return Err(ReadError::UnimplementedOp("OpVectorShuffle")),
@@ -229,7 +229,7 @@ fn read_instruction(stream: &mut Stream,
         109 => return Err(ReadError::UnimplementedOp("OpConvertFToU")),
         110 => return Err(ReadError::UnimplementedOp("OpConvertFToS")),
         111 => return Err(ReadError::UnimplementedOp("OpConvertSToF")),
-        112 => read_op_convert_utof(&mut im),
+        112 => OpConvertUToF::inst_read(&mut im),
         113 => return Err(ReadError::UnimplementedOp("OpUConvert")),
         114 => return Err(ReadError::UnimplementedOp("OpSConvert")),
         115 => return Err(ReadError::UnimplementedOp("OpFConvert")),
@@ -248,12 +248,12 @@ fn read_instruction(stream: &mut Stream,
         129 => return Err(ReadError::UnimplementedOp("OpFAdd")),
         130 => return Err(ReadError::UnimplementedOp("OpISub")),
         131 => return Err(ReadError::UnimplementedOp("OpFSub")),
-        132 => read_op_imul(&mut im),
+        132 => OpIMul::inst_read(&mut im),
         133 => return Err(ReadError::UnimplementedOp("OpFMul")),
         134 => return Err(ReadError::UnimplementedOp("OpUDiv")),
         135 => return Err(ReadError::UnimplementedOp("OpSDiv")),
         136 => return Err(ReadError::UnimplementedOp("OpFDiv")),
-        137 => read_op_umod(&mut im),
+        137 => OpUMod::inst_read(&mut im),
         138 => return Err(ReadError::UnimplementedOp("OpSRem")),
         139 => return Err(ReadError::UnimplementedOp("OpSMod")),
         140 => return Err(ReadError::UnimplementedOp("OpFRem")),
@@ -285,7 +285,7 @@ fn read_instruction(stream: &mut Stream,
         167 => return Err(ReadError::UnimplementedOp("OpLogicalAnd")),
         168 => return Err(ReadError::UnimplementedOp("OpLogicalNot")),
         169 => return Err(ReadError::UnimplementedOp("OpSelect")),
-        170 => read_op_iequal(&mut im),
+        170 => OpIEqual::inst_read(&mut im),
         171 => return Err(ReadError::UnimplementedOp("OpINotEqual")),
         172 => return Err(ReadError::UnimplementedOp("OpUGreaterThan")),
         173 => return Err(ReadError::UnimplementedOp("OpSGreaterThan")),
@@ -350,15 +350,15 @@ fn read_instruction(stream: &mut Stream,
         240 => return Err(ReadError::UnimplementedOp("OpAtomicAnd")),
         241 => return Err(ReadError::UnimplementedOp("OpAtomicOr")),
         242 => return Err(ReadError::UnimplementedOp("OpAtomicXor")),
-        245 => read_op_phi(&mut im),
-        246 => read_op_loop_merge(&mut im),
-        247 => read_op_selection_merge(&mut im),
-        248 => read_op_label(&mut im),
-        249 => read_op_branch(&mut im),
-        250 => read_op_branch_conditional(&mut im),
+        245 => OpPhi::inst_read(&mut im),
+        246 => OpLoopMerge::inst_read(&mut im),
+        247 => OpSelectionMerge::inst_read(&mut im),
+        248 => OpLabel::inst_read(&mut im),
+        249 => OpBranch::inst_read(&mut im),
+        250 => OpBranchConditional::inst_read(&mut im),
         251 => return Err(ReadError::UnimplementedOp("OpSwitch")),
         252 => return Err(ReadError::UnimplementedOp("OpKill")),
-        253 => read_op_return(&mut im),
+        253 => OpReturn::inst_read(&mut im),
         254 => return Err(ReadError::UnimplementedOp("OpReturnValue")),
         255 => return Err(ReadError::UnimplementedOp("OpUnreachable")),
         256 => return Err(ReadError::UnimplementedOp("OpLifetimeStart")),
@@ -453,11 +453,6 @@ impl<'a> InstructionMemory<'a> {
         self.block.len()
     }
 
-    fn get_remaining_words(&self) -> usize {
-        assert!(self.position <= self.block.len());
-        self.block.len() - self.position
-    }
-
     fn finish(self) -> ReadResult<()> {
         if self.block.len() != self.position {
             Err(ReadError::InstructionHadExcessData)
@@ -473,21 +468,58 @@ impl<'a> InstructionMemory<'a> {
     }
 }
 
+trait InstructionRead {
+    fn inst_read(stream: &mut InstructionMemory) -> ReadResult<Core>;
+}
+
+macro_rules! def_op_read {
+    ($name: ident; $($operand_name: ident)|*) => {
+        impl MemoryBlockRead for $name {
+            fn read(block: MemoryBlock) -> MemoryBlockResult<Self> {
+                $(
+                    let (block, $operand_name) = try!(
+                        $crate::spv::raw::MemoryBlockRead::read(block)
+                    );
+                )*
+                let op = $name {
+                    $(
+                        $operand_name: $operand_name
+                    ,)*
+                };
+                Ok((block, op))
+            }
+        }
+        impl InstructionRead for $name {
+            fn inst_read(stream: &mut InstructionMemory) -> ReadResult<Core> {
+                let block = stream.as_memory_block();
+                let (block, item) = try!(<$name as MemoryBlockRead>::read(block));
+                if !block.end() {
+                    return Err(ReadError::InstructionHadExcessData);
+                }
+                Ok($crate::spv::raw::Core::$name(item))
+            }
+        }
+    };
+}
+
+macro_rules! def_op_read_s1 {
+    ($name: ident) => {
+        def_op_read!($name; result_type | result_id | operand);
+    };
+}
+
+macro_rules! def_op_read_s2 {
+    ($name: ident) => {
+        def_op_read!($name; result_type | result_id | operand1 | operand2);
+    };
+}
+
 fn read_op_id(stream: &mut InstructionMemory) -> ReadResult<OpId> {
     Ok(OpId(try!(stream.read_next())))
 }
 
 fn read_result_id(stream: &mut InstructionMemory) -> ReadResult<ResultId> {
     Ok(ResultId(try!(stream.read_next())))
-}
-
-fn read_op_id_list(stream: &mut InstructionMemory) -> ReadResult<Vec<OpId>> {
-    let rem = stream.get_remaining_words();
-    let mut ids = Vec::with_capacity(rem);
-    for _ in 0..rem {
-        ids.push(read_op_id(stream).expect("Op list read should never pass end"));
-    }
-    Ok(ids)
 }
 
 fn read_lit_number_u32(stream: &mut InstructionMemory) -> ReadResult<u32> {
@@ -517,71 +549,12 @@ fn read_string_literal(stream: &mut InstructionMemory) -> ReadResult<LitString> 
     }
 }
 
-fn read_op_source(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let lang_id = try!(stream.read_next());
-    let lang = match lang_id {
-        0 => SourceLanguage::Unknown,
-        1 => SourceLanguage::Essl,
-        2 => SourceLanguage::Glsl,
-        3 => SourceLanguage::OpenCL_C,
-        4 => SourceLanguage::OpenCL_Cpp,
-        id => SourceLanguage::Other(id),
-    };
-    let version = SourceVersion(try!(read_lit_number_u32(stream)));
-    let file_id = if stream.get_remaining_words() > 0 {
-        Some(read_op_id(stream).expect("Reading file id after checking bounds"))
-    } else {
-        None
-    };
-    let source_name = if stream.get_remaining_words() > 0 {
-        Some(read_string_literal(stream).expect("Reading file name after checking bounds"))
-    } else {
-        None
-    };
-    Ok(Core::OpSource(OpSource {
-        language: lang,
-        version: version,
-        file: file_id,
-        source: source_name,
-    }))
-}
+def_op_read!(OpSource; language | version | file | source);
 
-fn read_op_name(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let id = try!(read_op_id(stream));
-    let name = try!(read_string_literal(stream));
-    Ok(Core::OpName(OpName {
-        target: id,
-        name: name,
-    }))
-}
+def_op_read!(OpName; target | name);
+def_op_read!(OpMemberName; struct_type | member | name);
 
-fn read_op_member_name(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let struct_type = try!(read_op_id(stream));
-    let member_index = MemberIndex(try!(read_lit_number_u32(stream)));
-    let name = try!(read_string_literal(stream));
-    Ok(Core::OpMemberName(OpMemberName {
-        struct_type: struct_type,
-        member: member_index,
-        name: name,
-    }))
-}
-
-fn read_op_extension(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let name = try!(read_string_literal(stream));
-    Ok(Core::OpExtension(OpExtension { name: name }))
-}
+def_op_read!(OpExtension; name);
 
 fn read_op_ext_inst_import(stream: &mut InstructionMemory,
                            known_inst_sets: &[Box<ExtInstSet>],
@@ -635,1055 +608,67 @@ fn read_op_ext_inst(stream: &mut InstructionMemory,
     }
 }
 
-fn read_addressing_model(stream: &mut InstructionMemory) -> ReadResult<AddressingModel> {
-    let am = try!(stream.read_next());
-    Ok(match am {
-        0 => AddressingModel::Logical,
-        1 => AddressingModel::Physical32,
-        2 => AddressingModel::Physical64,
-        id => return Err(ReadError::UnknownAddressingModel(id)),
-    })
-}
-
-fn read_memory_model(stream: &mut InstructionMemory) -> ReadResult<MemoryModel> {
-    let mm = try!(stream.read_next());
-    Ok(match mm {
-        0 => MemoryModel::Simple,
-        1 => MemoryModel::Glsl450,
-        2 => MemoryModel::OpenCL,
-        id => return Err(ReadError::UnknownMemoryModel(id)),
-    })
-}
-
-fn read_op_memory_model(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let am = try!(read_addressing_model(stream));
-    let mm = try!(read_memory_model(stream));
-    Ok(Core::OpMemoryModel(OpMemoryModel {
-        addressing_model: am,
-        memory_model: mm,
-    }))
-}
-
-fn read_execution_model(stream: &mut InstructionMemory) -> ReadResult<ExecutionModel> {
-    let em = try!(stream.read_next());
-    Ok(match em {
-        0 => ExecutionModel::Vertex,
-        1 => ExecutionModel::TesselationControl,
-        2 => ExecutionModel::TesselationEvaluation,
-        3 => ExecutionModel::Geometry,
-        4 => ExecutionModel::Fragment,
-        5 => ExecutionModel::GlCompute,
-        6 => ExecutionModel::Kernel,
-        id => return Err(ReadError::UnknownExecutionModel(id)),
-    })
-}
-
-fn read_op_entry_point(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let execution_model = try!(read_execution_model(stream));
-    let entry_point = try!(read_op_id(stream));
-    let name = try!(read_string_literal(stream));
-    let forward_defs = try!(read_op_id_list(stream));
-    let inst = OpEntryPoint {
-        execution_model: execution_model,
-        entry_point: entry_point,
-        name: name,
-        interface: forward_defs,
-    };
-    Ok(Core::OpEntryPoint(inst))
-}
-
-fn read_op_execution_mode(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let entry_point = try!(read_op_id(stream));
-    let execution_mode_id = try!(stream.read_next());
-    let mode = match execution_mode_id {
-        0 => {
-            let num = try!(read_lit_number_u32(stream));
-            ExecutionMode::Invocations(num)
-        }
-        1 => ExecutionMode::SpacingEqual,
-        2 => ExecutionMode::SpacingFractionalEven,
-        3 => ExecutionMode::SpacingFractionalOdd,
-        4 => ExecutionMode::VertexOrderCw,
-        5 => ExecutionMode::VertexOrderCcw,
-        6 => ExecutionMode::PixelCenterInteger,
-        7 => ExecutionMode::OriginUpperLeft,
-        8 => ExecutionMode::OriginLowerLeft,
-        9 => ExecutionMode::EarlyFragmentTests,
-        10 => ExecutionMode::PointMode,
-        11 => ExecutionMode::Xfb,
-        12 => ExecutionMode::DepthReplacing,
-        14 => ExecutionMode::DepthGreater,
-        15 => ExecutionMode::DepthLess,
-        16 => ExecutionMode::DepthUnchanged,
-        17 => {
-            let x = try!(read_lit_number_u32(stream));
-            let y = try!(read_lit_number_u32(stream));
-            let z = try!(read_lit_number_u32(stream));
-            ExecutionMode::LocalSize(x, y, z)
-        }
-        18 => {
-            let x = try!(read_lit_number_u32(stream));
-            let y = try!(read_lit_number_u32(stream));
-            let z = try!(read_lit_number_u32(stream));
-            ExecutionMode::LocalSizeHint(x, y, z)
-        }
-        19 => ExecutionMode::InputPoints,
-        20 => ExecutionMode::InputLines,
-        21 => ExecutionMode::InputLinesAdjacency,
-        22 => ExecutionMode::Triangles,
-        23 => ExecutionMode::InputTrianglesAdjacency,
-        24 => ExecutionMode::Quads,
-        25 => ExecutionMode::Isolines,
-        26 => {
-            let num = try!(read_lit_number_u32(stream));
-            ExecutionMode::OutputVerticies(num)
-        }
-        27 => ExecutionMode::OutputPoints,
-        28 => ExecutionMode::OutputLineStrip,
-        29 => ExecutionMode::OutputTriangleStrip,
-        30 => {
-            let id = try!(read_op_id(stream));
-            ExecutionMode::VecTypeHint(id)
-        }
-        31 => ExecutionMode::ContractionOff,
-        id => return Err(ReadError::UnknownExecutionMode(id)),
-    };
-    Ok(Core::OpExecutionMode(OpExecutionMode {
-        entry_point: entry_point,
-        mode: mode,
-    }))
-}
-
-fn read_op_capability(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let capability_id = try!(stream.read_next());
-    let capability = match capability_id {
-        0 => Capability::Matrix,
-        1 => Capability::Shader,
-        2 => Capability::Geometry,
-        3 => Capability::Tessellation,
-        4 => Capability::Addresses,
-        5 => Capability::Linkage,
-        6 => Capability::Kernel,
-        7 => Capability::Vector16,
-        8 => Capability::Float16Buffer,
-        9 => Capability::Float16,
-        10 => Capability::Float64,
-        11 => Capability::Int64,
-        12 => Capability::Int64Atomics,
-        13 => Capability::ImageBasic,
-        14 => Capability::ImageReadWrite,
-        15 => Capability::ImageMipmap,
-        17 => Capability::Pipes,
-        18 => Capability::Groups,
-        19 => Capability::DeviceEnqueue,
-        20 => Capability::LiteralSampler,
-        21 => Capability::AtomicStorage,
-        22 => Capability::Int16,
-        23 => Capability::TessellationPointSize,
-        24 => Capability::GeometryPointSize,
-        25 => Capability::ImageGatherExtended,
-        27 => Capability::StorageImageMultisample,
-        28 => Capability::UniformBufferArrayDynamicIndexing,
-        29 => Capability::SampledImageArrayDynamicIndexing,
-        30 => Capability::StorageBufferArrayDynamicIndexing,
-        31 => Capability::StorageImageArrayDynamicIndexing,
-        32 => Capability::ClipDistance,
-        33 => Capability::CullDistance,
-        34 => Capability::ImageCubeArray,
-        35 => Capability::SampleRateShading,
-        36 => Capability::ImageRect,
-        37 => Capability::SampledRect,
-        38 => Capability::GenericPointer,
-        39 => Capability::Int8,
-        40 => Capability::InputAttachment,
-        41 => Capability::SparseResidency,
-        42 => Capability::MinLod,
-        43 => Capability::Sampled1D,
-        44 => Capability::Image1D,
-        45 => Capability::SampledCubeArray,
-        46 => Capability::SampledBuffer,
-        47 => Capability::ImageBuffer,
-        48 => Capability::ImageMSArray,
-        49 => Capability::StorageImageExtendedFormats,
-        50 => Capability::ImageQuery,
-        51 => Capability::DerivativeControl,
-        52 => Capability::InterpolationFunction,
-        53 => Capability::TransformFeedback,
-        54 => Capability::GeometryStreams,
-        55 => Capability::StorageImageReadWithoutFormat,
-        56 => Capability::StorageImageWriteWithoutFormat,
-        57 => Capability::MultiViewport,
-        id => return Err(ReadError::UnknownCapability(id)),
-    };
-    Ok(Core::OpCapability(OpCapability { capability: capability }))
-}
-
-fn read_op_type_void(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    Ok(Core::OpTypeVoid(OpTypeVoid { result_id: result_id }))
-}
-
-fn read_op_type_bool(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    Ok(Core::OpTypeBool(OpTypeBool { result_id: result_id }))
-}
-
-fn read_op_type_int(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let width = try!(read_lit_number_u32(stream));
-    let signedness_u32 = try!(read_lit_number_u32(stream));
-    let signedness = match signedness_u32 {
-        0 => Signedness::UnsignedOrNone,
-        1 => Signedness::Signed,
-        n => return Err(ReadError::UnknownSignedness(n)),
-    };
-    Ok(Core::OpTypeInt(OpTypeInt {
-        result_id: result_id,
-        width: width,
-        signedness: signedness,
-    }))
-}
-
-fn read_op_type_float(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let width = try!(read_lit_number_u32(stream));
-    Ok(Core::OpTypeFloat(OpTypeFloat {
-        result_id: result_id,
-        width: width,
-    }))
-}
-
-fn read_op_type_vector(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let component_type = try!(read_op_id(stream));
-    let count = try!(read_lit_number_u32(stream));
-    Ok(Core::OpTypeVector(OpTypeVector {
-        result_id: result_id,
-        component_type: component_type,
-        component_count: count,
-    }))
-}
-
-fn read_op_type_matrix(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let column_type = try!(read_op_id(stream));
-    let column_count = try!(read_lit_number_u32(stream));
-    Ok(Core::OpTypeMatrix(OpTypeMatrix {
-        result_id: result_id,
-        column_type: column_type,
-        column_count: column_count,
-    }))
-}
-
-fn read_dim(stream: &mut InstructionMemory) -> ReadResult<Dim> {
-    Ok(match try!(stream.read_next()) {
-        0 => Dim::Tex1D,
-        1 => Dim::Tex2D,
-        2 => Dim::Tex3D,
-        3 => Dim::Cube,
-        4 => Dim::Rect,
-        5 => Dim::Buffer,
-        6 => Dim::SubpassData,
-        n => return Err(ReadError::UnknownDim(n)),
-    })
-}
-
-fn read_depth_status(stream: &mut InstructionMemory) -> ReadResult<DepthStatus> {
-    Ok(match try!(stream.read_next()) {
-        0 => DepthStatus::NotDepth,
-        1 => DepthStatus::Depth,
-        2 => DepthStatus::NoIndication,
-        n => return Err(ReadError::UnknownDepthStatus(n)),
-    })
-}
-
-fn read_arrayed(stream: &mut InstructionMemory) -> ReadResult<Arrayed> {
-    Ok(match try!(stream.read_next()) {
-        0 => Arrayed::False,
-        1 => Arrayed::True,
-        n => return Err(ReadError::UnknownArrayed(n)),
-    })
-}
-
-fn read_ms(stream: &mut InstructionMemory) -> ReadResult<MS> {
-    Ok(match try!(stream.read_next()) {
-        0 => MS::Single,
-        1 => MS::Multi,
-        n => return Err(ReadError::UnknownMS(n)),
-    })
-}
-
-fn read_sampled_status(stream: &mut InstructionMemory) -> ReadResult<SampledStatus> {
-    Ok(match try!(stream.read_next()) {
-        0 => SampledStatus::RuntimeChoice,
-        1 => SampledStatus::WithSampler,
-        2 => SampledStatus::WithoutSampler,
-        n => return Err(ReadError::UnknownSampledStatus(n)),
-    })
-}
-
-fn read_image_format(stream: &mut InstructionMemory) -> ReadResult<ImageFormat> {
-    Ok(match try!(stream.read_next()) {
-        0 => ImageFormat::Unknown,
-        1 => ImageFormat::Rgba32f,
-        2 => ImageFormat::Rgba16f,
-        3 => ImageFormat::R32f,
-        4 => ImageFormat::Rgba8,
-        5 => ImageFormat::Rgba8Snorm,
-        6 => ImageFormat::Rg32f,
-        7 => ImageFormat::Rg16f,
-        8 => ImageFormat::R11fG11fB10f,
-        9 => ImageFormat::R16f,
-        10 => ImageFormat::Rgba16,
-        11 => ImageFormat::Rgb10A2,
-        12 => ImageFormat::Rg16,
-        13 => ImageFormat::Rg8,
-        14 => ImageFormat::R16,
-        15 => ImageFormat::R8,
-        16 => ImageFormat::Rgba16Snorm,
-        17 => ImageFormat::Rg16Snorm,
-        18 => ImageFormat::Rg8Snorm,
-        19 => ImageFormat::R16Snorm,
-        20 => ImageFormat::R8Snorm,
-        21 => ImageFormat::Rgba32i,
-        22 => ImageFormat::Rgba16i,
-        23 => ImageFormat::Rgba8i,
-        24 => ImageFormat::R32i,
-        25 => ImageFormat::Rg32i,
-        26 => ImageFormat::Rg16i,
-        27 => ImageFormat::Rg8i,
-        28 => ImageFormat::R16i,
-        29 => ImageFormat::R8i,
-        30 => ImageFormat::Rgba32ui,
-        31 => ImageFormat::Rgba16ui,
-        32 => ImageFormat::Rgba8ui,
-        33 => ImageFormat::R32ui,
-        34 => ImageFormat::Rgb10a2ui,
-        35 => ImageFormat::Rg32ui,
-        36 => ImageFormat::Rg16ui,
-        37 => ImageFormat::Rg8ui,
-        38 => ImageFormat::R16ui,
-        39 => ImageFormat::R8ui,
-        n => return Err(ReadError::UnknownImageFormat(n)),
-    })
-}
-
-fn read_access_qualifier(stream: &mut InstructionMemory) -> ReadResult<AccessQualifier> {
-    Ok(match try!(stream.read_next()) {
-        0 => AccessQualifier::ReadOnly,
-        1 => AccessQualifier::WriteOnly,
-        2 => AccessQualifier::ReadWrite,
-        n => return Err(ReadError::UnknownAccessQualifier(n)),
-    })
-}
-
-fn read_op_type_image(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 9 && stream.get_word_count() != 10 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let sampled_type = try!(read_op_id(stream));
-    let dim = try!(read_dim(stream));
-    let depth = try!(read_depth_status(stream));
-    let arrayed = try!(read_arrayed(stream));
-    let ms = try!(read_ms(stream));
-    let sampled = try!(read_sampled_status(stream));
-    let image_format = try!(read_image_format(stream));
-    let access_qualifier = if stream.get_remaining_words() > 0 {
-        Some(try!(read_access_qualifier(stream)))
-    } else {
-        None
-    };
-    Ok(Core::OpTypeImage(OpTypeImage {
-        result_id: result_id,
-        sampled_type: sampled_type,
-        dim: dim,
-        depth: depth,
-        arrayed: arrayed,
-        ms: ms,
-        sampled: sampled,
-        format: image_format,
-        access_qualifier: access_qualifier,
-    }))
-}
-
-fn read_op_type_sampler(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    Ok(Core::OpTypeSampler(OpTypeSampler { result_id: result_id }))
-}
-
-fn read_op_type_sampled_image(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let image_type = try!(read_op_id(stream));
-    Ok(Core::OpTypeSampledImage(OpTypeSampledImage {
-        result_id: result_id,
-        image_type: image_type,
-    }))
-}
-
-fn read_op_type_array(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let element_type = try!(read_op_id(stream));
-    let length = try!(read_op_id(stream));
-    Ok(Core::OpTypeArray(OpTypeArray {
-        result_id: result_id,
-        element_type: element_type,
-        length: length,
-    }))
-}
-
-
-
-fn read_op_type_runtime_array(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let element_type = try!(read_op_id(stream));
-    Ok(Core::OpTypeRuntimeArray(OpTypeRuntimeArray {
-        result_id: result_id,
-        element_type: element_type,
-    }))
-}
-
-fn read_op_type_struct(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let member_types = try!(read_op_id_list(stream));
-    Ok(Core::OpTypeStruct(OpTypeStruct {
-        result_id: result_id,
-        member_types: member_types,
-    }))
-}
-
-fn read_op_type_opaque(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let name = try!(read_string_literal(stream));
-    Ok(Core::OpTypeOpaque(OpTypeOpaque {
-        result_id: result_id,
-        name: name,
-    }))
-}
-
-fn read_storage_class(stream: &mut InstructionMemory) -> ReadResult<StorageClass> {
-    Ok(match try!(stream.read_next()) {
-        0 => StorageClass::UniformConstant,
-        1 => StorageClass::Input,
-        2 => StorageClass::Uniform,
-        3 => StorageClass::Output,
-        4 => StorageClass::Workgroup,
-        5 => StorageClass::CrossWorkgroup,
-        6 => StorageClass::Private,
-        7 => StorageClass::Function,
-        8 => StorageClass::Generic,
-        9 => StorageClass::PushConstant,
-        10 => StorageClass::AtomicCounter,
-        11 => StorageClass::Image,
-        n => return Err(ReadError::UnknownStorageClass(n)),
-    })
-}
-
-fn read_op_type_pointer(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let storage_class = try!(read_storage_class(stream));
-    let pointed_type = try!(read_op_id(stream));
-    Ok(Core::OpTypePointer(OpTypePointer {
-        result_id: result_id,
-        storage_class: storage_class,
-        pointed_type: pointed_type,
-    }))
-}
-
-fn read_op_type_function(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    let return_type = try!(read_op_id(stream));
-    let rem = stream.get_remaining_words();
-    let mut param_types = Vec::with_capacity(rem);
-    for _ in 0..rem {
-        param_types.push(read_op_id(stream).expect("Reading function type arguments"))
-    }
-    Ok(Core::OpTypeFunction(OpTypeFunction {
-        result_id: result_id,
-        return_type: return_type,
-        parameter_types: param_types,
-    }))
-}
-
-fn read_op_constant(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type_id = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let rem = stream.get_remaining_words();
-    let mut constant = Vec::with_capacity(rem);
-    for _ in 0..rem {
-        constant.push(stream.read_next().expect("Reading OpConstant constant"))
-    }
-    Ok(Core::OpConstant(OpConstant {
-        result_type: result_type_id,
-        result_id: result_id,
-        value: constant,
-    }))
-}
-
-fn read_op_constant_composite(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type_id = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let rem = stream.get_remaining_words();
-    let mut constituents = Vec::with_capacity(rem);
-    for _ in 0..rem {
-        constituents.push(read_op_id(stream).expect("Reading OpConstantComposite arguments"))
-    }
-    Ok(Core::OpConstantComposite(OpConstantComposite {
-        result_type: result_type_id,
-        result_id: result_id,
-        constituents: constituents,
-    }))
-}
-
-fn read_function_control(stream: &mut InstructionMemory) -> ReadResult<FunctionControl> {
-    let value = try!(stream.read_next());
-    Ok(FunctionControl {
-        inline: (value & 0x1) != 0,
-        dont_inline: (value & 0x2) != 0,
-        pure_function: (value & 0x4) != 0,
-        const_function: (value & 0x8) != 0,
-    })
-}
-
-fn read_op_function(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 5 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type_id = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let function_control = try!(read_function_control(stream));
-    let function_type = try!(read_op_id(stream));
-    let func = OpFunction {
-        result_type: result_type_id,
-        result_id: result_id,
-        function_control: function_control,
-        function_type: function_type,
-    };
-    Ok(Core::OpFunction(func))
-}
-
-fn read_op_function_parameter(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    Ok(Core::OpFunctionParameter(OpFunctionParameter {
-        result_type: result_type,
-        result_id: result_id,
-    }))
-}
-
-fn read_op_function_end(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 1 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    Ok(Core::OpFunctionEnd(OpFunctionEnd))
-}
-
-fn read_op_variable(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 && stream.get_word_count() != 5 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let storage_class = try!(read_storage_class(stream));
-    let init = if stream.get_word_count() == 5 {
-        Some(try!(read_op_id(stream)))
-    } else {
-        None
-    };
-    Ok(Core::OpVariable(OpVariable {
-        result_type: result_type,
-        result_id: result_id,
-        storage_class: storage_class,
-        initializer: init,
-    }))
-}
-
-fn read_memory_access_opt(stream: &mut InstructionMemory) -> ReadResult<Option<MemoryAccess>> {
-    Ok(if stream.get_remaining_words() == 0 {
-        None
-    } else {
-        let memory_access_word = try!(stream.read_next());
-        if (memory_access_word & 0xFFF8) != 0 {
-            return Err(ReadError::UnknownMemoryAccess(memory_access_word));
-        }
-        Some(MemoryAccess {
-            volatile: (memory_access_word & 0x1) != 0,
-            aligned: (memory_access_word & 0x2) != 0,
-            non_temporal: (memory_access_word & 0x4) != 0,
-        })
-    })
-}
-
-fn read_op_load(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 && stream.get_word_count() != 5 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let pointer = try!(read_op_id(stream));
-    let memory_access = try!(read_memory_access_opt(stream));
-    Ok(Core::OpLoad(OpLoad {
-        result_type: result_type,
-        result_id: result_id,
-        pointer: pointer,
-        memory_access: memory_access,
-    }))
-}
-
-fn read_op_store(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let pointer = try!(read_op_id(stream));
-    let object = try!(read_op_id(stream));
-    let memory_access = try!(read_memory_access_opt(stream));
-    Ok(Core::OpStore(OpStore {
-        pointer: pointer,
-        object: object,
-        memory_access: memory_access,
-    }))
-}
-
-fn read_op_access_chain(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let base = try!(read_op_id(stream));
-    let indexes = try!(read_op_id_list(stream));
-    Ok(Core::OpAccessChain(OpAccessChain {
-        result_type: result_type,
-        result_id: result_id,
-        base: base,
-        indexes: indexes,
-    }))
-}
-
-fn read_builtin(stream: &mut InstructionMemory) -> ReadResult<BuiltIn> {
-    let builtin_id = try!(stream.read_next());
-    Ok(match builtin_id {
-        0 => BuiltIn::Position,
-        1 => BuiltIn::PointSize,
-        3 => BuiltIn::ClipDistance,
-        4 => BuiltIn::CullDistance,
-        5 => BuiltIn::VertexId,
-        6 => BuiltIn::InstanceId,
-        7 => BuiltIn::PrimitiveId,
-        8 => BuiltIn::InvocationId,
-        9 => BuiltIn::Layer,
-        10 => BuiltIn::ViewportIndex,
-        11 => BuiltIn::TessLevelOuter,
-        12 => BuiltIn::TessLevelInner,
-        13 => BuiltIn::TessCoord,
-        14 => BuiltIn::PatchVerticies,
-        15 => BuiltIn::FragCoord,
-        16 => BuiltIn::PointCoord,
-        17 => BuiltIn::FrontFacing,
-        18 => BuiltIn::SampleId,
-        19 => BuiltIn::SamplePosition,
-        20 => BuiltIn::SampleMask,
-        22 => BuiltIn::FragDepth,
-        23 => BuiltIn::HelperInvocation,
-        24 => BuiltIn::NumWorkgroups,
-        25 => BuiltIn::WorkgroupSize,
-        26 => BuiltIn::WorkgroupId,
-        27 => BuiltIn::LocalInvocationId,
-        28 => BuiltIn::GlobalInvocationId,
-        29 => BuiltIn::LocalInvocationIndex,
-        30 => BuiltIn::WorkDim,
-        31 => BuiltIn::GlobalSize,
-        32 => BuiltIn::EnqueuedWorkgroupSize,
-        33 => BuiltIn::GlobalOffset,
-        34 => BuiltIn::GlobalLinearId,
-        36 => BuiltIn::SubgroupSize,
-        37 => BuiltIn::SubgroupMaxSize,
-        38 => BuiltIn::NumSubgroups,
-        39 => BuiltIn::NumEnqueuedSubgroups,
-        40 => BuiltIn::SubgroupId,
-        41 => BuiltIn::SubgroupLocalInvocationId,
-        42 => BuiltIn::VertexIndex,
-        43 => BuiltIn::InstanceIndex,
-        id => return Err(ReadError::UnknownBuiltIn(id)),
-    })
-}
-
-fn read_func_param_attr(stream: &mut InstructionMemory) -> ReadResult<FunctionParameterAttribute> {
-    let id = try!(stream.read_next());
-    Ok(match id {
-        0 => FunctionParameterAttribute::Zext,
-        1 => FunctionParameterAttribute::Sext,
-        2 => FunctionParameterAttribute::ByVal,
-        3 => FunctionParameterAttribute::Sret,
-        4 => FunctionParameterAttribute::NoAlias,
-        5 => FunctionParameterAttribute::NoCapture,
-        6 => FunctionParameterAttribute::NoWrite,
-        7 => FunctionParameterAttribute::NoReadWrite,
-        id => return Err(ReadError::UnknownFunctionParameterAttribute(id)),
-    })
-}
-
-fn read_fp_rounding_mode(stream: &mut InstructionMemory) -> ReadResult<FpRoundingMode> {
-    let id = try!(stream.read_next());
-    Ok(match id {
-        0 => FpRoundingMode::Rte,
-        1 => FpRoundingMode::Rtz,
-        2 => FpRoundingMode::Rtp,
-        3 => FpRoundingMode::Rtn,
-        id => return Err(ReadError::UnknownFpRoundingMode(id)),
-    })
-}
-
-fn read_fp_fast_math_mode(stream: &mut InstructionMemory) -> ReadResult<FpFastMathMode> {
-    let id = try!(stream.read_next());
-    Ok(FpFastMathMode {
-        not_nan: id & 0x1 != 0,
-        not_inf: id & 0x2 != 0,
-        nsz: id & 0x4 != 0,
-        allow_recip: id & 0x9 != 0,
-        fast: id & 0x10 != 0,
-    })
-}
-
-fn read_linkage_type(stream: &mut InstructionMemory) -> ReadResult<LinkageType> {
-    let id = try!(stream.read_next());
-    Ok(match id {
-        0 => LinkageType::Export,
-        1 => LinkageType::Import,
-        id => return Err(ReadError::UnknownLinkageType(id)),
-    })
-}
-
-fn read_decoration(stream: &mut InstructionMemory) -> ReadResult<Decoration> {
-    Ok(match try!(stream.read_next()) {
-        0 => Decoration::RelaxedPrecision,
-        1 => Decoration::SpecId(try!(read_lit_number_u32(stream))),
-        2 => Decoration::Block,
-        3 => Decoration::BufferBlock,
-        4 => Decoration::RowMajor,
-        5 => Decoration::ColMajor,
-        6 => Decoration::ArrayStride(try!(read_lit_number_u32(stream))),
-        7 => Decoration::MatrixStride(try!(read_lit_number_u32(stream))),
-        8 => Decoration::GlslShared,
-        9 => Decoration::GlslPacked,
-        10 => Decoration::CPacked,
-        11 => Decoration::BuiltIn(try!(read_builtin(stream))),
-        13 => Decoration::NoPerspective,
-        14 => Decoration::Flat,
-        15 => Decoration::Patch,
-        16 => Decoration::Centroid,
-        17 => Decoration::Sample,
-        18 => Decoration::Invariant,
-        19 => Decoration::Restrict,
-        20 => Decoration::Aliased,
-        21 => Decoration::Volatile,
-        22 => Decoration::Constant,
-        23 => Decoration::Coherent,
-        24 => Decoration::NonWritable,
-        25 => Decoration::NonReadable,
-        26 => Decoration::Uniform,
-        28 => Decoration::SaturatedConversion,
-        29 => Decoration::Stream(try!(read_lit_number_u32(stream))),
-        30 => Decoration::Location(try!(read_lit_number_u32(stream))),
-        31 => Decoration::Component(try!(read_lit_number_u32(stream))),
-        32 => Decoration::Index(try!(read_lit_number_u32(stream))),
-        33 => Decoration::Binding(try!(read_lit_number_u32(stream))),
-        34 => Decoration::DescriptorSet(try!(read_lit_number_u32(stream))),
-        35 => Decoration::Offset(try!(read_lit_number_u32(stream))),
-        36 => Decoration::XfbBuffer(try!(read_lit_number_u32(stream))),
-        37 => Decoration::XfbStride(try!(read_lit_number_u32(stream))),
-        38 => Decoration::FuncParamAttr(try!(read_func_param_attr(stream))),
-        39 => Decoration::FpRoundingMode(try!(read_fp_rounding_mode(stream))),
-        40 => Decoration::FpFastMathMode(try!(read_fp_fast_math_mode(stream))),
-        41 => {
-            let name = try!(read_string_literal(stream));
-            let linkage_type = try!(read_linkage_type(stream));
-            Decoration::LinkageAttributes(name, linkage_type)
-        }
-        42 => Decoration::NoContraction,
-        43 => Decoration::InputAttachmentIndex(try!(read_lit_number_u32(stream))),
-        44 => Decoration::Alignment(try!(read_lit_number_u32(stream))),
-        id => return Err(ReadError::UnknownDecoration(id)),
-    })
-}
-
-fn read_op_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let id = try!(read_op_id(stream));
-    let decorate = try!(read_decoration(stream));
-    Ok(Core::OpDecorate(OpDecorate {
-        target: id,
-        decoration: decorate,
-    }))
-}
-
-fn read_op_member_decorate(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let structure_type = try!(read_op_id(stream));
-    let member = MemberIndex(try!(read_lit_number_u32(stream)));
-    let decorate = try!(read_decoration(stream));
-    Ok(Core::OpMemberDecorate(OpMemberDecorate {
-        structure_type: structure_type,
-        member: member,
-        decoration: decorate,
-    }))
-}
-
-fn read_op_convert_utof(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let unsigned_value = try!(read_op_id(stream));
-    Ok(Core::OpConvertUToF(OpConvertUToF {
-        result_type: result_type,
-        result_id: result_id,
-        unsigned_value: unsigned_value,
-    }))
-}
-
-fn read_op_imul(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 5 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let operand1 = try!(read_op_id(stream));
-    let operand2 = try!(read_op_id(stream));
-    Ok(Core::OpIMul(OpIMul {
-        result_type: result_type,
-        result_id: result_id,
-        operand1: operand1,
-        operand2: operand2,
-    }))
-}
-
-fn read_op_umod(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 5 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let operand1 = try!(read_op_id(stream));
-    let operand2 = try!(read_op_id(stream));
-    Ok(Core::OpUMod(OpUMod {
-        result_type: result_type,
-        result_id: result_id,
-        operand1: operand1,
-        operand2: operand2,
-    }))
-}
-
-fn read_op_iequal(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 5 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-    let operand1 = try!(read_op_id(stream));
-    let operand2 = try!(read_op_id(stream));
-    Ok(Core::OpIEqual(OpIEqual {
-        result_type: result_type,
-        result_id: result_id,
-        operand1: operand1,
-        operand2: operand2,
-    }))
-}
-
-fn read_op_phi(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_type = try!(read_op_id(stream));
-    let result_id = try!(read_result_id(stream));
-
-    let slots2 = stream.get_remaining_words();
-    let slots = slots2 / 2;
-    let mut ids = Vec::with_capacity(slots2);
-    for _ in 0..slots {
-        let var = read_op_id(stream).expect("Phi op var read should never pass end");
-        let parent = read_op_id(stream).expect("Phi op parent read should never pass end");
-        ids.push(PhiArg {
-            variable: var,
-            parent: parent,
-        });
-    }
-
-    Ok(Core::OpPhi(OpPhi {
-        result_type: result_type,
-        result_id: result_id,
-        variables: ids,
-    }))
-}
-
-fn read_loop_control(stream: &mut InstructionMemory) -> ReadResult<LoopControl> {
-    let word = try!(stream.read_next());
-    if word & 0xFFF0 != 0 {
-        return Err(ReadError::UnknownLoopControl(word));
-    }
-    let dependency_length_val = (word & 0x8) != 0;
-    let dependency_length = if dependency_length_val {
-        Some(try!(read_lit_number_u32(stream)))
-    } else {
-        None
-    };
-    Ok(LoopControl {
-        unroll: (word & 0x1) != 0,
-        dont_unroll: (word & 0x2) != 0,
-        dependency_infinite: (word & 0x4) != 0,
-        dependency_length: dependency_length,
-    })
-}
-
-fn read_op_loop_merge(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() < 4 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let merge_block = try!(read_op_id(stream));
-    let continue_target = try!(read_op_id(stream));
-    let loop_control = try!(read_loop_control(stream));
-    Ok(Core::OpLoopMerge(OpLoopMerge {
-        merge_block: merge_block,
-        continue_target: continue_target,
-        loop_control: loop_control,
-    }))
-}
-
-fn read_selection_control(stream: &mut InstructionMemory) -> ReadResult<SelectionControl> {
-    let word = try!(stream.read_next());
-    if word & 0xFFFC != 0 {
-        return Err(ReadError::UnknownSelectionControl(word));
-    }
-    Ok(SelectionControl {
-        flatten: (word & 0x1) != 0,
-        dont_flatten: (word & 0x2) != 0,
-    })
-}
-
-fn read_op_selection_merge(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 3 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let merge_block = try!(read_op_id(stream));
-    let selection_control = try!(read_selection_control(stream));
-    Ok(Core::OpSelectionMerge(OpSelectionMerge {
-        merge_block: merge_block,
-        selection_control: selection_control,
-    }))
-}
-
-fn read_op_label(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let result_id = try!(read_result_id(stream));
-    Ok(Core::OpLabel(OpLabel { result_id: result_id }))
-}
-
-fn read_op_branch(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 2 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let label_id = try!(read_op_id(stream));
-    Ok(Core::OpBranch(OpBranch { target_label: label_id }))
-}
-
-fn read_op_branch_conditional(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 4 && stream.get_word_count() != 6 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    let condition = try!(read_op_id(stream));
-    let true_label = try!(read_op_id(stream));
-    let false_label = try!(read_op_id(stream));
-    let weights = if stream.get_word_count() == 6 {
-        let w1 = try!(stream.read_next());
-        let w2 = try!(stream.read_next());
-        Some(BranchWeights {
-            true_weight: w1,
-            false_weight: w2,
-        })
-    } else {
-        None
-    };
-    Ok(Core::OpBranchConditional(OpBranchConditional {
-        condition: condition,
-        true_label: true_label,
-        false_label: false_label,
-        weights: weights,
-    }))
-}
-
-fn read_op_return(stream: &mut InstructionMemory) -> ReadResult<Core> {
-    if stream.get_word_count() != 1 {
-        return Err(ReadError::WrongWordCountForOp);
-    }
-    Ok(Core::OpReturn(OpReturn))
-}
+def_op_read!(OpMemoryModel; addressing_model | memory_model);
+def_op_read!(OpEntryPoint; execution_model | entry_point | name | interface);
+def_op_read!(OpExecutionMode; entry_point | mode);
+def_op_read!(OpCapability; capability);
+
+def_op_read!(OpTypeVoid; result_id);
+def_op_read!(OpTypeBool; result_id);
+def_op_read!(OpTypeInt; result_id | width | signedness);
+def_op_read!(OpTypeFloat; result_id | width);
+def_op_read!(OpTypeVector; result_id | component_type | component_count);
+def_op_read!(OpTypeMatrix; result_id | column_type | column_count);
+def_op_read!(OpTypeImage;
+    result_id |
+    sampled_type |
+    dim |
+    depth |
+    arrayed |
+    ms |
+    sampled |
+    format |
+    access_qualifier
+);
+def_op_read!(OpTypeSampler; result_id);
+def_op_read!(OpTypeSampledImage; result_id | image_type);
+def_op_read!(OpTypeArray; result_id | element_type | length);
+def_op_read!(OpTypeRuntimeArray; result_id | element_type);
+def_op_read!(OpTypeStruct; result_id | member_types);
+def_op_read!(OpTypeOpaque; result_id | name);
+def_op_read!(OpTypePointer; result_id | storage_class | pointed_type);
+def_op_read!(OpTypeFunction; result_id | return_type | parameter_types);
+
+def_op_read!(OpConstant; result_type | result_id | value);
+def_op_read!(OpConstantComposite; result_type | result_id | constituents);
+
+def_op_read!(OpFunction; result_type | result_id | function_control | function_type);
+def_op_read!(OpFunctionParameter; result_type | result_id);
+def_op_read!(OpFunctionEnd;);
+
+def_op_read!(OpVariable; result_type | result_id | storage_class | initializer);
+
+def_op_read!(OpLoad; result_type | result_id | pointer | memory_access);
+def_op_read!(OpStore; pointer | object |  memory_access);
+
+def_op_read!(OpAccessChain; result_type | result_id | base | indexes);
+
+def_op_read!(OpDecorate; target | decoration);
+def_op_read!(OpMemberDecorate; structure_type | member | decoration);
+
+def_op_read!(OpConvertUToF; result_type | result_id | unsigned_value);
+
+def_op_read_s2!(OpIMul);
+
+def_op_read_s2!(OpUMod);
+
+def_op_read_s2!(OpIEqual);
+
+def_op_read!(OpPhi; result_type | result_id | variables);
+def_op_read!(OpLoopMerge; merge_block | continue_target | loop_control);
+def_op_read!(OpSelectionMerge; merge_block | selection_control);
+def_op_read!(OpLabel; result_id);
+def_op_read!(OpBranch; target_label);
+def_op_read!(OpBranchConditional; condition | true_label | false_label | weights);
+
+def_op_read!(OpReturn;);
