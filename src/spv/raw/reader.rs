@@ -135,42 +135,42 @@ fn read_instruction(stream: &mut Stream,
         words.push(try!(stream.read_word()));
     }
     let block = MemoryBlock::new(&words[1..words.len()]);
-    let (block, inst) = try!(match id {
-        0 => OpNop::read_core(block),
+    let read_fn = match id {
+        0 => OpNop::read_core,
         1 => return Err(ReadError::UnimplementedOp("OpUndef")),
         2 => return Err(ReadError::UnimplementedOp("OpSourceContinued")),
-        3 => OpSource::read_core(block),
+        3 => OpSource::read_core,
         4 => return Err(ReadError::UnimplementedOp("OpSourceExtension")),
-        5 => OpName::read_core(block),
-        6 => OpMemberName::read_core(block),
+        5 => OpName::read_core,
+        6 => OpMemberName::read_core,
         7 => return Err(ReadError::UnimplementedOp("OpString")),
         8 => return Err(ReadError::UnimplementedOp("OpLine")),
-        10 => OpExtension::read_core(block),
-        11 => read_op_ext_inst_import(block, known_inst_sets, bound_inst_sets),
-        12 => read_op_ext_inst(block, bound_inst_sets),
-        14 => OpMemoryModel::read_core(block),
-        15 => OpEntryPoint::read_core(block),
-        16 => OpExecutionMode::read_core(block),
-        17 => OpCapability::read_core(block),
-        19 => OpTypeVoid::read_core(block),
-        20 => OpTypeBool::read_core(block),
-        21 => OpTypeInt::read_core(block),
-        22 => OpTypeFloat::read_core(block),
-        23 => OpTypeVector::read_core(block),
-        24 => OpTypeMatrix::read_core(block),
-        25 => OpTypeImage::read_core(block),
-        26 => OpTypeSampler::read_core(block),
-        27 => OpTypeSampledImage::read_core(block),
-        28 => OpTypeArray::read_core(block),
-        29 => OpTypeRuntimeArray::read_core(block),
-        30 => OpTypeStruct::read_core(block),
-        31 => OpTypeOpaque::read_core(block),
-        32 => OpTypePointer::read_core(block),
-        33 => OpTypeFunction::read_core(block),
+        10 => OpExtension::read_core,
+        11 => OpExtInstImport::read_core,
+        12 => OpExtInst::read_core,
+        14 => OpMemoryModel::read_core,
+        15 => OpEntryPoint::read_core,
+        16 => OpExecutionMode::read_core,
+        17 => OpCapability::read_core,
+        19 => OpTypeVoid::read_core,
+        20 => OpTypeBool::read_core,
+        21 => OpTypeInt::read_core,
+        22 => OpTypeFloat::read_core,
+        23 => OpTypeVector::read_core,
+        24 => OpTypeMatrix::read_core,
+        25 => OpTypeImage::read_core,
+        26 => OpTypeSampler::read_core,
+        27 => OpTypeSampledImage::read_core,
+        28 => OpTypeArray::read_core,
+        29 => OpTypeRuntimeArray::read_core,
+        30 => OpTypeStruct::read_core,
+        31 => OpTypeOpaque::read_core,
+        32 => OpTypePointer::read_core,
+        33 => OpTypeFunction::read_core,
         41 => return Err(ReadError::UnimplementedOp("OpConstantTrue")),
         42 => return Err(ReadError::UnimplementedOp("OpConstantFalse")),
-        43 => OpConstant::read_core(block),
-        44 => OpConstantComposite::read_core(block),
+        43 => OpConstant::read_core,
+        44 => OpConstantComposite::read_core,
         45 => return Err(ReadError::UnimplementedOp("OpConstantSampler")),
         46 => return Err(ReadError::UnimplementedOp("OpConstantNull")),
         48 => return Err(ReadError::UnimplementedOp("OpSpecConstantTrue")),
@@ -178,24 +178,24 @@ fn read_instruction(stream: &mut Stream,
         50 => return Err(ReadError::UnimplementedOp("OpSpecConstant")),
         51 => return Err(ReadError::UnimplementedOp("OpSpecConstantComposite")),
         52 => return Err(ReadError::UnimplementedOp("OpSpecConstantOp")),
-        54 => OpFunction::read_core(block),
-        55 => OpFunctionParameter::read_core(block),
-        56 => OpFunctionEnd::read_core(block),
+        54 => OpFunction::read_core,
+        55 => OpFunctionParameter::read_core,
+        56 => OpFunctionEnd::read_core,
         57 => return Err(ReadError::UnimplementedOp("OpFunctionCall")),
-        59 => OpVariable::read_core(block),
+        59 => OpVariable::read_core,
         60 => return Err(ReadError::UnimplementedOp("OpImageTexelPointer")),
-        61 => OpLoad::read_core(block),
-        62 => OpStore::read_core(block),
+        61 => OpLoad::read_core,
+        62 => OpStore::read_core,
         63 => return Err(ReadError::UnimplementedOp("OpCopyMemory")),
         64 => return Err(ReadError::UnimplementedOp("OpCopyMemorySized")),
-        65 => OpAccessChain::read_core(block),
+        65 => OpAccessChain::read_core,
         66 => return Err(ReadError::UnimplementedOp("OpInBoundsAccessChain")),
         67 => return Err(ReadError::UnimplementedOp("OpPtrAccessChain")),
         68 => return Err(ReadError::UnimplementedOp("OpArrayLength")),
         69 => return Err(ReadError::UnimplementedOp("OpGenericPtrMemSemantics")),
         70 => return Err(ReadError::UnimplementedOp("OpInBoundsPtrAccessChain")),
-        71 => OpDecorate::read_core(block),
-        72 => OpMemberDecorate::read_core(block),
+        71 => OpDecorate::read_core,
+        72 => OpMemberDecorate::read_core,
         77 => return Err(ReadError::UnimplementedOp("OpVectorExtractDynamic")),
         78 => return Err(ReadError::UnimplementedOp("OpVectorInsertDynamic")),
         79 => return Err(ReadError::UnimplementedOp("OpVectorShuffle")),
@@ -229,7 +229,7 @@ fn read_instruction(stream: &mut Stream,
         109 => return Err(ReadError::UnimplementedOp("OpConvertFToU")),
         110 => return Err(ReadError::UnimplementedOp("OpConvertFToS")),
         111 => return Err(ReadError::UnimplementedOp("OpConvertSToF")),
-        112 => OpConvertUToF::read_core(block),
+        112 => OpConvertUToF::read_core,
         113 => return Err(ReadError::UnimplementedOp("OpUConvert")),
         114 => return Err(ReadError::UnimplementedOp("OpSConvert")),
         115 => return Err(ReadError::UnimplementedOp("OpFConvert")),
@@ -248,12 +248,12 @@ fn read_instruction(stream: &mut Stream,
         129 => return Err(ReadError::UnimplementedOp("OpFAdd")),
         130 => return Err(ReadError::UnimplementedOp("OpISub")),
         131 => return Err(ReadError::UnimplementedOp("OpFSub")),
-        132 => OpIMul::read_core(block),
+        132 => OpIMul::read_core,
         133 => return Err(ReadError::UnimplementedOp("OpFMul")),
         134 => return Err(ReadError::UnimplementedOp("OpUDiv")),
         135 => return Err(ReadError::UnimplementedOp("OpSDiv")),
         136 => return Err(ReadError::UnimplementedOp("OpFDiv")),
-        137 => OpUMod::read_core(block),
+        137 => OpUMod::read_core,
         138 => return Err(ReadError::UnimplementedOp("OpSRem")),
         139 => return Err(ReadError::UnimplementedOp("OpSMod")),
         140 => return Err(ReadError::UnimplementedOp("OpFRem")),
@@ -285,7 +285,7 @@ fn read_instruction(stream: &mut Stream,
         167 => return Err(ReadError::UnimplementedOp("OpLogicalAnd")),
         168 => return Err(ReadError::UnimplementedOp("OpLogicalNot")),
         169 => return Err(ReadError::UnimplementedOp("OpSelect")),
-        170 => OpIEqual::read_core(block),
+        170 => OpIEqual::read_core,
         171 => return Err(ReadError::UnimplementedOp("OpINotEqual")),
         172 => return Err(ReadError::UnimplementedOp("OpUGreaterThan")),
         173 => return Err(ReadError::UnimplementedOp("OpSGreaterThan")),
@@ -350,15 +350,15 @@ fn read_instruction(stream: &mut Stream,
         240 => return Err(ReadError::UnimplementedOp("OpAtomicAnd")),
         241 => return Err(ReadError::UnimplementedOp("OpAtomicOr")),
         242 => return Err(ReadError::UnimplementedOp("OpAtomicXor")),
-        245 => OpPhi::read_core(block),
-        246 => OpLoopMerge::read_core(block),
-        247 => OpSelectionMerge::read_core(block),
-        248 => OpLabel::read_core(block),
-        249 => OpBranch::read_core(block),
-        250 => OpBranchConditional::read_core(block),
+        245 => OpPhi::read_core,
+        246 => OpLoopMerge::read_core,
+        247 => OpSelectionMerge::read_core,
+        248 => OpLabel::read_core,
+        249 => OpBranch::read_core,
+        250 => OpBranchConditional::read_core,
         251 => return Err(ReadError::UnimplementedOp("OpSwitch")),
         252 => return Err(ReadError::UnimplementedOp("OpKill")),
-        253 => OpReturn::read_core(block),
+        253 => OpReturn::read_core,
         254 => return Err(ReadError::UnimplementedOp("OpReturnValue")),
         255 => return Err(ReadError::UnimplementedOp("OpUnreachable")),
         256 => return Err(ReadError::UnimplementedOp("OpLifetimeStart")),
@@ -420,8 +420,9 @@ fn read_instruction(stream: &mut Stream,
         318 => return Err(ReadError::UnimplementedOp("OpAtomicFlagTestAndSet")),
         319 => return Err(ReadError::UnimplementedOp("OpAtomicFlagClear")),
         320 => return Err(ReadError::UnimplementedOp("OpImageSparseRead")),
-        _ => Err(ReadError::UnknownOp(id, wc)),
-    });
+        _ => return Err(ReadError::UnknownOp(id, wc)),
+    };
+    let (block, inst) = try!(read_fn(block, known_inst_sets, bound_inst_sets));
     if !block.end() {
         return Err(ReadError::InstructionHadExcessData);
     }
@@ -429,7 +430,10 @@ fn read_instruction(stream: &mut Stream,
 }
 
 trait CoreRead {
-    fn read_core(block: MemoryBlock) -> MemoryBlockResult<Core>;
+    fn read_core<'a>(block: MemoryBlock<'a>,
+                     known_inst_sets: &[Box<ExtInstSet>],
+                     bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
+                     -> MemoryBlockResult<'a, Core>;
 }
 
 macro_rules! def_op_read {
@@ -450,7 +454,10 @@ macro_rules! def_op_read {
             }
         }
         impl CoreRead for $name {
-            fn read_core(block: MemoryBlock) -> MemoryBlockResult<Core> {
+            fn read_core<'a>(block: MemoryBlock<'a>,
+                               _: &[Box<ExtInstSet>],
+                               _: &mut HashMap<OpId, Box<ExtInstSet>>)
+                            -> MemoryBlockResult<'a, Core> {
                 let (block, item) = try!(<$name as MemoryBlockRead>::read(block));
                 Ok((block, $crate::spv::raw::Core::$name(item)))
             }
@@ -479,47 +486,52 @@ def_op_read!(OpMemberName; struct_type | member | name);
 
 def_op_read!(OpExtension; name);
 
-fn read_op_ext_inst_import<'a>(block: MemoryBlock<'a>,
-                               known_inst_sets: &[Box<ExtInstSet>],
-                               bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
-                               -> MemoryBlockResult<'a, Core> {
-    let (block, result_id) = try!(ResultId::read(block));
-    let (block, name) = try!(LitString::read(block));
-    for inst_set in known_inst_sets {
-        if inst_set.get_name() == name {
-            match bound_inst_sets.insert(OpId(result_id.0), inst_set.duplicate()) {
-                Some(_) => return Err(ReadError::DuplicateResultId(result_id)),
-                None => {}
+impl CoreRead for OpExtInstImport {
+    fn read_core<'a>(block: MemoryBlock<'a>,
+                     known_inst_sets: &[Box<ExtInstSet>],
+                     bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
+                     -> MemoryBlockResult<'a, Core> {
+        let (block, result_id) = try!(ResultId::read(block));
+        let (block, name) = try!(LitString::read(block));
+        for inst_set in known_inst_sets {
+            if inst_set.get_name() == name {
+                match bound_inst_sets.insert(OpId(result_id.0), inst_set.duplicate()) {
+                    Some(_) => return Err(ReadError::DuplicateResultId(result_id)),
+                    None => {}
+                }
+                let op = Core::OpExtInstImport(OpExtInstImport {
+                    result_id: result_id,
+                    name: name,
+                });
+                return Ok((block, op));
             }
-            let op = Core::OpExtInstImport(OpExtInstImport {
-                result_id: result_id,
-                name: name,
-            });
-            return Ok((block, op));
         }
+        Err(ReadError::UnknownInstSet(name))
     }
-    Err(ReadError::UnknownInstSet(name))
 }
 
-fn read_op_ext_inst<'a>(block: MemoryBlock<'a>,
-                        bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
-                        -> MemoryBlockResult<'a, Core> {
-    let (block, result_type) = try!(OpId::read(block));
-    let (block, result_id) = try!(ResultId::read(block));
-    let (block, set_id) = try!(OpId::read(block));
-    let (block, inst) = try!(u32::read(block));
-    match bound_inst_sets.get(&set_id) {
-        Some(set) => {
-            let (block, extinst) = try!(set.read_instruction(inst, block));
-            let op = Core::OpExtInst(OpExtInst {
-                result_type: result_type,
-                result_id: result_id,
-                set: set_id,
-                instruction: ExtInstBox(extinst),
-            });
-            Ok((block, op))
+impl CoreRead for OpExtInst {
+    fn read_core<'a>(block: MemoryBlock<'a>,
+                     _: &[Box<ExtInstSet>],
+                     bound_inst_sets: &mut HashMap<OpId, Box<ExtInstSet>>)
+                     -> MemoryBlockResult<'a, Core> {
+        let (block, result_type) = try!(OpId::read(block));
+        let (block, result_id) = try!(ResultId::read(block));
+        let (block, set_id) = try!(OpId::read(block));
+        let (block, inst) = try!(u32::read(block));
+        match bound_inst_sets.get(&set_id) {
+            Some(set) => {
+                let (block, extinst) = try!(set.read_instruction(inst, block));
+                let op = Core::OpExtInst(OpExtInst {
+                    result_type: result_type,
+                    result_id: result_id,
+                    set: set_id,
+                    instruction: ExtInstBox(extinst),
+                });
+                Ok((block, op))
+            }
+            None => Err(ReadError::UnknownInstSetId(set_id)),
         }
-        None => Err(ReadError::UnknownInstSetId(set_id)),
     }
 }
 
