@@ -244,20 +244,20 @@ fn read_instruction(stream: &mut Stream,
         124 => return Err(ReadError::UnimplementedOp("OpBitcast")),
         126 => return Err(ReadError::UnimplementedOp("OpSNegate")),
         127 => return Err(ReadError::UnimplementedOp("OpFNegate")),
-        128 => return Err(ReadError::UnimplementedOp("OpIAdd")),
-        129 => return Err(ReadError::UnimplementedOp("OpFAdd")),
-        130 => return Err(ReadError::UnimplementedOp("OpISub")),
-        131 => return Err(ReadError::UnimplementedOp("OpFSub")),
+        128 => OpIAdd::read_core,
+        129 => OpFAdd::read_core,
+        130 => OpISub::read_core,
+        131 => OpFSub::read_core,
         132 => OpIMul::read_core,
-        133 => return Err(ReadError::UnimplementedOp("OpFMul")),
-        134 => return Err(ReadError::UnimplementedOp("OpUDiv")),
-        135 => return Err(ReadError::UnimplementedOp("OpSDiv")),
-        136 => return Err(ReadError::UnimplementedOp("OpFDiv")),
+        133 => OpFMul::read_core,
+        134 => OpUDiv::read_core,
+        135 => OpSDiv::read_core,
+        136 => OpFDiv::read_core,
         137 => OpUMod::read_core,
-        138 => return Err(ReadError::UnimplementedOp("OpSRem")),
-        139 => return Err(ReadError::UnimplementedOp("OpSMod")),
-        140 => return Err(ReadError::UnimplementedOp("OpFRem")),
-        141 => return Err(ReadError::UnimplementedOp("OpFMod")),
+        138 => OpSRem::read_core,
+        139 => OpSMod::read_core,
+        140 => OpFRem::read_core,
+        141 => OpFMod::read_core,
         142 => return Err(ReadError::UnimplementedOp("OpVectorTimesScalar")),
         143 => return Err(ReadError::UnimplementedOp("OpMatrixTimesScalar")),
         144 => return Err(ReadError::UnimplementedOp("OpVectorTimesMatrix")),
@@ -265,10 +265,10 @@ fn read_instruction(stream: &mut Stream,
         146 => return Err(ReadError::UnimplementedOp("OpMatrixTimesMatrix")),
         147 => return Err(ReadError::UnimplementedOp("OpOuterProduct")),
         148 => return Err(ReadError::UnimplementedOp("OpDot")),
-        149 => return Err(ReadError::UnimplementedOp("OpIAddCarry")),
-        150 => return Err(ReadError::UnimplementedOp("OpISubBorrow")),
-        151 => return Err(ReadError::UnimplementedOp("OpUMulExtended")),
-        152 => return Err(ReadError::UnimplementedOp("OpSMulExtended")),
+        149 => OpIAddCarry::read_core,
+        150 => OpISubBorrow::read_core,
+        151 => OpUMulExtended::read_core,
+        152 => OpSMulExtended::read_core,
         154 => return Err(ReadError::UnimplementedOp("OpAny")),
         155 => return Err(ReadError::UnimplementedOp("OpAll")),
         156 => return Err(ReadError::UnimplementedOp("OpIsNan")),
@@ -286,33 +286,33 @@ fn read_instruction(stream: &mut Stream,
         168 => return Err(ReadError::UnimplementedOp("OpLogicalNot")),
         169 => return Err(ReadError::UnimplementedOp("OpSelect")),
         170 => OpIEqual::read_core,
-        171 => return Err(ReadError::UnimplementedOp("OpINotEqual")),
-        172 => return Err(ReadError::UnimplementedOp("OpUGreaterThan")),
-        173 => return Err(ReadError::UnimplementedOp("OpSGreaterThan")),
-        174 => return Err(ReadError::UnimplementedOp("OpUGreaterThanEqual")),
-        175 => return Err(ReadError::UnimplementedOp("OpSGreaterThanEqual")),
-        176 => return Err(ReadError::UnimplementedOp("OpULessThan")),
-        177 => return Err(ReadError::UnimplementedOp("OpSLessThan")),
-        178 => return Err(ReadError::UnimplementedOp("OpULessThanEqual")),
-        179 => return Err(ReadError::UnimplementedOp("OpSLessThanEqual")),
-        180 => return Err(ReadError::UnimplementedOp("OpFOrdEqual")),
-        181 => return Err(ReadError::UnimplementedOp("OpFUnordEqual")),
-        182 => return Err(ReadError::UnimplementedOp("OpFOrdNotEqual")),
-        183 => return Err(ReadError::UnimplementedOp("OpFUnordNotEqual")),
-        184 => return Err(ReadError::UnimplementedOp("OpFOrdLessThan")),
-        185 => return Err(ReadError::UnimplementedOp("OpFUnordLessThan")),
-        186 => return Err(ReadError::UnimplementedOp("OpFOrdGreaterThan")),
-        187 => return Err(ReadError::UnimplementedOp("OpFUnordGreaterThan")),
-        188 => return Err(ReadError::UnimplementedOp("OpFOrdLessThanEqual")),
-        189 => return Err(ReadError::UnimplementedOp("OpFUnordLessThanEqual")),
-        190 => return Err(ReadError::UnimplementedOp("OpFOrdGreaterThanEqual")),
-        191 => return Err(ReadError::UnimplementedOp("OpFUnordGreaterThanEqual")),
+        171 => OpINotEqual::read_core,
+        172 => OpUGreaterThan::read_core,
+        173 => OpSGreaterThan::read_core,
+        174 => OpUGreaterThanEqual::read_core,
+        175 => OpSGreaterThanEqual::read_core,
+        176 => OpULessThan::read_core,
+        177 => OpSLessThan::read_core,
+        178 => OpULessThanEqual::read_core,
+        179 => OpSLessThanEqual::read_core,
+        180 => OpFOrdEqual::read_core,
+        181 => OpFUnordEqual::read_core,
+        182 => OpFOrdNotEqual::read_core,
+        183 => OpFUnordNotEqual::read_core,
+        184 => OpFOrdLessThan::read_core,
+        185 => OpFUnordLessThan::read_core,
+        186 => OpFOrdGreaterThan::read_core,
+        187 => OpFUnordGreaterThan::read_core,
+        188 => OpFOrdLessThanEqual::read_core,
+        189 => OpFUnordLessThanEqual::read_core,
+        190 => OpFOrdGreaterThanEqual::read_core,
+        191 => OpFUnordGreaterThanEqual::read_core,
         194 => return Err(ReadError::UnimplementedOp("OpShiftRightLogical")),
         195 => return Err(ReadError::UnimplementedOp("OpShiftRightArithmetic")),
         196 => return Err(ReadError::UnimplementedOp("OpShiftLeftLogical")),
-        197 => return Err(ReadError::UnimplementedOp("OpBitwiseOr")),
-        198 => return Err(ReadError::UnimplementedOp("OpBitwiseXor")),
-        199 => return Err(ReadError::UnimplementedOp("OpBitwiseAnd")),
+        197 => OpBitwiseOr::read_core,
+        198 => OpBitwiseXor::read_core,
+        199 => OpBitwiseAnd::read_core,
         200 => return Err(ReadError::UnimplementedOp("OpNot")),
         201 => return Err(ReadError::UnimplementedOp("OpBitFieldInsert")),
         202 => return Err(ReadError::UnimplementedOp("OpBitFieldSExtract")),
@@ -477,6 +477,8 @@ macro_rules! def_op_read_s2 {
     };
 }
 
+// CoreRead implementations. In same order as standard.
+
 def_op_read!(OpNop;);
 
 def_op_read!(OpSource; language | version | file | source);
@@ -484,6 +486,11 @@ def_op_read!(OpSource; language | version | file | source);
 def_op_read!(OpName; target | name);
 def_op_read!(OpMemberName; struct_type | member | name);
 
+// Annotation Instructions
+def_op_read!(OpDecorate; target | decoration);
+def_op_read!(OpMemberDecorate; structure_type | member | decoration);
+
+// Extension Instructions
 def_op_read!(OpExtension; name);
 
 impl CoreRead for OpExtInstImport {
@@ -540,6 +547,7 @@ def_op_read!(OpEntryPoint; execution_model | entry_point | name | interface);
 def_op_read!(OpExecutionMode; entry_point | mode);
 def_op_read!(OpCapability; capability);
 
+// Type-Declaration Instructions
 def_op_read!(OpTypeVoid; result_id);
 def_op_read!(OpTypeBool; result_id);
 def_op_read!(OpTypeInt; result_id | width | signedness);
@@ -566,13 +574,16 @@ def_op_read!(OpTypeOpaque; result_id | name);
 def_op_read!(OpTypePointer; result_id | storage_class | pointed_type);
 def_op_read!(OpTypeFunction; result_id | return_type | parameter_types);
 
+// Constant-Creation Instructions
 def_op_read!(OpConstant; result_type | result_id | value);
 def_op_read!(OpConstantComposite; result_type | result_id | constituents);
 
+// Function Instructions
 def_op_read!(OpFunction; result_type | result_id | function_control | function_type);
 def_op_read!(OpFunctionParameter; result_type | result_id);
 def_op_read!(OpFunctionEnd;);
 
+// Memory Instructions
 def_op_read!(OpVariable; result_type | result_id | storage_class | initializer);
 
 def_op_read!(OpLoad; result_type | result_id | pointer | memory_access);
@@ -580,17 +591,60 @@ def_op_read!(OpStore; pointer | object |  memory_access);
 
 def_op_read!(OpAccessChain; result_type | result_id | base | indexes);
 
-def_op_read!(OpDecorate; target | decoration);
-def_op_read!(OpMemberDecorate; structure_type | member | decoration);
-
+// Conversion Instructions
 def_op_read!(OpConvertUToF; result_type | result_id | unsigned_value);
 
+// Arithmetic Instructions
+def_op_read_s2!(OpIAdd);
+def_op_read_s2!(OpFAdd);
+def_op_read_s2!(OpISub);
+def_op_read_s2!(OpFSub);
 def_op_read_s2!(OpIMul);
-
+def_op_read_s2!(OpFMul);
+def_op_read_s2!(OpUDiv);
+def_op_read_s2!(OpSDiv);
+def_op_read_s2!(OpFDiv);
 def_op_read_s2!(OpUMod);
+def_op_read_s2!(OpSRem);
+def_op_read_s2!(OpSMod);
+def_op_read_s2!(OpFRem);
+def_op_read_s2!(OpFMod);
 
+def_op_read_s2!(OpIAddCarry);
+def_op_read_s2!(OpISubBorrow);
+def_op_read_s2!(OpUMulExtended);
+def_op_read_s2!(OpSMulExtended);
+
+// Bit Instructions
+def_op_read_s2!(OpBitwiseOr);
+def_op_read_s2!(OpBitwiseXor);
+def_op_read_s2!(OpBitwiseAnd);
+
+// Relational and Logical Instructions
 def_op_read_s2!(OpIEqual);
+def_op_read_s2!(OpINotEqual);
+def_op_read_s2!(OpUGreaterThan);
+def_op_read_s2!(OpSGreaterThan);
+def_op_read_s2!(OpUGreaterThanEqual);
+def_op_read_s2!(OpSGreaterThanEqual);
+def_op_read_s2!(OpULessThan);
+def_op_read_s2!(OpSLessThan);
+def_op_read_s2!(OpULessThanEqual);
+def_op_read_s2!(OpSLessThanEqual);
+def_op_read_s2!(OpFOrdEqual);
+def_op_read_s2!(OpFUnordEqual);
+def_op_read_s2!(OpFOrdNotEqual);
+def_op_read_s2!(OpFUnordNotEqual);
+def_op_read_s2!(OpFOrdLessThan);
+def_op_read_s2!(OpFUnordLessThan);
+def_op_read_s2!(OpFOrdGreaterThan);
+def_op_read_s2!(OpFUnordGreaterThan);
+def_op_read_s2!(OpFOrdLessThanEqual);
+def_op_read_s2!(OpFUnordLessThanEqual);
+def_op_read_s2!(OpFOrdGreaterThanEqual);
+def_op_read_s2!(OpFUnordGreaterThanEqual);
 
+// Control-Flow Instructions
 def_op_read!(OpPhi; result_type | result_id | variables);
 def_op_read!(OpLoopMerge; merge_block | continue_target | loop_control);
 def_op_read!(OpSelectionMerge; merge_block | selection_control);
