@@ -479,8 +479,10 @@ macro_rules! def_op_read_s2 {
 
 // CoreRead implementations. In same order as standard.
 
+// Miscellaneous Instructions
 def_op_read!(OpNop;);
 
+// Debug Instructions
 def_op_read!(OpSource; language | version | file | source);
 
 def_op_read!(OpName; target | name);

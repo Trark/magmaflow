@@ -6,6 +6,8 @@ use super::types::*;
 use super::ExtInstBox;
 use super::dis::*;
 
+// Miscellaneous Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpNop;
 
@@ -18,6 +20,8 @@ pub struct OpUndef {
 }
 
 def_op_display!(OpUndef; result_id = result_type);
+
+// Debug Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSourceContinued {
@@ -82,6 +86,8 @@ pub struct OpNoLine;
 
 def_op_display!(OpNoLine;);
 
+// Annotation Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpDecorate {
     pub target: OpId,
@@ -120,6 +126,8 @@ pub struct OpGroupMemberDecorate {
     pub targets: Vec<(OpId, MemberIndex)>,
 }
 
+// Extension Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpExtension {
     pub name: LitString,
@@ -144,6 +152,8 @@ pub struct OpExtInst {
 }
 
 def_op_display!(OpExtInst; result_id = result_type | set | instruction);
+
+// Mode-Setting Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMemoryModel {
@@ -177,6 +187,8 @@ pub struct OpCapability {
 }
 
 def_op_display!(OpCapability; capability);
+
+// Type-Declaration Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpTypeVoid {
@@ -361,6 +373,8 @@ pub struct OpTypeForwardPointer {
 
 def_op_display!(OpTypeForwardPointer; pointer_type | storage_class);
 
+// Constant-Creation Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConstantTrue {
     pub result_type: OpId,
@@ -447,6 +461,8 @@ pub struct OpSpecConstantComposite {
 }
 
 def_op_display!(OpSpecConstantComposite; result_id = result_type | constituents);
+
+// Memory Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVariable {
@@ -568,6 +584,8 @@ pub struct OpInBoundsPtrAccessChain {
 
 def_op_display!(OpInBoundsPtrAccessChain; result_id = result_type | base | element | indexes);
 
+// Function Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFunction {
     pub result_type: OpId,
@@ -600,6 +618,8 @@ pub struct OpFunctionCall {
 }
 
 def_op_display!(OpFunctionCall; result_id = result_type | function | arguments);
+
+// Image Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSampledImage {
@@ -806,6 +826,8 @@ pub struct OpImageSparseTexelsResident(pub OpId, pub ResultId, pub OpId);
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpImageSparseRead(pub OpId, pub ResultId, pub OpId, pub OpId, pub Option<ImageOperands>);
 
+// Conversion Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpConvertFToU {
     pub result_type: OpId,
@@ -951,6 +973,8 @@ pub struct OpBitcast {
 
 def_op_display_s1!(OpBitcast);
 
+// Composite Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpVectorExtractDynamic {
     pub result_type: OpId,
@@ -1030,6 +1054,8 @@ pub struct OpTranspose {
 }
 
 def_op_display!(OpTranspose; result_id = result_type | matrix);
+
+// Arithmetic Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpSNegate {
@@ -1299,6 +1325,8 @@ pub struct OpSMulExtended {
 
 def_op_display_s2!(OpSMulExtended);
 
+// Bit Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpShiftRightLogical {
     pub result_type: OpId,
@@ -1382,6 +1410,8 @@ pub struct OpBitReverse(pub OpId, pub ResultId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpBitCount(pub OpId, pub ResultId, pub OpId);
+
+// Relational and Logical Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpAny(pub OpId, pub ResultId, pub OpId);
@@ -1651,6 +1681,8 @@ pub struct OpFUnordGreaterThanEqual {
 
 def_op_display_s2!(OpFUnordGreaterThanEqual);
 
+// Derivative Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpDPdx(pub OpId, pub ResultId, pub OpId);
 
@@ -1677,6 +1709,8 @@ pub struct OpDPdyCoarse(pub OpId, pub ResultId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpFwidthCoarse(pub OpId, pub ResultId, pub OpId);
+
+// Control-Flow Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpPhi {
@@ -1750,6 +1784,8 @@ pub struct OpLifetimeStart(pub OpId, pub u32);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpLifetimeStop(pub OpId, pub u32);
+
+// Atomic Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpAtomicLoad(pub OpId, pub ResultId, pub OpId, pub ScopeId, pub MemorySemanticsId);
@@ -1883,6 +1919,8 @@ pub struct OpAtomicFlagTestAndSet(pub OpId,
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpAtomicFlagClear(pub OpId, pub ScopeId, pub MemorySemanticsId);
 
+// Primitive Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpEmitVertex;
 
@@ -1895,6 +1933,8 @@ pub struct OpEmitStreamVertex(pub OpId);
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpEndStreamPrimitive(pub OpId);
 
+// Barrier Instructions
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpControlBarrier(pub ScopeId, pub ScopeId, pub MemorySemanticsId);
 
@@ -1906,6 +1946,8 @@ pub struct OpNamedBarrierInitialize(pub OpId, pub ResultId, pub OpId);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpMemoryNamedBarrier(pub OpId, pub ScopeId, pub MemorySemanticsId);
+
+// Group Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpGroupAsyncCopy(pub OpId,
@@ -1952,6 +1994,8 @@ pub struct OpGroupUMax(pub OpId, pub ResultId, pub ScopeId, pub GroupOperation, 
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpGroupSMax(pub OpId, pub ResultId, pub ScopeId, pub GroupOperation, pub OpId);
+
+// Device-Side Enqueue Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpEnqueueMarker(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId, pub OpId);
@@ -2040,6 +2084,8 @@ pub struct OpGetKernelMaxNumSubgroups(pub OpId,
                                       pub OpId,
                                       pub OpId,
                                       pub OpId);
+
+// Pipe Instructions
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct OpReadPipe(pub OpId, pub ResultId, pub OpId, pub OpId, pub OpId, pub OpId);
