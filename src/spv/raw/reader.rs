@@ -137,13 +137,13 @@ fn read_instruction(stream: &mut Stream,
     let block = MemoryBlock::new(&words[1..words.len()]);
     let read_fn = match id {
         0 => OpNop::read_core,
-        1 => return Err(ReadError::UnimplementedOp("OpUndef")),
-        2 => return Err(ReadError::UnimplementedOp("OpSourceContinued")),
+        1 => OpUndef::read_core,
+        2 => OpSourceContinued::read_core,
         3 => OpSource::read_core,
-        4 => return Err(ReadError::UnimplementedOp("OpSourceExtension")),
+        4 => OpSourceExtension::read_core,
         5 => OpName::read_core,
         6 => OpMemberName::read_core,
-        7 => return Err(ReadError::UnimplementedOp("OpString")),
+        7 => OpString::read_core,
         8 => return Err(ReadError::UnimplementedOp("OpLine")),
         10 => OpExtension::read_core,
         11 => OpExtInstImport::read_core,
@@ -417,6 +417,7 @@ fn read_instruction(stream: &mut Stream,
         314 => return Err(ReadError::UnimplementedOp("OpImageSparseGather")),
         315 => return Err(ReadError::UnimplementedOp("OpImageSparseDrefGather")),
         316 => return Err(ReadError::UnimplementedOp("OpImageSparseTexelsResident")),
+        317 => return Err(ReadError::UnimplementedOp("OpNoLine")),
         318 => return Err(ReadError::UnimplementedOp("OpAtomicFlagTestAndSet")),
         319 => return Err(ReadError::UnimplementedOp("OpAtomicFlagClear")),
         320 => return Err(ReadError::UnimplementedOp("OpImageSparseRead")),
@@ -481,12 +482,15 @@ macro_rules! def_op_read_s2 {
 
 // Miscellaneous Instructions
 def_op_read!(OpNop;);
+def_op_read!(OpUndef; result_type | result_id);
 
 // Debug Instructions
+def_op_read!(OpSourceContinued; continued_source);
 def_op_read!(OpSource; language | version | file | source);
-
+def_op_read!(OpSourceExtension; extension);
 def_op_read!(OpName; target | name);
 def_op_read!(OpMemberName; struct_type | member | name);
+def_op_read!(OpString; result_id | string);
 
 // Annotation Instructions
 def_op_read!(OpDecorate; target | decoration);

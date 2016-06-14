@@ -7,9 +7,12 @@ use super::types::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GroupDebug {
+    OpSourceContinued(OpSourceContinued),
     OpSource(OpSource),
+    OpSourceExtension(OpSourceExtension),
     OpName(OpName),
     OpMemberName(OpMemberName),
+    OpString(OpString),
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -59,6 +62,7 @@ pub enum GroupGlobal {
 #[derive(Clone, Debug, PartialEq)]
 pub enum GroupCode {
     OpNop(OpNop),
+    OpUndef(OpUndef),
     OpExtInst(OpExtInst),
     /// Variables inside blocks must have a storage class of Function
     OpVariable(OpVariable),

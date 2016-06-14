@@ -52,9 +52,13 @@ impl Display for RawModule {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Core {
     OpNop(OpNop),
+    OpUndef(OpUndef),
+    OpSourceContinued(OpSourceContinued),
     OpSource(OpSource),
+    OpSourceExtension(OpSourceExtension),
     OpName(OpName),
     OpMemberName(OpMemberName),
+    OpString(OpString),
     OpExtension(OpExtension),
     OpExtInstImport(OpExtInstImport),
     OpExtInst(OpExtInst),
@@ -150,9 +154,13 @@ impl Display for Core {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match *self {
             Core::OpNop(ref op) => Display::fmt(op, f),
+            Core::OpUndef(ref op) => Display::fmt(op, f),
+            Core::OpSourceContinued(ref op) => Display::fmt(op, f),
             Core::OpSource(ref op) => Display::fmt(op, f),
+            Core::OpSourceExtension(ref op) => Display::fmt(op, f),
             Core::OpName(ref op) => Display::fmt(op, f),
             Core::OpMemberName(ref op) => Display::fmt(op, f),
+            Core::OpString(ref op) => Display::fmt(op, f),
             Core::OpExtension(ref op) => Display::fmt(op, f),
             Core::OpExtInstImport(ref op) => Display::fmt(op, f),
             Core::OpExtInst(ref op) => Display::fmt(op, f),

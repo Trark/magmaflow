@@ -97,9 +97,13 @@ impl From<Core> for OpByBlock {
         use spv::raw::Core::*;
         match inst {
             OpNop(op) => GroupCode::OpNop(op).into(),
+            OpUndef(op) => GroupCode::OpUndef(op).into(),
+            OpSourceContinued(op) => GroupDebug::OpSourceContinued(op).into(),
             OpSource(op) => GroupDebug::OpSource(op).into(),
+            OpSourceExtension(op) => GroupDebug::OpSourceExtension(op).into(),
             OpName(op) => GroupDebug::OpName(op).into(),
             OpMemberName(op) => GroupDebug::OpMemberName(op).into(),
+            OpString(op) => GroupDebug::OpString(op).into(),
             OpExtension(op) => OpByBlock::OpExtension(op),
             OpExtInstImport(op) => OpByBlock::OpExtInstImport(op),
             OpExtInst(op) => GroupCode::OpExtInst(op).into(),
