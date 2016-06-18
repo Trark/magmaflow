@@ -241,7 +241,7 @@ fn read_instruction(stream: &mut Stream,
         121 => return Err(ReadError::UnimplementedOp("OpPtrCastToGeneric")),
         122 => return Err(ReadError::UnimplementedOp("OpGenericCastToPtr")),
         123 => return Err(ReadError::UnimplementedOp("OpGenericCastToPtrExplicit")),
-        124 => return Err(ReadError::UnimplementedOp("OpBitcast")),
+        124 => OpBitcast::read_core,
         126 => return Err(ReadError::UnimplementedOp("OpSNegate")),
         127 => return Err(ReadError::UnimplementedOp("OpFNegate")),
         128 => OpIAdd::read_core,
@@ -599,6 +599,8 @@ def_op_read!(OpAccessChain; result_type | result_id | base | indexes);
 
 // Conversion Instructions
 def_op_read!(OpConvertUToF; result_type | result_id | unsigned_value);
+
+def_op_read_s1!(OpBitcast);
 
 // Arithmetic Instructions
 def_op_read_s2!(OpIAdd);

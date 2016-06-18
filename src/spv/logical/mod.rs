@@ -70,6 +70,7 @@ pub enum GroupCode {
     OpStore(OpStore),
     OpAccessChain(OpAccessChain),
     OpConvertUToF(OpConvertUToF),
+    OpBitcast(OpBitcast),
     OpIAdd(OpIAdd),
     OpFAdd(OpFAdd),
     OpISub(OpISub),

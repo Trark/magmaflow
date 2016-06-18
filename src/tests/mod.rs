@@ -12,6 +12,8 @@ const WRITE_MULTIPLY_SPV: &'static [u8] = include_bytes!("write_multiply.spv");
 const WRITE_MULTIPLY_DIS: &'static str = include_str!("write_multiply.dis");
 const COND_TRIG_SPV: &'static [u8] = include_bytes!("cond_trig.spv");
 const COND_TRIG_DIS: &'static str = include_str!("cond_trig.dis");
+const NEST_IF_SPV: &'static [u8] = include_bytes!("nest_if.spv");
+const NEST_IF_DIS: &'static str = include_str!("nest_if.dis");
 
 fn read(module: &'static [u8]) -> ReadResult<RawModule> {
     let inst_sets: Vec<Box<ExtInstSet>> = vec![Box::new(glsl450::InstSet)];
@@ -162,6 +164,23 @@ fn dis_cond_trig() {
 #[test]
 fn validate_cond_trig() {
     let raw_module = read(COND_TRIG_SPV).expect("Failed to load cond_trig.spv");
+    let module = validate(raw_module);
+    module.unwrap();
+}
+
+#[test]
+fn dis_next_if() {
+    let raw_module = read(NEST_IF_SPV).expect("Failed to load nest_if.spv");
+    let disassembly = format!("{}", raw_module);
+    for (dis, expect) in disassembly.lines().zip(NEST_IF_DIS.lines()) {
+        assert_eq!(dis, expect);
+    }
+    assert_eq!(NEST_IF_DIS, disassembly);
+}
+
+#[test]
+fn validate_next_if() {
+    let raw_module = read(NEST_IF_SPV).expect("Failed to load nest_if.spv");
     let module = validate(raw_module);
     module.unwrap();
 }

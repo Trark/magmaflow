@@ -143,6 +143,7 @@ impl From<Core> for OpByBlock {
             OpDecorate(op) => GroupAnnotation::OpDecorate(op).into(),
             OpMemberDecorate(op) => GroupAnnotation::OpMemberDecorate(op).into(),
             OpConvertUToF(op) => GroupCode::OpConvertUToF(op).into(),
+            OpBitcast(op) => GroupCode::OpBitcast(op).into(),
             OpIAdd(op) => GroupCode::OpIAdd(op).into(),
             OpFAdd(op) => GroupCode::OpFAdd(op).into(),
             OpISub(op) => GroupCode::OpISub(op).into(),

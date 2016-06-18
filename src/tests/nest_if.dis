@@ -1,0 +1,128 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 1
+; Bound: 76
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %4 "main" %9
+               OpExecutionMode %4 LocalSize 32 32 32
+               OpSource GLSL 430
+               OpName %4 "main"
+               OpName %9 "gl_GlobalInvocationID"
+               OpName %23 "write_value"
+               OpName %61 "MyBuffer"
+               OpMemberName %61 0 "value"
+               OpName %63 ""
+               OpName %73 "Block"
+               OpMemberName %73 0 "value"
+               OpName %75 "test"
+               OpDecorate %9 BuiltIn GlobalInvocationId
+               OpDecorate %60 ArrayStride 4
+               OpMemberDecorate %61 0 Offset 0
+               OpDecorate %61 BufferBlock
+               OpDecorate %63 DescriptorSet 0
+               OpDecorate %63 Binding 2
+               OpDecorate %70 BuiltIn WorkgroupSize
+               OpMemberDecorate %73 0 Offset 0
+               OpDecorate %73 BufferBlock
+               OpDecorate %75 DescriptorSet 0
+          %2 = OpTypeVoid
+          %3 = OpTypeFunction %2
+          %6 = OpTypeInt 32 0
+          %7 = OpTypeVector %6 3
+          %8 = OpTypePointer Input %7
+          %9 = OpVariable %8 Input
+         %10 = OpConstant %6 1
+         %11 = OpTypePointer Input %6
+         %14 = OpConstant %6 2
+         %16 = OpConstant %6 0
+         %17 = OpTypeBool
+         %21 = OpTypeInt 32 1
+         %22 = OpTypePointer Function %21
+         %27 = OpConstant %21 128
+         %30 = OpConstant %21 0
+         %34 = OpConstant %21 1
+         %37 = OpConstant %21 2
+         %60 = OpTypeRuntimeArray %21
+         %61 = OpTypeStruct %60
+         %62 = OpTypePointer Uniform %61
+         %63 = OpVariable %62 Uniform
+         %67 = OpTypePointer Uniform %21
+         %69 = OpConstant %6 32
+         %70 = OpConstantComposite %7 %69 %69 %69
+         %71 = OpTypeFloat 32
+         %72 = OpTypeVector %71 3
+         %73 = OpTypeStruct %72
+         %74 = OpTypePointer Uniform %73
+         %75 = OpVariable %74 Uniform
+          %4 = OpFunction %2 None %3
+          %5 = OpLabel
+         %23 = OpVariable %22 Function
+         %12 = OpAccessChain %11 %9 %10
+         %13 = OpLoad %6 %12
+         %15 = OpUMod %6 %13 %14
+         %18 = OpIEqual %17 %15 %16
+               OpSelectionMerge %20 None
+               OpBranchConditional %18 %19 %40
+         %19 = OpLabel
+         %24 = OpAccessChain %11 %9 %10
+         %25 = OpLoad %6 %24
+         %26 = OpBitcast %21 %25
+         %28 = OpISub %21 %26 %27
+               OpStore %23 %28
+         %29 = OpLoad %21 %23
+         %31 = OpSGreaterThan %17 %29 %30
+               OpSelectionMerge %33 None
+               OpBranchConditional %31 %32 %33
+         %32 = OpLabel
+         %35 = OpLoad %21 %23
+         %36 = OpIAdd %21 %35 %34
+               OpStore %23 %36
+               OpBranch %33
+         %33 = OpLabel
+         %38 = OpLoad %21 %23
+         %39 = OpSDiv %21 %38 %37
+               OpStore %23 %39
+               OpBranch %20
+         %40 = OpLabel
+         %41 = OpAccessChain %11 %9 %14
+         %42 = OpLoad %6 %41
+         %43 = OpBitcast %21 %42
+         %44 = OpISub %21 %43 %27
+               OpStore %23 %44
+         %45 = OpLoad %21 %23
+         %46 = OpSGreaterThan %17 %45 %30
+               OpSelectionMerge %48 None
+               OpBranchConditional %46 %47 %51
+         %47 = OpLabel
+         %49 = OpLoad %21 %23
+         %50 = OpIAdd %21 %49 %34
+               OpStore %23 %50
+               OpBranch %48
+         %51 = OpLabel
+         %52 = OpLoad %21 %23
+         %53 = OpISub %21 %52 %34
+               OpStore %23 %53
+               OpBranch %48
+         %48 = OpLabel
+               OpBranch %20
+         %20 = OpLabel
+         %54 = OpLoad %21 %23
+         %55 = OpSGreaterThan %17 %54 %30
+               OpSelectionMerge %57 None
+               OpBranchConditional %55 %56 %57
+         %56 = OpLabel
+         %58 = OpLoad %21 %23
+         %59 = OpIMul %21 %58 %37
+               OpStore %23 %59
+               OpBranch %57
+         %57 = OpLabel
+         %64 = OpAccessChain %11 %9 %16
+         %65 = OpLoad %6 %64
+         %66 = OpLoad %21 %23
+         %68 = OpAccessChain %67 %63 %30 %65
+               OpStore %68 %66
+               OpReturn
+               OpFunctionEnd
