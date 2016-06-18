@@ -3,17 +3,7 @@ use spv::*;
 use spv::op::*;
 use spv::types::*;
 use spv::raw::*;
-use spv::logical::*;
 use glsl450;
-
-const NOOP_SPV: &'static [u8] = include_bytes!("noop.spv");
-const NOOP_DIS: &'static str = include_str!("noop.dis");
-const WRITE_MULTIPLY_SPV: &'static [u8] = include_bytes!("write_multiply.spv");
-const WRITE_MULTIPLY_DIS: &'static str = include_str!("write_multiply.dis");
-const COND_TRIG_SPV: &'static [u8] = include_bytes!("cond_trig.spv");
-const COND_TRIG_DIS: &'static str = include_str!("cond_trig.dis");
-const NEST_IF_SPV: &'static [u8] = include_bytes!("nest_if.spv");
-const NEST_IF_DIS: &'static str = include_str!("nest_if.dis");
 
 fn read(module: &'static [u8]) -> ReadResult<RawModule> {
     let inst_sets: Vec<Box<ExtInstSet>> = vec![Box::new(glsl450::InstSet)];
@@ -22,7 +12,7 @@ fn read(module: &'static [u8]) -> ReadResult<RawModule> {
 
 #[test]
 fn load_noop() {
-    let result = read(NOOP_SPV);
+    let result = read(include_bytes!("noop.spv"));
     let glsl450 = OpExtInstImport {
         result_id: ResultId(1),
         name: "GLSL.std.450".into(),
@@ -117,70 +107,37 @@ fn load_noop() {
     assert_eq!(result, Ok(expected));
 }
 
-#[test]
-fn dis_noop() {
-    let raw_module = read(NOOP_SPV).expect("Failed to load noop.spv");
-    let disassembly = format!("{}", raw_module);
-    for (dis, expect) in disassembly.lines().zip(NOOP_DIS.lines()) {
-        assert_eq!(dis, expect);
+macro_rules! def_test {
+    ($name: ident) => {
+        mod $name {
+
+            use super::read;
+            use spv::logical::validate;
+
+            const SPV: &'static [u8] = include_bytes!(concat!(stringify!($name), ".spv"));
+            const DIS: &'static str = include_str!(concat!(stringify!($name), ".dis"));
+
+            #[test]
+            fn disassemble() {
+                let raw_module = read(SPV).expect("Failed to load spv");
+                let disassembly = format!("{}", raw_module);
+                for (dis, expect) in disassembly.lines().zip(DIS.lines()) {
+                    assert_eq!(dis, expect);
+                }
+                assert_eq!(DIS, disassembly);
+            }
+
+            #[test]
+            fn logical_pass() {
+                let raw_module = read(SPV).expect("Failed to load spv");
+                let module = validate(raw_module);
+                module.unwrap();
+            }
+        }
     }
-    assert_eq!(NOOP_DIS, disassembly);
 }
 
-#[test]
-fn validate_noop() {
-    let raw_module = read(NOOP_SPV).expect("Failed to load noop.spv");
-    let module = validate(raw_module);
-    module.unwrap();
-}
-
-#[test]
-fn dis_write_multiply() {
-    let raw_module = read(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
-    let disassembly = format!("{}", raw_module);
-    for (dis, expect) in disassembly.lines().zip(WRITE_MULTIPLY_DIS.lines()) {
-        assert_eq!(dis, expect);
-    }
-    assert_eq!(WRITE_MULTIPLY_DIS, disassembly);
-}
-
-#[test]
-fn validate_write_multiply() {
-    let raw_module = read(WRITE_MULTIPLY_SPV).expect("Failed to load write_multiply.spv");
-    let module = validate(raw_module);
-    module.unwrap();
-}
-
-#[test]
-fn dis_cond_trig() {
-    let raw_module = read(COND_TRIG_SPV).expect("Failed to load cond_trig.spv");
-    let disassembly = format!("{}", raw_module);
-    for (dis, expect) in disassembly.lines().zip(COND_TRIG_DIS.lines()) {
-        assert_eq!(dis, expect);
-    }
-    assert_eq!(COND_TRIG_DIS, disassembly);
-}
-
-#[test]
-fn validate_cond_trig() {
-    let raw_module = read(COND_TRIG_SPV).expect("Failed to load cond_trig.spv");
-    let module = validate(raw_module);
-    module.unwrap();
-}
-
-#[test]
-fn dis_next_if() {
-    let raw_module = read(NEST_IF_SPV).expect("Failed to load nest_if.spv");
-    let disassembly = format!("{}", raw_module);
-    for (dis, expect) in disassembly.lines().zip(NEST_IF_DIS.lines()) {
-        assert_eq!(dis, expect);
-    }
-    assert_eq!(NEST_IF_DIS, disassembly);
-}
-
-#[test]
-fn validate_next_if() {
-    let raw_module = read(NEST_IF_SPV).expect("Failed to load nest_if.spv");
-    let module = validate(raw_module);
-    module.unwrap();
-}
+def_test!(noop);
+def_test!(write_multiply);
+def_test!(cond_trig);
+def_test!(nest_if);
