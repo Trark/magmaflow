@@ -141,3 +141,4 @@ def_test!(noop);
 def_test!(write_multiply);
 def_test!(cond_trig);
 def_test!(nest_if);
+def_test!(loop_simple);

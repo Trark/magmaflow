@@ -1,0 +1,94 @@
+; SPIR-V
+; Version: 1.0
+; Generator: Khronos Glslang Reference Front End; 1
+; Bound: 52
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %4 "main" %20
+               OpExecutionMode %4 LocalSize 32 32 32
+               OpSource GLSL 430
+               OpName %4 "main"
+               OpName %8 "write_value"
+               OpName %10 "i"
+               OpName %20 "gl_GlobalInvocationID"
+               OpName %36 "MyBuffer"
+               OpMemberName %36 0 "value"
+               OpName %38 ""
+               OpName %49 "Block"
+               OpMemberName %49 0 "value"
+               OpName %51 "test"
+               OpDecorate %20 BuiltIn GlobalInvocationId
+               OpDecorate %35 ArrayStride 4
+               OpMemberDecorate %36 0 Offset 0
+               OpDecorate %36 BufferBlock
+               OpDecorate %38 DescriptorSet 0
+               OpDecorate %38 Binding 2
+               OpDecorate %46 BuiltIn WorkgroupSize
+               OpMemberDecorate %49 0 Offset 0
+               OpDecorate %49 BufferBlock
+               OpDecorate %51 DescriptorSet 0
+          %2 = OpTypeVoid
+          %3 = OpTypeFunction %2
+          %6 = OpTypeInt 32 0
+          %7 = OpTypePointer Function %6
+          %9 = OpConstant %6 1
+         %11 = OpConstant %6 0
+         %18 = OpTypeVector %6 3
+         %19 = OpTypePointer Input %18
+         %20 = OpVariable %19 Input
+         %21 = OpTypePointer Input %6
+         %24 = OpTypeBool
+         %26 = OpConstant %6 2
+         %32 = OpTypeInt 32 1
+         %33 = OpConstant %32 1
+         %35 = OpTypeRuntimeArray %6
+         %36 = OpTypeStruct %35
+         %37 = OpTypePointer Uniform %36
+         %38 = OpVariable %37 Uniform
+         %39 = OpConstant %32 0
+         %43 = OpTypePointer Uniform %6
+         %45 = OpConstant %6 32
+         %46 = OpConstantComposite %18 %45 %45 %45
+         %47 = OpTypeFloat 32
+         %48 = OpTypeVector %47 3
+         %49 = OpTypeStruct %48
+         %50 = OpTypePointer Uniform %49
+         %51 = OpVariable %50 Uniform
+          %4 = OpFunction %2 None %3
+          %5 = OpLabel
+          %8 = OpVariable %7 Function
+         %10 = OpVariable %7 Function
+               OpStore %8 %9
+               OpStore %10 %11
+               OpBranch %12
+         %12 = OpLabel
+               OpLoopMerge %14 %15 None
+               OpBranch %16
+         %16 = OpLabel
+         %17 = OpLoad %6 %10
+         %22 = OpAccessChain %21 %20 %9
+         %23 = OpLoad %6 %22
+         %25 = OpULessThan %24 %17 %23
+               OpBranchConditional %25 %13 %14
+         %13 = OpLabel
+         %27 = OpAccessChain %21 %20 %26
+         %28 = OpLoad %6 %27
+         %29 = OpLoad %6 %8
+         %30 = OpIMul %6 %29 %28
+               OpStore %8 %30
+               OpBranch %15
+         %15 = OpLabel
+         %31 = OpLoad %6 %10
+         %34 = OpIAdd %6 %31 %33
+               OpStore %10 %34
+               OpBranch %12
+         %14 = OpLabel
+         %40 = OpAccessChain %21 %20 %11
+         %41 = OpLoad %6 %40
+         %42 = OpLoad %6 %8
+         %44 = OpAccessChain %43 %38 %39 %41
+               OpStore %44 %42
+               OpReturn
+               OpFunctionEnd
