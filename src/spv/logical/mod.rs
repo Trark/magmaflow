@@ -2,6 +2,11 @@
 mod parser;
 pub use self::parser::{validate, ValidationError};
 
+mod control_flow;
+pub use self::control_flow::{BlockId, ControlFlowChain};
+pub use self::control_flow::{ControlType, ControlFlowError, ControlFlowResult};
+pub use self::control_flow::find_control_flow;
+
 use super::op::*;
 use super::types::*;
 

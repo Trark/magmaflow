@@ -1200,7 +1200,7 @@ impl Display for LoopControl {
 
 impl DisplayArgType for LoopControl {}
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct SelectionControl {
     pub flatten: bool,
     pub dont_flatten: bool,
