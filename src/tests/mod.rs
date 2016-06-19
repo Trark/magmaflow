@@ -113,6 +113,7 @@ macro_rules! def_test {
 
             use super::read;
             use spv::logical::validate;
+            use spv::logical::find_control_flow;
 
             const SPV: &'static [u8] = include_bytes!(concat!(stringify!($name), ".spv"));
             const DIS: &'static str = include_str!(concat!(stringify!($name), ".dis"));
@@ -132,6 +133,17 @@ macro_rules! def_test {
                 let raw_module = read(SPV).expect("Failed to load spv");
                 let module = validate(raw_module);
                 module.unwrap();
+            }
+
+            #[test]
+            fn cfa() {
+                let raw_module = read(SPV).expect("Failed to load spv");
+                let module = validate(raw_module);
+                let raw = module.unwrap();
+                for func in raw.function_definitions {
+                    let chain_res = find_control_flow(func);
+                    chain_res.unwrap();
+                }
             }
         }
     }
