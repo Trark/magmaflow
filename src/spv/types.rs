@@ -1165,7 +1165,7 @@ impl Display for FunctionControl {
 
 impl DisplayArgType for FunctionControl {}
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct LoopControl {
     pub unroll: bool,
     pub dont_unroll: bool,
