@@ -16,18 +16,18 @@ impl fmt::Display for BlockId {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ControlFlowChain {
     Atom(BlockId),
     Block(Vec<ControlFlowChain>),
-    If(BlockId, Box<ControlFlowChain>, SelectionControl, Option<BranchWeights>),
-    IfElse(BlockId,
-           Box<ControlFlowChain>,
-           Box<ControlFlowChain>,
-           SelectionControl,
-           Option<BranchWeights>),
+    Selection(BlockId,
+              Box<ControlFlowChain>,
+              Box<ControlFlowChain>,
+              SelectionControl,
+              Option<BranchWeights>),
     Loop(BlockId, Box<ControlFlowChain>, LoopControl, Option<BranchWeights>),
     Break,
+    Continue,
 }
 
 impl fmt::Display for ControlFlowChain {
@@ -70,21 +70,6 @@ impl ControlFlowChain {
         }
     }
 
-    /// Emit If or IfElse depending on the branch
-    fn conditional(id: BlockId,
-                   true_chain: Box<ControlFlowChain>,
-                   false_chain: Box<ControlFlowChain>,
-                   selection_control: SelectionControl,
-                   weights: Option<BranchWeights>)
-                   -> ControlFlowChain {
-        match *false_chain {
-            ControlFlowChain::Block(ref block) if block.len() == 0 => {
-                ControlFlowChain::If(id, true_chain, selection_control, weights)
-            }
-            _ => ControlFlowChain::IfElse(id, true_chain, false_chain, selection_control, weights),
-        }
-    }
-
     fn fmt_indent(&self, f: &mut fmt::Formatter, indent: u32) -> fmt::Result {
         let write_indent = |f: &mut fmt::Formatter| -> fmt::Result {
             for _ in 0..indent {
@@ -103,23 +88,9 @@ impl ControlFlowChain {
                 }
                 Ok(())
             }
-            ControlFlowChain::If(ref id, ref left, ref hint, ref weights) => {
+            ControlFlowChain::Selection(ref id, ref left, ref right, ref hint, ref weights) => {
                 try!(write_indent(f));
-                try!(write!(f, "if {} ", id));
-                if SelectionControl::default() != *hint {
-                    try!(write!(f, " [{}]", hint));
-                }
-                if let Some(ref weights) = *weights {
-                    try!(write!(f, " [{}]", weights));
-                }
-                try!(writeln!(f, "{{"));
-                try!(left.fmt_indent(f, indent + 1));
-                try!(write_indent(f));
-                writeln!(f, "}}")
-            }
-            ControlFlowChain::IfElse(ref id, ref left, ref right, ref hint, ref weights) => {
-                try!(write_indent(f));
-                try!(write!(f, "if {}", id));
+                try!(write!(f, "selection {}", id));
                 if SelectionControl::default() != *hint {
                     try!(write!(f, " [{}]", hint));
                 }
@@ -128,9 +99,11 @@ impl ControlFlowChain {
                 }
                 try!(writeln!(f, " {{"));
                 try!(left.fmt_indent(f, indent + 1));
-                try!(write_indent(f));
-                try!(writeln!(f, "}} else {{"));
-                try!(right.fmt_indent(f, indent + 1));
+                if **right != ControlFlowChain::Block(vec![]) {
+                    try!(write_indent(f));
+                    try!(writeln!(f, "}} else {{"));
+                    try!(right.fmt_indent(f, indent + 1));
+                }
                 try!(write_indent(f));
                 writeln!(f, "}}")
             }
@@ -152,14 +125,17 @@ impl ControlFlowChain {
                 try!(write_indent(f));
                 writeln!(f, "break;")
             }
+            ControlFlowChain::Continue => {
+                try!(write_indent(f));
+                writeln!(f, "continue;")
+            }
         }
     }
 }
 
 #[derive(Debug)]
 pub enum ControlType {
-    If,
-    IfElse,
+    Selection,
     Loop,
 }
 
@@ -376,11 +352,10 @@ fn search_block(id: BlockId,
 
                     if true_next == false_next && true_next == Continue::Next(merge) {
 
-                        let true_box = Box::new(true_chain);
-                        let false_box = Box::new(false_chain);
+                        let true_b = Box::new(true_chain);
+                        let false_b = Box::new(false_chain);
                         let weights = op.weights.clone();
-                        let ctc =
-                            ControlFlowChain::conditional(id, true_box, false_box, hints, weights);
+                        let ctc = ControlFlowChain::Selection(id, true_b, false_b, hints, weights);
 
                         let (next_chain, next_next) =
                             try!(search_block(merge, flow_list, block_map));
@@ -389,7 +364,7 @@ fn search_block(id: BlockId,
 
                         Ok((chain, next_next))
                     } else {
-                        Err(ControlFlowError::InvalidConvergePrediction(ControlType::IfElse, id))
+                        Err(ControlFlowError::InvalidConvergePrediction(ControlType::Selection, id))
                     }
                 }
                 // Loop construct
@@ -399,21 +374,27 @@ fn search_block(id: BlockId,
                         Some(l) => l,
                         None => return Err(ControlFlowError::CouldNotPredictConverge(id)),
                     };
-                    if false_block == merge {
-                        // Break block
+                    let is_break = false_block == merge;
+                    let is_continue = false_block == head;
+                    if is_break || is_continue {
+                        // Break block or Continue block
 
                         let inner = try!(search_block(true_block, &flow_list, block_map));
                         let (inner_chain, inner_next) = inner;
 
                         if inner_next == Continue::Next(head) {
                             let inner_box = Box::new(inner_chain);
-                            let break_box = Box::new(ControlFlowChain::Break);
+                            let break_box = if is_break {
+                                Box::new(ControlFlowChain::Break)
+                            } else {
+                                Box::new(ControlFlowChain::Continue)
+                            };
                             let weights = op.weights.clone();
-                            let ctc = ControlFlowChain::conditional(id,
-                                                                    inner_box,
-                                                                    break_box,
-                                                                    SelectionControl::default(),
-                                                                    weights);
+                            let ctc = ControlFlowChain::Selection(id,
+                                                                  inner_box,
+                                                                  break_box,
+                                                                  SelectionControl::default(),
+                                                                  weights);
 
                             Ok((ctc, inner_next))
                         } else {
