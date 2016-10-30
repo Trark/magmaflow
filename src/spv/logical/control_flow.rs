@@ -412,3 +412,102 @@ fn search_block(id: BlockId,
         }
     }
 }
+
+pub struct ControlFlowFunctionPrinter<'a, 'b>(pub &'a FunctionDefinition, pub &'b ControlFlowChain);
+
+impl<'a, 'b> fmt::Display for ControlFlowFunctionPrinter<'a, 'b> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.fmt_indent(f, 0)
+    }
+}
+
+impl<'a, 'b> ControlFlowFunctionPrinter<'a, 'b> {
+
+    fn fmt_block_indent(&self, f: &mut fmt::Formatter, indent: u32, id: BlockId) -> fmt::Result {
+        let write_indent = |f: &mut fmt::Formatter| -> fmt::Result {
+            for _ in 0..indent {
+                try!(f.write_str("    "))
+            }
+            Ok(())
+        };
+        let mut block: Option<&BasicBlock> = None;
+        for search in &self.0.blocks {
+            if search.label.result_id.0 == id.0 {
+                assert!(block == None, "Multiple basic blocks with the same id");
+                block = Some(search);
+            }
+        }
+        let block = block.expect("Basic block with given id does not exist");
+        try!(write_indent(f));
+        try!(writeln!(f, "> Begin {}", id.0));
+        for code_op in &block.code {
+            try!(write_indent(f));
+            try!(writeln!(f, ">>> {}", code_op));
+        }
+        try!(write_indent(f));
+        try!(writeln!(f, ">>> {}", block.branch));
+        try!(write_indent(f));
+        writeln!(f, "> End {}", id.0)
+    }
+
+    fn fmt_indent(&self, f: &mut fmt::Formatter, indent: u32) -> fmt::Result {
+        let write_indent = |f: &mut fmt::Formatter| -> fmt::Result {
+            for _ in 0..indent {
+                try!(f.write_str("    "))
+            }
+            Ok(())
+        };
+        match *self.1 {
+            ControlFlowChain::Atom(ref id) => {
+                self.fmt_block_indent(f, indent, id.clone())
+            }
+            ControlFlowChain::Block(ref block) => {
+                for cfc in block {
+                    try!(ControlFlowFunctionPrinter(self.0, cfc).fmt_indent(f, indent));
+                }
+                Ok(())
+            }
+            ControlFlowChain::Selection(ref id, ref left, ref right, ref hint, ref weights) => {
+                try!(self.fmt_block_indent(f, indent, id.clone()));
+                if SelectionControl::default() != *hint {
+                    try!(write!(f, " [{}]", hint));
+                }
+                if let Some(ref weights) = *weights {
+                    try!(write!(f, " [{}]", weights));
+                }
+                try!(write_indent(f));
+                try!(writeln!(f, "{{"));
+                try!(ControlFlowFunctionPrinter(self.0, left).fmt_indent(f, indent + 1));
+                if **right != ControlFlowChain::Block(vec![]) {
+                    try!(write_indent(f));
+                    try!(writeln!(f, "}} else {{"));
+                    try!(ControlFlowFunctionPrinter(self.0, right).fmt_indent(f, indent + 1));
+                }
+                try!(write_indent(f));
+                writeln!(f, "}}")
+            }
+            ControlFlowChain::Loop(ref id, ref inner, ref hint, ref weights) => {
+                try!(self.fmt_block_indent(f, indent, id.clone()));
+                if LoopControl::default() != *hint {
+                    try!(write!(f, " [{}]", hint));
+                }
+                if let Some(ref weights) = *weights {
+                    try!(write!(f, " [{}]", weights));
+                }
+                try!(write_indent(f));
+                try!(writeln!(f, "{{"));
+                try!(ControlFlowFunctionPrinter(self.0, inner).fmt_indent(f, indent + 1));
+                try!(write_indent(f));
+                writeln!(f, "}}")
+            }
+            ControlFlowChain::Break => {
+                try!(write_indent(f));
+                writeln!(f, "break;")
+            }
+            ControlFlowChain::Continue => {
+                try!(write_indent(f));
+                writeln!(f, "continue;")
+            }
+        }
+    }
+}

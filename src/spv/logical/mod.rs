@@ -3,12 +3,13 @@ mod parser;
 pub use self::parser::{validate, ValidationError};
 
 mod control_flow;
-pub use self::control_flow::{BlockId, ControlFlowChain};
+pub use self::control_flow::{BlockId, ControlFlowChain, ControlFlowFunctionPrinter};
 pub use self::control_flow::{ControlType, ControlFlowError, ControlFlowResult};
 pub use self::control_flow::find_control_flow;
 
 use super::op::*;
 use super::types::*;
+use std::fmt;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GroupDebug {
@@ -122,6 +123,67 @@ pub enum GroupCode {
     OpPhi(OpPhi),
 }
 
+impl fmt::Display for GroupCode {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use std::fmt::Display;
+        match *self {
+            GroupCode::OpNop(ref op) => Display::fmt(op, f),
+            GroupCode::OpUndef(ref op) => Display::fmt(op, f),
+            GroupCode::OpExtInst(ref op) => Display::fmt(op, f),
+            GroupCode::OpVariable(ref op) => Display::fmt(op, f),
+            GroupCode::OpLoad(ref op) => Display::fmt(op, f),
+            GroupCode::OpStore(ref op) => Display::fmt(op, f),
+            GroupCode::OpAccessChain(ref op) => Display::fmt(op, f),
+            GroupCode::OpConvertUToF(ref op) => Display::fmt(op, f),
+            GroupCode::OpBitcast(ref op) => Display::fmt(op, f),
+            GroupCode::OpIAdd(ref op) => Display::fmt(op, f),
+            GroupCode::OpFAdd(ref op) => Display::fmt(op, f),
+            GroupCode::OpISub(ref op) => Display::fmt(op, f),
+            GroupCode::OpFSub(ref op) => Display::fmt(op, f),
+            GroupCode::OpIMul(ref op) => Display::fmt(op, f),
+            GroupCode::OpFMul(ref op) => Display::fmt(op, f),
+            GroupCode::OpUDiv(ref op) => Display::fmt(op, f),
+            GroupCode::OpSDiv(ref op) => Display::fmt(op, f),
+            GroupCode::OpFDiv(ref op) => Display::fmt(op, f),
+            GroupCode::OpUMod(ref op) => Display::fmt(op, f),
+            GroupCode::OpSRem(ref op) => Display::fmt(op, f),
+            GroupCode::OpSMod(ref op) => Display::fmt(op, f),
+            GroupCode::OpFRem(ref op) => Display::fmt(op, f),
+            GroupCode::OpFMod(ref op) => Display::fmt(op, f),
+            GroupCode::OpIAddCarry(ref op) => Display::fmt(op, f),
+            GroupCode::OpISubBorrow(ref op) => Display::fmt(op, f),
+            GroupCode::OpUMulExtended(ref op) => Display::fmt(op, f),
+            GroupCode::OpSMulExtended(ref op) => Display::fmt(op, f),
+            GroupCode::OpBitwiseOr(ref op) => Display::fmt(op, f),
+            GroupCode::OpBitwiseXor(ref op) => Display::fmt(op, f),
+            GroupCode::OpBitwiseAnd(ref op) => Display::fmt(op, f),
+            GroupCode::OpIEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpINotEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpUGreaterThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpSGreaterThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpUGreaterThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpSGreaterThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpULessThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpSLessThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpULessThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpSLessThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFOrdEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFUnordEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFOrdNotEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFUnordNotEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFOrdLessThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpFUnordLessThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpFOrdGreaterThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpFUnordGreaterThan(ref op) => Display::fmt(op, f),
+            GroupCode::OpFOrdLessThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFUnordLessThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFOrdGreaterThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpFUnordGreaterThanEqual(ref op) => Display::fmt(op, f),
+            GroupCode::OpPhi(ref op) => Display::fmt(op, f),
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum GroupMerge {
     OpLoopMerge(OpLoopMerge),
@@ -133,6 +195,17 @@ pub enum GroupBranch {
     OpBranch(OpBranch),
     OpBranchConditional(OpBranchConditional),
     OpReturn(OpReturn),
+}
+
+impl fmt::Display for GroupBranch {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use std::fmt::Display;
+        match *self {
+            GroupBranch::OpBranch(ref op) => Display::fmt(op, f),
+            GroupBranch::OpBranchConditional(ref op) => Display::fmt(op, f),
+            GroupBranch::OpReturn(ref op) => Display::fmt(op, f),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
